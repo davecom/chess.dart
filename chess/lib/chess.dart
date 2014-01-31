@@ -169,8 +169,7 @@ class Chess {
   }
 
   load(String fen) {
-    print("Load");
-    List tokens = fen.split(new RegExp(r"/\s+/"));
+    List tokens = fen.split(new RegExp(r"\s+"));
     String position = tokens[0];
     int square = 0;
     String valid = SYMBOLS + '12345678/';
@@ -188,14 +187,12 @@ class Chess {
 
       if (piece == '/') {
         square += 8;
+      } else if (is_digit(piece)) {
+        square += int.parse(piece);
       } else {
-        try {
-          square += int.parse(piece);
-        } on FormatException {
-          String color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
-          put({'type': piece.toLowerCase(), 'color': color}, algebraic(square));
-          square++;
-        }
+        var color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
+        put({'type': piece.toLowerCase(), 'color': color}, algebraic(square));
+        square++;
       }
     }
 
@@ -549,7 +546,9 @@ class Chess {
             if (board[square] == null) {
               add_move(board, moves, i, square, BITS['NORMAL']);
             } else {
-              if (board[square].color == us) break;
+              if (board[square]['color'] == us) {
+                break;
+              }
               add_move(board, moves, i, square, BITS['CAPTURE']);
               break;
             }
@@ -625,7 +624,7 @@ class Chess {
 
     if ((move['flags'] & BITS['KSIDE_CASTLE']) != 0) {
       output = 'O-O';
-    } else if ((move.flags & BITS['QSIDE_CASTLE']) != 0) {
+    } else if ((move["flags"] & BITS['QSIDE_CASTLE']) != 0) {
       output = 'O-O-O';
     } else {
       var disambiguator = get_disambiguator(move);
@@ -729,7 +728,7 @@ class Chess {
       if ((i & 0x88) != 0) { i += 7; continue; }
 
       var piece = board[i];
-      if (piece) {
+      if (piece != null) {
         pieces[piece['type']] = (pieces.containsKey(piece['type'])) ?
                               pieces[piece['type']] + 1 : 1;
         if (piece['type'] == BISHOP) {
@@ -747,7 +746,7 @@ class Chess {
                                  pieces[KNIGHT] == 1)) { return true; }
 
     /* kb vs. kb where any number of bishops are all on the same color */
-    else if (num_pieces == pieces[BISHOP] + 2) {
+    else if (num_pieces == (pieces[BISHOP] + 2)) {
       var sum = 0;
       var len = bishops.length;
       for (int i = 0; i < len; i++) {
@@ -771,7 +770,9 @@ class Chess {
 
     while (true) {
       var move = undo_move();
-      if (!move) break;
+      if (move == null) {
+        break;
+      }
       moves.add(move);
     }
 
@@ -847,11 +848,11 @@ class Chess {
       }
 
       /* turn off castling */
-      castling[us] = '';
+      castling[us] = 0;
     }
 
     /* turn off castling if we move a rook */
-    if (castling[us]) {
+    if (castling[us] != 0) {
       for (int i = 0, len = ROOKS[us].length; i < len; i++) {
         if (move['from'] == ROOKS[us][i]['square'] &&
             ((castling[us] & ROOKS[us][i]['flag']) != 0)) {
@@ -862,7 +863,7 @@ class Chess {
     }
 
     /* turn off castling if we capture a rook */
-    if (castling[them]) {
+    if (castling[them] != 0) {
       for (int i = 0, len = ROOKS[them].length; i < len; i++) {
         if (move['to'] == ROOKS[them][i]['square'] &&
             ((castling[them] & ROOKS[them][i]['flag']) != 0)) {
@@ -899,6 +900,9 @@ class Chess {
   }
 
   undo_move() {
+    if (history.isEmpty) {
+      return null;
+    }
     var old = history.removeLast();
     if (old == null) { return null; }
 
@@ -919,7 +923,7 @@ class Chess {
 
     if ((move['flags'] & BITS['CAPTURE']) != 0) {
       board[move['to']] = {'type': move['captured'], 'color': them};
-    } else if (move['flags'] & BITS['EP_CAPTURE']) {
+    } else if ((move['flags'] & BITS['EP_CAPTURE']) != 0) {
       var index;
       if (us == BLACK) {
         index = move['to'] - 16;
@@ -1060,12 +1064,12 @@ class Chess {
   make_pretty(ugly_move) {
     var move = clone(ugly_move);
     move['san'] = move_to_san(move);
-    move['to'] = algebraic(move.to);
-    move['from'] = algebraic(move.from);
+    move['to'] = algebraic(move['to']);
+    move['from'] = algebraic(move['from']);
 
     var flags = '';
 
-    for (var flag in BITS) {
+    for (var flag in BITS.keys) {
       if ((BITS[flag] & move['flags']) != 0) {
         flags += FLAGS[flag];
       }
@@ -1486,8 +1490,10 @@ void main() {
   print(chess.ascii());
   while (!chess.game_over()) {
     print('position: ' + chess.fen());
+    print(chess.ascii());
     var moves = chess.moves();
-    var move = moves.shuffle()[0];
+    moves.shuffle();
+    var move = moves[0];
     chess.move(move);
     print('move: ' + move);
   }
