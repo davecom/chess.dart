@@ -28,6 +28,6 @@ void main() {
 ```
 
 ## Links
-chess.js (https://github.com/jhlywa/chess.js)
-Wikipedia's Article on FEN Format (http://en.wikipedia.org/wiki/Forsyth–Edwards_Notation)
-Wikipedia's Article on PGN Format (http://en.wikipedia.org/wiki/Portable_Game_Notation)
+- [chess.js](https://github.com/jhlywa/chess.js)
+- [Wikipedia's Article on FEN Format](http://en.wikipedia.org/wiki/Forsyth–Edwards_Notation)
+- [Wikipedia's Article on PGN Format](http://en.wikipedia.org/wiki/Portable_Game_Notation)
