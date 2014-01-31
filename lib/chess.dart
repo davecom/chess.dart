@@ -401,7 +401,7 @@ class Chess {
     return (piece != null) ? {'type': piece['type'], 'color': piece['color']} : null;
   }
 
-  put(Map piece, square) {
+  bool put(Map piece, square) {
     /* check for valid piece object */
     if (!(piece.containsKey('type') && piece.containsKey('color'))) {
       return false;
@@ -431,7 +431,7 @@ class Chess {
   remove(square) {
     Map piece = get(square);
     board[SQUARES[square]] = null;
-    if (piece && piece['type'] == KING) {
+    if (piece != null && piece['type'] == KING) {
       kings[piece['color']] = EMPTY;
     }
 

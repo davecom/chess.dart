@@ -80,277 +80,275 @@ void main() {
     });
   
   });
+
+  
+  group("Checkmate", () {
+  
+    Chess chess = new Chess();
+    List checkmates = [
+      '8/5r2/4K1q1/4p3/3k4/8/8/8 w - - 0 7',
+      '4r2r/p6p/1pnN2p1/kQp5/3pPq2/3P4/PPP3PP/R5K1 b - - 0 2',
+      'r3k2r/ppp2p1p/2n1p1p1/8/2B2P1q/2NPb1n1/PP4PP/R2Q3K w kq - 0 8',
+      '8/6R1/pp1r3p/6p1/P3R1Pk/1P4P1/7K/8 b - - 0 4'
+    ];
+  
+    checkmates.forEach((checkmate) {
+      chess.load(checkmate);
+  
+      test(checkmate, () {
+        expect(chess.in_checkmate(), isTrue);
+      });
+    });
+  
+  });
+
+  
+  group("Stalemate", () {
+  
+    List stalemates = [
+      '1R6/8/8/8/8/8/7R/k6K b - - 0 1',
+      '8/8/5k2/p4p1p/P4K1P/1r6/8/8 w - - 0 2',
+    ];
+  
+    stalemates.forEach((stalemate) {
+      Chess chess = new Chess();
+      chess.load(stalemate);
+  
+      test(stalemate, () {
+        expect(chess.in_stalemate(), isTrue);
+      });
+  
+    });
+  
+  });
+
+
+
+  group("Insufficient Material", () {
+  
+    List positions = [
+      {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'draw': false},
+      {'fen': '8/8/8/8/8/8/8/k6K w - - 0 1', 'draw': true},
+      {'fen': '8/2p5/8/8/8/8/8/k6K w - - 0 1', 'draw': false},
+      {'fen': '8/2N5/8/8/8/8/8/k6K w - - 0 1', 'draw': true},
+      {'fen': '8/2b5/8/8/8/8/8/k6K w - - 0 1', 'draw': true},
+      {'fen': '8/b7/3B4/8/8/8/8/k6K w - - 0 1', 'draw': true},
+      {'fen': '8/b7/B7/8/8/8/8/k6K w - - 0 1', 'draw': false},
+      {'fen': '8/b1B1b1B1/1b1B1b1B/8/8/8/8/1k5K w - - 0 1', 'draw': true},
+      {'fen': '8/bB2b1B1/1b1B1b1B/8/8/8/8/1k5K w - - 0 1', 'draw': false}
+    ];
+  
+    positions.forEach( (position) {
+      Chess chess = new Chess();
+      chess.load(position['fen']);
+  
+      test(position['fen'], () {
+        if (position['draw']) {
+          expect(chess.insufficient_material() && chess.in_draw(), isTrue);
+        } else {
+          expect(!chess.insufficient_material() && !chess.in_draw(), isTrue);
+        }
+      });
+  
+    });
+  
+  });
+
+  
+  group("Threefold Repetition", () {
+  
+    List positions = [
+      {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+       'moves': ['Nf3', 'Nf6', 'Ng1', 'Ng8', 'Nf3', 'Nf6', 'Ng1', 'Ng8']},
+  
+      /* Fischer - Petrosian, Buenos Aires, 1971 */
+      {'fen': '8/pp3p1k/2p2q1p/3r1P2/5R2/7P/P1P1QP2/7K b - - 2 30',
+       'moves': ['Qe5', 'Qh5', 'Qf6', 'Qe2', 'Re5', 'Qd3', 'Rd5', 'Qe2']},
+    ];
+  
+    positions.forEach( (position) {
+      Chess chess = new Chess();
+      chess.load(position['fen']);
+  
+      test(position['fen'], () {
+  
+        bool passed = true;
+        for (int j = 0; j < position['moves'].length; j++) {
+          if (chess.in_threefold_repetition()) {
+            passed = false;
+            break;
+          }
+          chess.move(position['moves'][j]);
+        }
+  
+        expect(passed && chess.in_threefold_repetition() && chess.in_draw(), isTrue);
+  
+      });
+  
+    });
+  
+  });
+
+
+  group("Algebraic Notation", () {
+  
+    List positions = [
+      {'fen': '7k/3R4/3p2Q1/6Q1/2N1N3/8/8/3R3K w - - 0 1',
+       'moves': ['Rd8#', 'Re7', 'Rf7', 'Rg7', 'Rh7#', 'R7xd6', 'Rc7', 'Rb7', 'Ra7',
+               'Qf7', 'Qe8#', 'Qg7#', 'Qg8#', 'Qh7#', 'Q6h6#', 'Q6h5#', 'Q6f5',
+               'Q6f6#', 'Qe6', 'Qxd6', 'Q5f6#', 'Qe7', 'Qd8#', 'Q5h6#', 'Q5h5#',
+               'Qh4#', 'Qg4', 'Qg3', 'Qg2', 'Qg1', 'Qf4', 'Qe3', 'Qd2', 'Qc1',
+               'Q5f5', 'Qe5+', 'Qd5', 'Qc5', 'Qb5', 'Qa5', 'Na5', 'Nb6', 'Ncxd6',
+               'Ne5', 'Ne3', 'Ncd2', 'Nb2', 'Na3', 'Nc5', 'Nexd6', 'Nf6', 'Ng3',
+               'Nf2', 'Ned2', 'Nc3', 'Rd2', 'Rd3', 'Rd4', 'Rd5', 'R1xd6', 'Re1',
+               'Rf1', 'Rg1', 'Rc1', 'Rb1', 'Ra1', 'Kg2', 'Kh2', 'Kg1']},
+      {'fen': '1r3k2/P1P5/8/8/8/8/8/R3K2R w KQ - 0 1',
+       'moves': ['a8=Q', 'a8=R', 'a8=B', 'a8=N', 'axb8=Q+', 'axb8=R+', 'axb8=B',
+               'axb8=N', 'c8=Q+', 'c8=R+', 'c8=B', 'c8=N', 'cxb8=Q+', 'cxb8=R+',
+               'cxb8=B', 'cxb8=N', 'Ra2', 'Ra3', 'Ra4', 'Ra5', 'Ra6', 'Rb1',
+               'Rc1', 'Rd1', 'Kd2', 'Ke2', 'Kf2', 'Kf1', 'Kd1', 'Rh2', 'Rh3',
+               'Rh4', 'Rh5', 'Rh6', 'Rh7', 'Rh8+', 'Rg1', 'Rf1+', 'O-O+',
+               'O-O-O']},
+      {'fen': '5rk1/8/8/8/8/8/2p5/R3K2R w KQ - 0 1',
+       'moves': ['Ra2', 'Ra3', 'Ra4', 'Ra5', 'Ra6', 'Ra7', 'Ra8', 'Rb1', 'Rc1',
+               'Rd1', 'Kd2', 'Ke2', 'Rh2', 'Rh3', 'Rh4', 'Rh5', 'Rh6', 'Rh7',
+               'Rh8+', 'Rg1+', 'Rf1']},
+      {'fen': '5rk1/8/8/8/8/8/2p5/R3K2R b KQ - 0 1',
+       'moves': ['Rf7', 'Rf6', 'Rf5', 'Rf4', 'Rf3', 'Rf2', 'Rf1+', 'Re8+', 'Rd8',
+               'Rc8', 'Rb8', 'Ra8', 'Kg7', 'Kf7', 'c1=Q+', 'c1=R+', 'c1=B',
+               'c1=N']},
+      {'fen': 'r3k2r/p2pqpb1/1n2pnp1/2pPN3/1p2P3/2N2Q1p/PPPB1PPP/R3K2R w KQkq c6 0 2',
+       'moves': ['gxh3', 'Qxf6', 'Qxh3', 'Nxd7', 'Nxf7', 'Nxg6', 'dxc6', 'dxe6',
+               'Rg1', 'Rf1', 'Ke2', 'Kf1', 'Kd1', 'Rb1', 'Rc1', 'Rd1', 'g3',
+               'g4', 'Be3', 'Bf4', 'Bg5', 'Bh6', 'Bc1', 'b3', 'a3', 'a4', 'Qf4',
+               'Qf5', 'Qg4', 'Qh5', 'Qg3', 'Qe2', 'Qd1', 'Qe3', 'Qd3', 'Na4',
+               'Nb5', 'Ne2', 'Nd1', 'Nb1', 'Nc6', 'Ng4', 'Nd3', 'Nc4', 'd6',
+               'O-O', 'O-O-O']},
+      {'fen': 'k7/8/K7/8/3n3n/5R2/3n4/8 b - - 0 1',
+       'moves': ['N2xf3', 'Nhxf3', 'Nd4xf3', 'N2b3', 'Nc4', 'Ne4', 'Nf1', 'Nb1',
+               'Nhf5', 'Ng6', 'Ng2', 'Nb5', 'Nc6', 'Ne6', 'Ndf5', 'Ne2', 'Nc2',
+               'N4b3', 'Kb8']},
+    ];
+  
+    positions.forEach( (position) {
+      Chess chess = new Chess();
+      bool passed = true;
+      chess.load(position['fen']);
+  
+      test(position['fen'], () {
+        var moves = chess.moves();
+        if (moves.length != position['moves'].length) {
+          passed = false;
+        } else {
+          for (int j = 0; j < moves.length; j++) {
+            if (!position['moves'].contains(moves[j])) {
+              passed = false;
+              break;
+            }
+          }
+        }
+        expect(passed, isTrue);
+      });
+  
+    });
+  
+  });
+
+
+
+  group("Get/Put/Remove", () {
+  
+    Chess chess = new Chess();
+    bool passed = true;
+    List positions = [
+      {'pieces': {'a7': {'type': Chess.PAWN, 'color': Chess.WHITE},
+                'b7': {'type': Chess.PAWN, 'color': Chess.BLACK},
+                'c7': {'type': Chess.KNIGHT, 'color': Chess.WHITE},
+                'd7': {'type': Chess.KNIGHT, 'color': Chess.BLACK},
+                'e7': {'type': Chess.BISHOP, 'color': Chess.WHITE},
+                'f7': {'type': Chess.BISHOP, 'color': Chess.BLACK},
+                'g7': {'type': Chess.ROOK, 'color': Chess.WHITE},
+                'h7': {'type': Chess.ROOK, 'color': Chess.BLACK},
+                'a6': {'type': Chess.QUEEN, 'color': Chess.WHITE},
+                'b6': {'type': Chess.QUEEN, 'color': Chess.BLACK},
+                'a4': {'type': Chess.KING, 'color': Chess.WHITE},
+                'h4': {'type': Chess.KING, 'color': Chess.BLACK}},
+       'should_pass': true},
+  
+      {'pieces': {'a7': {'type': 'z', 'color': Chess.WHITE}}, // bad piece
+       'should_pass': false},
+  
+      {'pieces': {'j4': {'type': Chess.PAWN, 'color': Chess.WHITE}}, // bad square
+       'should_pass': false},
+    ];
+  
+    positions.forEach( (position) {
+  
+      passed = true;
+      chess.clear();
+  
+      test("position should pass - " + position['should_pass'].toString(), () {
+  
+        /* places the pieces */
+        for (var square in position['pieces'].keys) {
+          passed = passed && chess.put(position['pieces'][square], square);
+        }
+  
+        /* iterate over every square to make sure get returns the proper
+         * piece values/color
+         */
+        for (var square in Chess.SQUARES.keys) {
+          if (!(position['pieces'].containsKey(square))) {
+            if (chess.get(square) != null) {
+              passed = false;
+              break;
+            }
+          } else {
+            var piece = chess.get(square);
+            if (!(piece != null &&
+                piece['type'] == position['pieces'][square]['type'] &&
+                piece['color'] == position['pieces'][square]['color'])) {
+              passed = false;
+              break;
+            }
+          }
+        }
+  
+        if (passed) {
+          /* remove the pieces */
+          for (var square in Chess.SQUARES.keys) {
+            var piece = chess.remove(square);
+            if ((!(position['pieces'].containsKey(square))) && piece != null) {
+              passed = false;
+              break;
+            }
+  
+            if (piece != null &&
+               (position['pieces'][square]['type'] != piece['type'] ||
+                position['pieces'][square]['color'] != piece['color'])) {
+              passed = false;
+              break;
+            }
+          }
+        }
+  
+        /* finally, check for an empty board */
+        passed = passed && (chess.fen() == '8/8/8/8/8/8/8/8 w - - 0 1');
+  
+        /* some tests should fail, so make sure we're supposed to pass/fail each
+         * test
+         */
+        passed = (passed == position['should_pass']);
+  
+        expect(passed, isTrue);
+      });
+  
+    });
+  
+  });
 }
 
-
 /*
-suite("Checkmate", function() {
-
-  var chess = new Chess();
-  var checkmates = [
-    '8/5r2/4K1q1/4p3/3k4/8/8/8 w - - 0 7',
-    '4r2r/p6p/1pnN2p1/kQp5/3pPq2/3P4/PPP3PP/R5K1 b - - 0 2',
-    'r3k2r/ppp2p1p/2n1p1p1/8/2B2P1q/2NPb1n1/PP4PP/R2Q3K w kq - 0 8',
-    '8/6R1/pp1r3p/6p1/P3R1Pk/1P4P1/7K/8 b - - 0 4'
-  ];
-
-  checkmates.forEach(function(checkmate) {
-    chess.load(checkmate);
-
-    test(checkmate, function() {
-      assert(chess.in_checkmate());
-    });
-  });
-
-});
-
-
-
-suite("Stalemate", function() {
-
-  var stalemates = [
-    '1R6/8/8/8/8/8/7R/k6K b - - 0 1',
-    '8/8/5k2/p4p1p/P4K1P/1r6/8/8 w - - 0 2',
-  ];
-
-  stalemates.forEach(function(stalemate) {
-    var chess = new Chess();
-    chess.load(stalemate);
-
-    test(stalemate, function() {
-      assert(chess.in_stalemate())
-    });
-
-  });
-
-});
-
-
-suite("Insufficient Material", function() {
-
-  var positions = [
-    {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', draw: false},
-    {fen: '8/8/8/8/8/8/8/k6K w - - 0 1', draw: true},
-    {fen: '8/2p5/8/8/8/8/8/k6K w - - 0 1', draw: false},
-    {fen: '8/2N5/8/8/8/8/8/k6K w - - 0 1', draw: true},
-    {fen: '8/2b5/8/8/8/8/8/k6K w - - 0 1', draw: true},
-    {fen: '8/b7/3B4/8/8/8/8/k6K w - - 0 1', draw: true},
-    {fen: '8/b7/B7/8/8/8/8/k6K w - - 0 1', draw: false},
-    {fen: '8/b1B1b1B1/1b1B1b1B/8/8/8/8/1k5K w - - 0 1', draw: true},
-    {fen: '8/bB2b1B1/1b1B1b1B/8/8/8/8/1k5K w - - 0 1', draw: false}
-  ];
-
-  positions.forEach(function(position) {
-    var chess = new Chess();
-    chess.load(position.fen);
-
-    test(position.fen, function() {
-      if (position.draw) {
-        assert(chess.insufficient_material() && chess.in_draw());
-      } else {
-        assert(!chess.insufficient_material() && !chess.in_draw());
-      }
-    });
-
-  });
-
-});
-
-
-suite("Threefold Repetition", function() {
-
-  var positions = [
-    {fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-     moves: ['Nf3', 'Nf6', 'Ng1', 'Ng8', 'Nf3', 'Nf6', 'Ng1', 'Ng8']},
-
-    /* Fischer - Petrosian, Buenos Aires, 1971 */
-    {fen: '8/pp3p1k/2p2q1p/3r1P2/5R2/7P/P1P1QP2/7K b - - 2 30',
-     moves: ['Qe5', 'Qh5', 'Qf6', 'Qe2', 'Re5', 'Qd3', 'Rd5', 'Qe2']},
-  ];
-
-  positions.forEach(function(position) {
-    var chess = new Chess();
-    chess.load(position.fen);
-
-    test(position.fen, function() {
-
-      var passed = true;
-      for (var j = 0; j < position.moves.length; j++) {
-        if (chess.in_threefold_repetition()) {
-          passed = false;
-          break;
-        }
-        chess.move(position.moves[j]);
-      }
-
-      assert(passed && chess.in_threefold_repetition() && chess.in_draw());
-
-    });
-
-  });
-
-});
-
-
-suite("Algebraic Notation", function() {
-
-  var positions = [
-    {fen: '7k/3R4/3p2Q1/6Q1/2N1N3/8/8/3R3K w - - 0 1',
-     moves: ['Rd8#', 'Re7', 'Rf7', 'Rg7', 'Rh7#', 'R7xd6', 'Rc7', 'Rb7', 'Ra7',
-             'Qf7', 'Qe8#', 'Qg7#', 'Qg8#', 'Qh7#', 'Q6h6#', 'Q6h5#', 'Q6f5',
-             'Q6f6#', 'Qe6', 'Qxd6', 'Q5f6#', 'Qe7', 'Qd8#', 'Q5h6#', 'Q5h5#',
-             'Qh4#', 'Qg4', 'Qg3', 'Qg2', 'Qg1', 'Qf4', 'Qe3', 'Qd2', 'Qc1',
-             'Q5f5', 'Qe5+', 'Qd5', 'Qc5', 'Qb5', 'Qa5', 'Na5', 'Nb6', 'Ncxd6',
-             'Ne5', 'Ne3', 'Ncd2', 'Nb2', 'Na3', 'Nc5', 'Nexd6', 'Nf6', 'Ng3',
-             'Nf2', 'Ned2', 'Nc3', 'Rd2', 'Rd3', 'Rd4', 'Rd5', 'R1xd6', 'Re1',
-             'Rf1', 'Rg1', 'Rc1', 'Rb1', 'Ra1', 'Kg2', 'Kh2', 'Kg1']},
-    {fen: '1r3k2/P1P5/8/8/8/8/8/R3K2R w KQ - 0 1',
-     moves: ['a8=Q', 'a8=R', 'a8=B', 'a8=N', 'axb8=Q+', 'axb8=R+', 'axb8=B',
-             'axb8=N', 'c8=Q+', 'c8=R+', 'c8=B', 'c8=N', 'cxb8=Q+', 'cxb8=R+',
-             'cxb8=B', 'cxb8=N', 'Ra2', 'Ra3', 'Ra4', 'Ra5', 'Ra6', 'Rb1',
-             'Rc1', 'Rd1', 'Kd2', 'Ke2', 'Kf2', 'Kf1', 'Kd1', 'Rh2', 'Rh3',
-             'Rh4', 'Rh5', 'Rh6', 'Rh7', 'Rh8+', 'Rg1', 'Rf1+', 'O-O+',
-             'O-O-O']},
-    {fen: '5rk1/8/8/8/8/8/2p5/R3K2R w KQ - 0 1',
-     moves: ['Ra2', 'Ra3', 'Ra4', 'Ra5', 'Ra6', 'Ra7', 'Ra8', 'Rb1', 'Rc1',
-             'Rd1', 'Kd2', 'Ke2', 'Rh2', 'Rh3', 'Rh4', 'Rh5', 'Rh6', 'Rh7',
-             'Rh8+', 'Rg1+', 'Rf1']},
-    {fen: '5rk1/8/8/8/8/8/2p5/R3K2R b KQ - 0 1',
-     moves: ['Rf7', 'Rf6', 'Rf5', 'Rf4', 'Rf3', 'Rf2', 'Rf1+', 'Re8+', 'Rd8',
-             'Rc8', 'Rb8', 'Ra8', 'Kg7', 'Kf7', 'c1=Q+', 'c1=R+', 'c1=B',
-             'c1=N']},
-    {fen: 'r3k2r/p2pqpb1/1n2pnp1/2pPN3/1p2P3/2N2Q1p/PPPB1PPP/R3K2R w KQkq c6 0 2',
-     moves: ['gxh3', 'Qxf6', 'Qxh3', 'Nxd7', 'Nxf7', 'Nxg6', 'dxc6', 'dxe6',
-             'Rg1', 'Rf1', 'Ke2', 'Kf1', 'Kd1', 'Rb1', 'Rc1', 'Rd1', 'g3',
-             'g4', 'Be3', 'Bf4', 'Bg5', 'Bh6', 'Bc1', 'b3', 'a3', 'a4', 'Qf4',
-             'Qf5', 'Qg4', 'Qh5', 'Qg3', 'Qe2', 'Qd1', 'Qe3', 'Qd3', 'Na4',
-             'Nb5', 'Ne2', 'Nd1', 'Nb1', 'Nc6', 'Ng4', 'Nd3', 'Nc4', 'd6',
-             'O-O', 'O-O-O']},
-    {fen: 'k7/8/K7/8/3n3n/5R2/3n4/8 b - - 0 1',
-     moves: ['N2xf3', 'Nhxf3', 'Nd4xf3', 'N2b3', 'Nc4', 'Ne4', 'Nf1', 'Nb1',
-             'Nhf5', 'Ng6', 'Ng2', 'Nb5', 'Nc6', 'Ne6', 'Ndf5', 'Ne2', 'Nc2',
-             'N4b3', 'Kb8']},
-  ];
-
-  positions.forEach(function(position) {
-    var chess = new Chess();
-    var passed = true;
-    chess.load(position.fen);
-
-    test(position.fen, function() {
-      var moves = chess.moves();
-      if (moves.length != position.moves.length) {
-        passed = false;
-      } else {
-        for (var j = 0; j < moves.length; j++) {
-          if (position.moves.indexOf(moves[j]) == -1) {
-            passed = false;
-            break;
-          }
-        }
-      }
-      assert(passed);
-    });
-
-  });
-
-});
-
-
-suite("Get/Put/Remove", function() {
-
-  var chess = new Chess();
-  var passed = true;
-  var positions = [
-    {pieces: {a7: {type: chess.PAWN, color: chess.WHITE},
-              b7: {type: chess.PAWN, color: chess.BLACK},
-              c7: {type: chess.KNIGHT, color: chess.WHITE},
-              d7: {type: chess.KNIGHT, color: chess.BLACK},
-              e7: {type: chess.BISHOP, color: chess.WHITE},
-              f7: {type: chess.BISHOP, color: chess.BLACK},
-              g7: {type: chess.ROOK, color: chess.WHITE},
-              h7: {type: chess.ROOK, color: chess.BLACK},
-              a6: {type: chess.QUEEN, color: chess.WHITE},
-              b6: {type: chess.QUEEN, color: chess.BLACK},
-              a4: {type: chess.KING, color: chess.WHITE},
-              h4: {type: chess.KING, color: chess.BLACK}},
-     should_pass: true},
-
-    {pieces: {a7: {type: 'z', color: chess.WHTIE}}, // bad piece
-     should_pass: false},
-
-    {pieces: {j4: {type: chess.PAWN, color: chess.WHTIE}}, // bad square
-     should_pass: false},
-  ];
-
-  positions.forEach(function(position) {
-
-    passed = true;
-    chess.clear();
-
-    test("position should pass - " + position.should_pass, function() {
-
-      /* places the pieces */
-      for (var square in position.pieces) {
-        passed &= chess.put(position.pieces[square], square);
-      }
-
-      /* iterate over every square to make sure get returns the proper
-       * piece values/color
-       */
-      for (var j = 0; j < chess.SQUARES.length; j++) {
-        var square = chess.SQUARES[j];
-        if (!(square in position.pieces)) {
-          if (chess.get(square)) {
-            passed = false;
-            break;
-          }
-        } else {
-          var piece = chess.get(square);
-          if (!(piece &&
-              piece.type == position.pieces[square].type &&
-              piece.color == position.pieces[square].color)) {
-            passed = false;
-            break;
-          }
-        }
-      }
-
-      if (passed) {
-        /* remove the pieces */
-        for (var j = 0; j < chess.SQUARES.length; j++) {
-          var square = chess.SQUARES[j];
-          var piece = chess.remove(square);
-          if ((!(square in position.pieces)) && piece) {
-            passed = false;
-            break;
-          }
-
-          if (piece &&
-             (position.pieces[square].type != piece.type ||
-              position.pieces[square].color != piece.color)) {
-            passed = false;
-            break;
-          }
-        }
-      }
-
-      /* finally, check for an empty board */
-      passed = passed && (chess.fen() == '8/8/8/8/8/8/8/8 w - - 0 1');
-
-      /* some tests should fail, so make sure we're supposed to pass/fail each
-       * test
-       */
-      passed = (passed == position.should_pass);
-
-      assert(passed);
-    });
-
-  });
-
-});
-
-
 suite("FEN", function() {
 
   var positions = [
