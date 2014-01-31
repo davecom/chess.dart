@@ -169,12 +169,15 @@ class Chess {
   }
 
   load(String fen) {
+    print("Load");
     List tokens = fen.split(new RegExp(r"/\s+/"));
     String position = tokens[0];
     int square = 0;
     String valid = SYMBOLS + '12345678/';
 
-    if (!validate_fen(fen)["valid"]) {
+    Map validMap = validate_fen(fen);
+    if (!validMap["valid"]) {
+      print(validMap["error"]);
       return false;
     }
 
@@ -236,7 +239,7 @@ class Chess {
     };
 
     /* 1st criterion: 6 space-seperated fields? */
-    List tokens = fen.split(new RegExp("/\s+/"));
+    List tokens = fen.split(new RegExp(r"\s+"));
     if (tokens.length != 6) {
       return {'valid': false, 'error_number': 1, 'error': errors[1]};
     }
@@ -254,7 +257,7 @@ class Chess {
     /* 3rd criterion: half move counter is an integer >= 0? */
     try {
       int temp = int.parse(tokens[4]);
-      if (temp <= 0) {
+      if (temp < 0) {
         return {'valid': false, 'error_number': 3, 'error': errors[3]};
       }
     } on FormatException {
@@ -262,19 +265,19 @@ class Chess {
     }
 
     /* 4th criterion: 4th field is a valid e.p.-string? */
-    RegExp check4 = new RegExp(r"!/^(-|[abcdefgh][36])$/");
+    RegExp check4 = new RegExp(r"^(-|[abcdefgh][36])$");
     if (check4.firstMatch(tokens[3]) == null) {
       return {'valid': false, 'error_number': 4, 'error': errors[4]};
     }
 
     /* 5th criterion: 3th field is a valid castle-string? */
-    RegExp check5 = new RegExp(r"!/^(KQ?k?q?|Qk?q?|kq?|q|-)$/");
+    RegExp check5 = new RegExp(r"^(KQ?k?q?|Qk?q?|kq?|q|-)$");
     if (check5.firstMatch(tokens[2]) == null) {
       return {'valid': false, 'error_number': 5, 'error': errors[5]};
     }
 
     /* 6th criterion: 2nd field is "w" (white) or "b" (black)? */
-    RegExp check6 = new RegExp(r"!/^(w|b)$/");
+    RegExp check6 = new RegExp(r"^(w|b)$");
     if (check6.firstMatch(tokens[1]) == null) {
       return {'valid': false, 'error_number': 6, 'error': errors[6]};
     }
@@ -301,7 +304,7 @@ class Chess {
           sum_fields += temp2;
           previous_was_number = true;
         } on FormatException {
-          RegExp checkOM = new RegExp(r"!/^[prnbqkPRNBQK]$/");
+          RegExp checkOM = new RegExp(r"^[prnbqkPRNBQK]$");
           if (checkOM.firstMatch(rows[i][k]) == null) {
             return {'valid': false, 'error_number': 9, 'error': errors[9]};
           }
@@ -354,10 +357,10 @@ class Chess {
     }
 
     String cflags = '';
-    if ((castling["WHITE"] & BITS['KSIDE_CASTLE']) != 0) { cflags += 'K'; }
-    if ((castling["WHITE"] & BITS['QSIDE_CASTLE']) != 0) { cflags += 'Q'; }
-    if ((castling["BLACK"] & BITS['KSIDE_CASTLE']) != 0) { cflags += 'k'; }
-    if ((castling["BLACK"] & BITS['QSIDE_CASTLE']) != 0) { cflags += 'q'; }
+    if ((castling[WHITE] & BITS['KSIDE_CASTLE']) != 0) { cflags += 'K'; }
+    if ((castling[WHITE] & BITS['QSIDE_CASTLE']) != 0) { cflags += 'Q'; }
+    if ((castling[BLACK] & BITS['KSIDE_CASTLE']) != 0) { cflags += 'k'; }
+    if ((castling[BLACK] & BITS['QSIDE_CASTLE']) != 0) { cflags += 'q'; }
 
     /* do we have an empty castling flag? */
     if (cflags == "") {
@@ -1479,6 +1482,13 @@ class Chess {
 
 //some light testing
 void main() {
-  Chess c = new Chess();
-  
+  Chess chess = new Chess();
+  print(chess.ascii());
+  while (!chess.game_over()) {
+    print('position: ' + chess.fen());
+    var moves = chess.moves();
+    var move = moves.shuffle()[0];
+    chess.move(move);
+    print('move: ' + move);
+  }
 }
