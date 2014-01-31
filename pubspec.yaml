@@ -1,0 +1,5 @@
+name: chess
+version: 0.0.1
+author: David Kopec
+description: A port of chess.js to Dart. chess.dart is a library for legal chess move generation, maintenance of chess game state, and conversion to and from the formats FEN and PGN. It has no external dependencies.
+homepage: https://github.com/davecom/chess.dart

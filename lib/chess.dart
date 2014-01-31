@@ -746,7 +746,7 @@ class Chess {
                                  pieces[KNIGHT] == 1)) { return true; }
 
     /* kb vs. kb where any number of bishops are all on the same color */
-    else if (num_pieces == (pieces[BISHOP] + 2)) {
+    else if (pieces.containsKey(BISHOP) && num_pieces == (pieces[BISHOP] + 2)) {
       var sum = 0;
       var len = bishops.length;
       for (int i = 0; i < len; i++) {
@@ -1482,19 +1482,4 @@ class Chess {
       return move_history;
     }
 
-}
-
-//some light testing
-void main() {
-  Chess chess = new Chess();
-  print(chess.ascii());
-  while (!chess.game_over()) {
-    print('position: ' + chess.fen());
-    print(chess.ascii());
-    var moves = chess.moves();
-    moves.shuffle();
-    var move = moves[0];
-    chess.move(move);
-    print('move: ' + move);
-  }
 }
