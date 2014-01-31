@@ -1,6 +1,6 @@
 library chess;
 
-/*  Copyright (c) 2014, David Kopec (jhlywa@gmail.com)
+/*  Copyright (c) 2014, David Kopec (my first name at oaksnow dot com)
  *  Released under the MIT license
  *  https://github.com/davecom/chess.dart/blob/master/LICENSE
  * 
@@ -14,30 +14,30 @@ class Chess {
 
   /* jshint indent: false */
 
-  var BLACK = 'b';
-  var WHITE = 'w';
+  static const String BLACK = 'b';
+  static const String WHITE = 'w';
 
-  var EMPTY = -1;
+  static const int EMPTY = -1;
 
-  var PAWN = 'p';
-  var KNIGHT = 'n';
-  var BISHOP = 'b';
-  var ROOK = 'r';
-  var QUEEN = 'q';
-  var KING = 'k';
+  static const String PAWN = 'p';
+  static const String KNIGHT = 'n';
+  static const String BISHOP = 'b';
+  static const String ROOK = 'r';
+  static const String QUEEN = 'q';
+  static const String KING = 'k';
 
-  var SYMBOLS = 'pnbrqkPNBRQK';
+  static const String SYMBOLS = 'pnbrqkPNBRQK';
 
-  var DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  static const String DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-  var POSSIBLE_RESULTS = ['1-0', '0-1', '1/2-1/2', '*'];
+  static const List POSSIBLE_RESULTS = ['1-0', '0-1', '1/2-1/2', '*'];
 
-  var PAWN_OFFSETS = {
+  static const Map PAWN_OFFSETS = {
     b: [16, 32, 17, 15],
     w: [-16, -32, -17, -15]
   };
 
-  var PIECE_OFFSETS = {
+  static const Map PIECE_OFFSETS = {
     n: [-18, -33, -31, -14,  18, 33, 31,  14],
     b: [-17, -15,  17,  15],
     r: [-16,   1,  16,  -1],
@@ -45,7 +45,7 @@ class Chess {
     k: [-17, -16, -15,   1,  17, 16, 15,  -1]
   };
 
-  var ATTACKS = [
+  static const List ATTACKS = [
     20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20, 0,
      0,20, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0,20, 0, 0,
      0, 0,20, 0, 0, 0, 0, 24,  0, 0, 0, 0,20, 0, 0, 0,
@@ -63,7 +63,7 @@ class Chess {
     20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20
   ];
 
-  var RAYS = [
+  static const List RAYS = [
      17,  0,  0,  0,  0,  0,  0, 16,  0,  0,  0,  0,  0,  0, 15, 0,
       0, 17,  0,  0,  0,  0,  0, 16,  0,  0,  0,  0,  0, 15,  0, 0,
       0,  0, 17,  0,  0,  0,  0, 16,  0,  0,  0,  0, 15,  0,  0, 0,
@@ -81,64 +81,64 @@ class Chess {
     -15,  0,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,  0,-17
   ];
 
-  var SHIFTS = { p: 0, n: 1, b: 2, r: 3, q: 4, k: 5 };
+  static const Map SHIFTS = { 'p': 0, 'n': 1, 'b': 2, 'r': 3, 'q': 4, 'k': 5 };
 
-  var FLAGS = {
-    NORMAL: 'n',
-    CAPTURE: 'c',
-    BIG_PAWN: 'b',
-    EP_CAPTURE: 'e',
-    PROMOTION: 'p',
-    KSIDE_CASTLE: 'k',
-    QSIDE_CASTLE: 'q'
+  static const Map FLAGS = {
+    'NORMAL': 'n',
+    'CAPTURE': 'c',
+    'BIG_PAWN': 'b',
+    'EP_CAPTURE': 'e',
+    'PROMOTION': 'p',
+    'KSIDE_CASTLE': 'k',
+    'QSIDE_CASTLE': 'q'
   };
 
-  var BITS = {
-    NORMAL: 1,
-    CAPTURE: 2,
-    BIG_PAWN: 4,
-    EP_CAPTURE: 8,
-    PROMOTION: 16,
-    KSIDE_CASTLE: 32,
-    QSIDE_CASTLE: 64
+  static const Map BITS = {
+    'NORMAL': 1,
+    'CAPTURE': 2,
+    'BIG_PAWN': 4,
+    'EP_CAPTURE': 8,
+    'PROMOTION': 16,
+    'KSIDE_CASTLE': 32,
+    'QSIDE_CASTLE': 64
   };
 
-  var RANK_1 = 7;
-  var RANK_2 = 6;
-  var RANK_3 = 5;
-  var RANK_4 = 4;
-  var RANK_5 = 3;
-  var RANK_6 = 2;
-  var RANK_7 = 1;
-  var RANK_8 = 0;
+  static const int RANK_1 = 7;
+  static const int RANK_2 = 6;
+  static const int RANK_3 = 5;
+  static const int RANK_4 = 4;
+  static const int RANK_5 = 3;
+  static const intr RANK_6 = 2;
+  static const int RANK_7 = 1;
+  static const int RANK_8 = 0;
 
-  var SQUARES = {
-    a8:   0, b8:   1, c8:   2, d8:   3, e8:   4, f8:   5, g8:   6, h8:   7,
-    a7:  16, b7:  17, c7:  18, d7:  19, e7:  20, f7:  21, g7:  22, h7:  23,
-    a6:  32, b6:  33, c6:  34, d6:  35, e6:  36, f6:  37, g6:  38, h6:  39,
-    a5:  48, b5:  49, c5:  50, d5:  51, e5:  52, f5:  53, g5:  54, h5:  55,
-    a4:  64, b4:  65, c4:  66, d4:  67, e4:  68, f4:  69, g4:  70, h4:  71,
-    a3:  80, b3:  81, c3:  82, d3:  83, e3:  84, f3:  85, g3:  86, h3:  87,
-    a2:  96, b2:  97, c2:  98, d2:  99, e2: 100, f2: 101, g2: 102, h2: 103,
-    a1: 112, b1: 113, c1: 114, d1: 115, e1: 116, f1: 117, g1: 118, h1: 119
+  static const Map SQUARES = {
+    'a8':   0, 'b8':   1, 'c8':   2, 'd8':   3, 'e8':   4, 'f8':   5, 'g8':   6, 'h8':   7,
+    'a7':  16, 'b7':  17, 'c7':  18, 'd7':  19, 'e7':  20, 'f7':  21, 'g7':  22, 'h7':  23,
+    'a6':  32, 'b6':  33, 'c6':  34, 'd6':  35, 'e6':  36, 'f6':  37, 'g6':  38, 'h6':  39,
+    'a5':  48, 'b5':  49, 'c5':  50, 'd5':  51, 'e5':  52, 'f5':  53, 'g5':  54, 'h5':  55,
+    'a4':  64, 'b4':  65, 'c4':  66, 'd4':  67, 'e4':  68, 'f4':  69, 'g4':  70, 'h4':  71,
+    'a3':  80, 'b3':  81, 'c3':  82, 'd3':  83, 'e3':  84, 'f3':  85, 'g3':  86, 'h3':  87,
+    'a2':  96, 'b2':  97, 'c2':  98, 'd2':  99, 'e2': 100, 'f2': 101, 'g2': 102, 'h2': 103,
+    'a1': 112, 'b1': 113, 'c1': 114, 'd1': 115, 'e1': 116, 'f1': 117, 'g1': 118, 'h1': 119
   };
 
-  var ROOKS = {
-    w: [{square: SQUARES.a1, flag: BITS.QSIDE_CASTLE},
-        {square: SQUARES.h1, flag: BITS.KSIDE_CASTLE}],
-    b: [{square: SQUARES.a8, flag: BITS.QSIDE_CASTLE},
-        {square: SQUARES.h8, flag: BITS.KSIDE_CASTLE}]
+  static const Map ROOKS = {
+    w: [{'square': SQUARES['a1'], 'flag': BITS['QSIDE_CASTLE']},
+        {'square': SQUARES['h1'], 'flag': BITS['KSIDE_CASTLE']}],
+    b: [{'square': SQUARES['a8'], 'flag': BITS['QSIDE_CASTLE']},
+        {'square': SQUARES['h8'], 'flag': BITS['KSIDE_CASTLE']}]
   };
 
-  var board = new Array(128);
-  var kings = {w: EMPTY, b: EMPTY};
-  var turn = WHITE;
-  var castling = {w: 0, b: 0};
-  var ep_square = EMPTY;
-  var half_moves = 0;
-  var move_number = 1;
-  var history = [];
-  var header = {};
+  List board = new List(128);
+  Map kings = {'w': EMPTY, 'b': EMPTY};
+  String turn = WHITE;
+  Map castling = {'w': 0, 'b': 0};
+  int ep_square = EMPTY;
+  int half_moves = 0;
+  int move_number = 1;
+  List history = [];
+  Map header = {};
 
   /* if the user passes in a fen string, load it, else default to
    * starting position
@@ -151,11 +151,11 @@ class Chess {
     load(fen);
   }
 
-  function clear() {
-    board = new Array(128);
-    kings = {w: EMPTY, b: EMPTY};
+  clear() {
+    board = new List(128);
+    kings = {'w': EMPTY, 'b': EMPTY};
     turn = WHITE;
-    castling = {w: 0, b: 0};
+    castling = {'w': 0, 'b': 0};
     ep_square = EMPTY;
     half_moves = 0;
     move_number = 1;
@@ -164,54 +164,56 @@ class Chess {
     update_setup(generate_fen());
   }
 
-  function reset() {
+  reset() {
     load(DEFAULT_POSITION);
   }
 
-  function load(fen) {
-    var tokens = fen.split(/\s+/);
-    var position = tokens[0];
-    var square = 0;
-    var valid = SYMBOLS + '12345678/';
+  load(String fen) {
+    List tokens = fen.split(new RegExp(r"/\s+/"));
+    String position = tokens[0];
+    int square = 0;
+    String valid = SYMBOLS + '12345678/';
 
-    if (!validate_fen(fen).valid) {
+    if (!validate_fen(fen)["valid"]) {
       return false;
     }
 
     clear();
 
-    for (var i = 0; i < position.length; i++) {
-      var piece = position.charAt(i);
+    for (int i = 0; i < position.length; i++) {
+      String piece = position[i];
 
-      if (piece === '/') {
+      if (piece == '/') {
         square += 8;
-      } else if (is_digit(piece)) {
-        square += parseInt(piece, 10);
       } else {
-        var color = (piece < 'a') ? WHITE : BLACK;
-        put({type: piece.toLowerCase(), color: color}, algebraic(square));
-        square++;
+        try {
+          square += int.parse(piece);
+        } on FormatException {
+          String color = (piece < 'a') ? WHITE : BLACK;
+          put({'type': piece.toLowerCase(), 'color': color}, algebraic(square));
+          square++;
+        }
       }
     }
 
     turn = tokens[1];
 
     if (tokens[2].indexOf('K') > -1) {
-      castling.w |= BITS.KSIDE_CASTLE;
+      castling['w'] |= BITS['KSIDE_CASTLE'];
     }
     if (tokens[2].indexOf('Q') > -1) {
-      castling.w |= BITS.QSIDE_CASTLE;
+      castling['w'] |= BITS['QSIDE_CASTLE'];
     }
     if (tokens[2].indexOf('k') > -1) {
-      castling.b |= BITS.KSIDE_CASTLE;
+      castling['b'] |= BITS['KSIDE_CASTLE'];
     }
     if (tokens[2].indexOf('q') > -1) {
-      castling.b |= BITS.QSIDE_CASTLE;
+      castling['b'] |= BITS['QSIDE_CASTLE'];
     }
 
-    ep_square = (tokens[3] === '-') ? EMPTY : SQUARES[tokens[3]];
-    half_moves = parseInt(tokens[4], 10);
-    move_number = parseInt(tokens[5], 10);
+    ep_square = (tokens[3] == '-') ? EMPTY : SQUARES[tokens[3]];
+    half_moves = int.parse(tokens[4]);
+    move_number = int.parse(tokens[5]);
 
     update_setup(generate_fen());
 
@@ -234,73 +236,91 @@ class Chess {
     };
 
     /* 1st criterion: 6 space-seperated fields? */
-    var tokens = fen.split(/\s+/);
-    if (tokens.length !== 6) {
-      return {valid: false, error_number: 1, error: errors[1]};
+    List tokens = fen.split(new RegExp("/\s+/"));
+    if (tokens.length != 6) {
+      return {'valid': false, 'error_number': 1, 'error': errors[1]};
     }
 
     /* 2nd criterion: move number field is a integer value > 0? */
-    if (isNaN(tokens[5]) || (parseInt(tokens[5], 10) <= 0)) {
-      return {valid: false, error_number: 2, error: errors[2]};
+    try {
+      int temp = int.parse(tokens[5]);
+      if (temp <= 0) {
+        return {'valid': false, 'error_number': 2, 'error': errors[2]};
+      }
+    } on FormatException {
+      return {'valid': false, 'error_number': 2, 'error': errors[2]};
     }
 
     /* 3rd criterion: half move counter is an integer >= 0? */
-    if (isNaN(tokens[4]) || (parseInt(tokens[4], 10) < 0)) {
-      return {valid: false, error_number: 3, error: errors[3]};
+    try {
+      int temp = int.parse(tokens[4]);
+      if (temp <= 0) {
+        return {'valid': false, 'error_number': 3, 'error': errors[3]};
+      }
+    } on FormatException {
+      return {'valid': false, 'error_number': 3, 'error': errors[3]};
     }
 
     /* 4th criterion: 4th field is a valid e.p.-string? */
-    if (!/^(-|[abcdefgh][36])$/.test(tokens[3])) {
-      return {valid: false, error_number: 4, error: errors[4]};
+    RegExp check4 = new RegExp(r"!/^(-|[abcdefgh][36])$/");
+    if (check4.firstMatch(tokens[3]) == null) {
+      return {'valid': false, 'error_number': 4, 'error': errors[4]};
     }
 
     /* 5th criterion: 3th field is a valid castle-string? */
-    if( !/^(KQ?k?q?|Qk?q?|kq?|q|-)$/.test(tokens[2])) {
-      return {valid: false, error_number: 5, error: errors[5]};
+    RegExp check5 = new RegExp(r"!/^(KQ?k?q?|Qk?q?|kq?|q|-)$/");
+    if (check5.firstMatch(tokens[2]) == null) {
+      return {'valid': false, 'error_number': 5, 'error': errors[5]};
     }
 
     /* 6th criterion: 2nd field is "w" (white) or "b" (black)? */
-    if (!/^(w|b)$/.test(tokens[1])) {
-      return {valid: false, error_number: 6, error: errors[6]};
+    RegExp check6 = new RegExp(r"!/^(w|b)$/");
+    if (check6.firstMatch(tokens[1]) == null) {
+      return {'valid': false, 'error_number': 6, 'error': errors[6]};
     }
 
     /* 7th criterion: 1st field contains 8 rows? */
-    var rows = tokens[0].split('/');
-    if (rows.length !== 8) {
-      return {valid: false, error_number: 7, error: errors[7]};
+    List rows = tokens[0].split('/');
+    if (rows.length != 8) {
+      return {'valid': false, 'error_number': 7, 'error': errors[7]};
     }
 
     /* 8th criterion: every row is valid? */
-    for (var i = 0; i < rows.length; i++) {
+    for (int i = 0; i < rows.length; i++) {
       /* check for right sum of fields AND not two numbers in succession */
-      var sum_fields = 0;
-      var previous_was_number = false;
+      int sum_fields = 0;
+      bool previous_was_number = false;
 
-      for (var k = 0; k < rows[i].length; k++) {
-        if (!isNaN(rows[i][k])) {
+      for (int k = 0; k < rows[i].length; k++) {
+        
+        try {
+          int temp2 = int.parse(rows[i][k]);
           if (previous_was_number) {
-            return {valid: false, error_number: 8, error: errors[8]};
+            return {'valid': false, 'error_number': 8, 'error': errors[8]};
           }
-          sum_fields += parseInt(rows[i][k], 10);
+          sum_fields += temp2;
           previous_was_number = true;
-        } else {
-          if (!/^[prnbqkPRNBQK]$/.test(rows[i][k])) {
-            return {valid: false, error_number: 9, error: errors[9]};
+        } on FormatException {
+          RegExp checkOM = new RegExp(r"!/^[prnbqkPRNBQK]$/");
+          if (checkOM.firstMatch(rows[i][k]) == null) {
+            return {'valid': false, 'error_number': 9, 'error': errors[9]};
           }
           sum_fields += 1;
           previous_was_number = false;
         }
+        
       }
-      if (sum_fields !== 8) {
-        return {valid: false, error_number: 10, error: errors[10]};
+      
+      if (sum_fields != 8) {
+        return {'valid': false, 'error_number': 10, 'error': errors[10]};
       }
     }
 
     /* everything's okay! */
-    return {valid: true, error_number: 0, error: errors[0]};
+    return {'valid': true, 'error_number': 0, 'error': errors[0]};
   }
 
-  function generate_fen() {
+  generate_fen() {
     var empty = 0;
     var fen = '';
 
