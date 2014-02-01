@@ -1,0 +1,3850 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Chess class / chess Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="chess" data-type="Chess">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../chess.html">chess</a> &rsaquo; <a href="../chess/Chess.html">Chess</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+<h2><div class="icon-library"></div><a href="../chess.html">chess</a></h2><ul class="icon">
+<li><div class="icon-class"></div><strong>Chess</strong></li>
+</ul>
+</div>
+<div class="content">
+        <h2><strong>Chess</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class Chess {
+
+ // Constants/Class Variables
+ static const String BLACK = 'b';
+ static const String WHITE = 'w';
+
+ static const int EMPTY = -1;
+
+ static const String PAWN = 'p';
+ static const String KNIGHT = 'n';
+ static const String BISHOP = 'b';
+ static const String ROOK = 'r';
+ static const String QUEEN = 'q';
+ static const String KING = 'k';
+
+ static const String SYMBOLS = 'pnbrqkPNBRQK';
+
+ static const String DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+ static const List POSSIBLE_RESULTS = const ['1-0', '0-1', '1/2-1/2', '*'];
+
+ static const Map PAWN_OFFSETS = const {
+   'b': const [16, 32, 17, 15],
+   'w': const [-16, -32, -17, -15]
+ };
+
+ static const Map PIECE_OFFSETS = const {
+   'n': const [-18, -33, -31, -14,  18, 33, 31,  14],
+   'b': const [-17, -15,  17,  15],
+   'r': const [-16,   1,  16,  -1],
+   'q': const [-17, -16, -15,   1,  17, 16, 15,  -1],
+   'k': const [-17, -16, -15,   1,  17, 16, 15,  -1]
+ };
+
+ static const List ATTACKS = const [
+   20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20, 0,
+    0,20, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0,20, 0, 0,
+    0, 0,20, 0, 0, 0, 0, 24,  0, 0, 0, 0,20, 0, 0, 0,
+    0, 0, 0,20, 0, 0, 0, 24,  0, 0, 0,20, 0, 0, 0, 0,
+    0, 0, 0, 0,20, 0, 0, 24,  0, 0,20, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,20, 2, 24,  2,20, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 2,53, 56, 53, 2, 0, 0, 0, 0, 0, 0,
+   24,24,24,24,24,24,56,  0, 56,24,24,24,24,24,24, 0,
+    0, 0, 0, 0, 0, 2,53, 56, 53, 2, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,20, 2, 24,  2,20, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0,20, 0, 0, 24,  0, 0,20, 0, 0, 0, 0, 0,
+    0, 0, 0,20, 0, 0, 0, 24,  0, 0, 0,20, 0, 0, 0, 0,
+    0, 0,20, 0, 0, 0, 0, 24,  0, 0, 0, 0,20, 0, 0, 0,
+    0,20, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0,20, 0, 0,
+   20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20
+ ];
+
+ static const List RAYS = const [
+    17,  0,  0,  0,  0,  0,  0, 16,  0,  0,  0,  0,  0,  0, 15, 0,
+     0, 17,  0,  0,  0,  0,  0, 16,  0,  0,  0,  0,  0, 15,  0, 0,
+     0,  0, 17,  0,  0,  0,  0, 16,  0,  0,  0,  0, 15,  0,  0, 0,
+     0,  0,  0, 17,  0,  0,  0, 16,  0,  0,  0, 15,  0,  0,  0, 0,
+     0,  0,  0,  0, 17,  0,  0, 16,  0,  0, 15,  0,  0,  0,  0, 0,
+     0,  0,  0,  0,  0, 17,  0, 16,  0, 15,  0,  0,  0,  0,  0, 0,
+     0,  0,  0,  0,  0,  0, 17, 16, 15,  0,  0,  0,  0,  0,  0, 0,
+     1,  1,  1,  1,  1,  1,  1,  0, -1, -1,  -1,-1, -1, -1, -1, 0,
+     0,  0,  0,  0,  0,  0,-15,-16,-17,  0,  0,  0,  0,  0,  0, 0,
+     0,  0,  0,  0,  0,-15,  0,-16,  0,-17,  0,  0,  0,  0,  0, 0,
+     0,  0,  0,  0,-15,  0,  0,-16,  0,  0,-17,  0,  0,  0,  0, 0,
+     0,  0,  0,-15,  0,  0,  0,-16,  0,  0,  0,-17,  0,  0,  0, 0,
+     0,  0,-15,  0,  0,  0,  0,-16,  0,  0,  0,  0,-17,  0,  0, 0,
+     0,-15,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,-17,  0, 0,
+   -15,  0,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,  0,-17
+ ];
+
+ static const Map SHIFTS = const { 'p': 0, 'n': 1, 'b': 2, 'r': 3, 'q': 4, 'k': 5 };
+
+ static const Map FLAGS = const {
+   'NORMAL': 'n',
+   'CAPTURE': 'c',
+   'BIG_PAWN': 'b',
+   'EP_CAPTURE': 'e',
+   'PROMOTION': 'p',
+   'KSIDE_CASTLE': 'k',
+   'QSIDE_CASTLE': 'q'
+ };
+
+ static const Map BITS = const {
+   'NORMAL': 1,
+   'CAPTURE': 2,
+   'BIG_PAWN': 4,
+   'EP_CAPTURE': 8,
+   'PROMOTION': 16,
+   'KSIDE_CASTLE': 32,
+   'QSIDE_CASTLE': 64
+ };
+
+ static const int RANK_1 = 7;
+ static const int RANK_2 = 6;
+ static const int RANK_3 = 5;
+ static const int RANK_4 = 4;
+ static const int RANK_5 = 3;
+ static const int RANK_6 = 2;
+ static const int RANK_7 = 1;
+ static const int RANK_8 = 0;
+
+ static const Map SQUARES = const {
+   'a8':   0, 'b8':   1, 'c8':   2, 'd8':   3, 'e8':   4, 'f8':   5, 'g8':   6, 'h8':   7,
+   'a7':  16, 'b7':  17, 'c7':  18, 'd7':  19, 'e7':  20, 'f7':  21, 'g7':  22, 'h7':  23,
+   'a6':  32, 'b6':  33, 'c6':  34, 'd6':  35, 'e6':  36, 'f6':  37, 'g6':  38, 'h6':  39,
+   'a5':  48, 'b5':  49, 'c5':  50, 'd5':  51, 'e5':  52, 'f5':  53, 'g5':  54, 'h5':  55,
+   'a4':  64, 'b4':  65, 'c4':  66, 'd4':  67, 'e4':  68, 'f4':  69, 'g4':  70, 'h4':  71,
+   'a3':  80, 'b3':  81, 'c3':  82, 'd3':  83, 'e3':  84, 'f3':  85, 'g3':  86, 'h3':  87,
+   'a2':  96, 'b2':  97, 'c2':  98, 'd2':  99, 'e2': 100, 'f2': 101, 'g2': 102, 'h2': 103,
+   'a1': 112, 'b1': 113, 'c1': 114, 'd1': 115, 'e1': 116, 'f1': 117, 'g1': 118, 'h1': 119
+ };
+
+ static final Map ROOKS = {
+   'w': [{'square': SQUARES['a1'], 'flag': BITS['QSIDE_CASTLE']},
+       {'square': SQUARES['h1'], 'flag': BITS['KSIDE_CASTLE']}],
+   'b': [{'square': SQUARES['a8'], 'flag': BITS['QSIDE_CASTLE']},
+       {'square': SQUARES['h8'], 'flag': BITS['KSIDE_CASTLE']}]
+ };
+
+ // Instance Variables
+ List board = new List(128);
+ Map kings = {'w': EMPTY, 'b': EMPTY};
+ String turn = WHITE;
+ Map castling = {'w': 0, 'b': 0};
+ int ep_square = EMPTY;
+ int half_moves = 0;
+ int move_number = 1;
+ List history = [];
+ Map header = {};
+
+ /// By default start with the standard chess starting position
+ Chess() {
+   load(DEFAULT_POSITION);
+ }
+ 
+ /// Start with a position from a FEN
+ Chess.fromFEN(String fen) {
+   load(fen);
+ }
+
+ /// Reset all of the instance variables
+ clear() {
+   board = new List(128);
+   kings = {'w': EMPTY, 'b': EMPTY};
+   turn = WHITE;
+   castling = {'w': 0, 'b': 0};
+   ep_square = EMPTY;
+   half_moves = 0;
+   move_number = 1;
+   history = [];
+   header = {};
+   update_setup(generate_fen());
+ }
+
+ /// Go back to the chess starting position
+ reset() {
+   load(DEFAULT_POSITION);
+ }
+
+ /// Load a position from a FEN String
+ bool load(String fen) {
+   List tokens = fen.split(new RegExp(r"\s+"));
+   String position = tokens[0];
+   int square = 0;
+   String valid = SYMBOLS + '12345678/';
+
+   Map validMap = validate_fen(fen);
+   if (!validMap["valid"]) {
+     print(validMap["error"]);
+     return false;
+   }
+
+   clear();
+
+   for (int i = 0; i &lt; position.length; i++) {
+     String piece = position[i];
+
+     if (piece == '/') {
+       square += 8;
+     } else if (is_digit(piece)) {
+       square += int.parse(piece);
+     } else {
+       String color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
+       put({'type': piece.toLowerCase(), 'color': color}, algebraic(square));
+       square++;
+     }
+   }
+
+   turn = tokens[1];
+
+   if (tokens[2].indexOf('K') &gt; -1) {
+     castling['w'] |= BITS['KSIDE_CASTLE'];
+   }
+   if (tokens[2].indexOf('Q') &gt; -1) {
+     castling['w'] |= BITS['QSIDE_CASTLE'];
+   }
+   if (tokens[2].indexOf('k') &gt; -1) {
+     castling['b'] |= BITS['KSIDE_CASTLE'];
+   }
+   if (tokens[2].indexOf('q') &gt; -1) {
+     castling['b'] |= BITS['QSIDE_CASTLE'];
+   }
+
+   ep_square = (tokens[3] == '-') ? EMPTY : SQUARES[tokens[3]];
+   half_moves = int.parse(tokens[4]);
+   move_number = int.parse(tokens[5]);
+
+   update_setup(generate_fen());
+
+   return true;
+ }
+
+ /// Check the formatting of a FEN String is correct
+ /// Returns a Map with keys valid, error_number, and error
+ Map validate_fen(fen) {
+   Map errors = {
+      0: 'No errors.',
+      1: 'FEN string must contain six space-delimited fields.',
+      2: '6th field (move number) must be a positive integer.',
+      3: '5th field (half move counter) must be a non-negative integer.',
+      4: '4th field (en-passant square) is invalid.',
+      5: '3rd field (castling availability) is invalid.',
+      6: '2nd field (side to move) is invalid.',
+      7: '1st field (piece positions) does not contain 8 \'/\'-delimited rows.',
+      8: '1st field (piece positions) is invalid [consecutive numbers].',
+      9: '1st field (piece positions) is invalid [invalid piece].',
+     10: '1st field (piece positions) is invalid [row too large].',
+   };
+
+   /* 1st criterion: 6 space-seperated fields? */
+   List tokens = fen.split(new RegExp(r"\s+"));
+   if (tokens.length != 6) {
+     return {'valid': false, 'error_number': 1, 'error': errors[1]};
+   }
+
+   /* 2nd criterion: move number field is a integer value &gt; 0? */
+   try {
+     int temp = int.parse(tokens[5]);
+     if (temp &lt;= 0) {
+       return {'valid': false, 'error_number': 2, 'error': errors[2]};
+     }
+   } on FormatException {
+     return {'valid': false, 'error_number': 2, 'error': errors[2]};
+   }
+
+   /* 3rd criterion: half move counter is an integer &gt;= 0? */
+   try {
+     int temp = int.parse(tokens[4]);
+     if (temp &lt; 0) {
+       return {'valid': false, 'error_number': 3, 'error': errors[3]};
+     }
+   } on FormatException {
+     return {'valid': false, 'error_number': 3, 'error': errors[3]};
+   }
+
+   /* 4th criterion: 4th field is a valid e.p.-string? */
+   RegExp check4 = new RegExp(r"^(-|[abcdefgh][36])$");
+   if (check4.firstMatch(tokens[3]) == null) {
+     return {'valid': false, 'error_number': 4, 'error': errors[4]};
+   }
+
+   /* 5th criterion: 3th field is a valid castle-string? */
+   RegExp check5 = new RegExp(r"^(KQ?k?q?|Qk?q?|kq?|q|-)$");
+   if (check5.firstMatch(tokens[2]) == null) {
+     return {'valid': false, 'error_number': 5, 'error': errors[5]};
+   }
+
+   /* 6th criterion: 2nd field is "w" (white) or "b" (black)? */
+   RegExp check6 = new RegExp(r"^(w|b)$");
+   if (check6.firstMatch(tokens[1]) == null) {
+     return {'valid': false, 'error_number': 6, 'error': errors[6]};
+   }
+
+   /* 7th criterion: 1st field contains 8 rows? */
+   List rows = tokens[0].split('/');
+   if (rows.length != 8) {
+     return {'valid': false, 'error_number': 7, 'error': errors[7]};
+   }
+
+   /* 8th criterion: every row is valid? */
+   for (int i = 0; i &lt; rows.length; i++) {
+     /* check for right sum of fields AND not two numbers in succession */
+     int sum_fields = 0;
+     bool previous_was_number = false;
+
+     for (int k = 0; k &lt; rows[i].length; k++) {
+       
+       try {
+         int temp2 = int.parse(rows[i][k]);
+         if (previous_was_number) {
+           return {'valid': false, 'error_number': 8, 'error': errors[8]};
+         }
+         sum_fields += temp2;
+         previous_was_number = true;
+       } on FormatException {
+         RegExp checkOM = new RegExp(r"^[prnbqkPRNBQK]$");
+         if (checkOM.firstMatch(rows[i][k]) == null) {
+           return {'valid': false, 'error_number': 9, 'error': errors[9]};
+         }
+         sum_fields += 1;
+         previous_was_number = false;
+       }
+       
+     }
+     
+     if (sum_fields != 8) {
+       return {'valid': false, 'error_number': 10, 'error': errors[10]};
+     }
+   }
+
+   /* everything's okay! */
+   return {'valid': true, 'error_number': 0, 'error': errors[0]};
+ }
+
+ /// Returns a FEN String representing the current position
+ String generate_fen() {
+   int empty = 0;
+   String fen = '';
+
+   for (int i = SQUARES["a8"]; i &lt;= SQUARES["h1"]; i++) {
+     if (board[i] == null) {
+       empty++;
+     } else {
+       if (empty &gt; 0) {
+         fen += empty.toString();
+         empty = 0;
+       }
+       String color = board[i]["color"];
+       String piece = board[i]["type"];
+
+       fen += (color == WHITE) ?
+                piece.toUpperCase() : piece.toLowerCase();
+     }
+
+     if (((i + 1) &amp; 0x88) != 0) {
+       if (empty &gt; 0) {
+         fen += empty.toString();
+       }
+
+       if (i != SQUARES["h1"]) {
+         fen += '/';
+       }
+
+       empty = 0;
+       i += 8;
+     }
+   }
+
+   String cflags = '';
+   if ((castling[WHITE] &amp; BITS['KSIDE_CASTLE']) != 0) { cflags += 'K'; }
+   if ((castling[WHITE] &amp; BITS['QSIDE_CASTLE']) != 0) { cflags += 'Q'; }
+   if ((castling[BLACK] &amp; BITS['KSIDE_CASTLE']) != 0) { cflags += 'k'; }
+   if ((castling[BLACK] &amp; BITS['QSIDE_CASTLE']) != 0) { cflags += 'q'; }
+
+   /* do we have an empty castling flag? */
+   if (cflags == "") {
+     cflags = '-';
+   }
+   String epflags = (ep_square == EMPTY) ? '-' : algebraic(ep_square);
+
+   return [fen, turn, cflags, epflags, half_moves, move_number].join(' ');
+ }
+
+ /// Updates [header] with the List of args and returns it
+ Map set_header(args) {
+   for (int i = 0; i &lt; args.length; i += 2) {
+     if (args[i] is String &amp;&amp;
+         args[i + 1] is String) {
+       header[args[i]] = args[i + 1];
+     }
+   }
+   return header;
+ }
+
+ /// called when the initial board setup is changed with put() or remove().
+ /// modifies the SetUp and FEN properties of the header object.  if the FEN is
+ /// equal to the default position, the SetUp and FEN are deleted
+ /// the setup is only updated if history.length is zero, ie moves haven't been
+ /// made.
+ void update_setup(String fen) {
+   if (history.length &gt; 0) return;
+
+   if (fen != DEFAULT_POSITION) {
+     header['SetUp'] = '1';
+     header['FEN'] = fen;
+   } else {
+     header.remove('SetUp');
+     header.remove('FEN');
+   }
+ }
+
+ /// Returns the piece at the square in question or null
+ /// if there is none
+ Map get(String square) {
+   Map piece = board[SQUARES[square]];
+   return (piece != null) ? {'type': piece['type'], 'color': piece['color']} : null;
+ }
+
+ /// Put [piece] on [square]
+ bool put(Map piece, String square) {
+   /* check for valid piece object */
+   if (!(piece.containsKey('type') &amp;&amp; piece.containsKey('color'))) {
+     return false;
+   }
+
+   /* check for piece */
+   if (SYMBOLS.indexOf(piece['type'].toLowerCase()) == -1) {
+     return false;
+   }
+
+   /* check for valid square */
+   if (!(SQUARES.containsKey(square))) {
+     return false;
+   }
+
+   int sq = SQUARES[square];
+   board[sq] = {'type': piece['type'], 'color': piece['color']};
+   if (piece['type'] == KING) {
+     kings[piece['color']] = sq;
+   }
+
+   update_setup(generate_fen());
+
+   return true;
+ }
+
+ /// Removes a piece from a square and returns it,
+ /// or null if none is present
+ Map remove(String square) {
+   Map piece = get(square);
+   board[SQUARES[square]] = null;
+   if (piece != null &amp;&amp; piece['type'] == KING) {
+     kings[piece['color']] = EMPTY;
+   }
+
+   update_setup(generate_fen());
+
+   return piece;
+ }
+ 
+ Map build_move(board, from, to, flags, [promotion]) {
+   Map move = {
+     'color': turn,
+     'from': from,
+     'to': to,
+     'flags': flags,
+     'piece': board[from]['type']
+   };
+
+   if (promotion != null) {
+     move['flags'] |= BITS['PROMOTION'];
+     move['promotion'] = promotion;
+   }
+
+   if (board[to] != null) {
+     move['captured'] = board[to]['type'];
+   } else if ((flags &amp; BITS['EP_CAPTURE']) != 0) {
+       move['captured'] = PAWN;
+   }
+   return move;
+ }
+
+ generate_moves([Map options]) {
+   add_move(board, moves, from, to, flags) {
+     /* if pawn promotion */
+     if (board[from]['type'] == PAWN &amp;&amp;
+        (rank(to) == RANK_8 || rank(to) == RANK_1)) {
+         List pieces = [QUEEN, ROOK, BISHOP, KNIGHT];
+         for (var i = 0, len = pieces.length; i &lt; len; i++) {
+           moves.add(build_move(board, from, to, flags, pieces[i]));
+         }
+     } else {
+      moves.add(build_move(board, from, to, flags));
+     }
+   }
+
+   List moves = [];
+   var us = turn;
+   var them = swap_color(us);
+   Map second_rank = {'b': RANK_7, 'w': RANK_2};
+
+   var first_sq = SQUARES['a8'];
+   var last_sq = SQUARES['h1'];
+   bool single_square = false;
+
+   /* do we want legal moves? */
+   var legal = (options != null &amp;&amp; options.containsKey('legal')) ?
+               options['legal'] : true;
+
+   /* are we generating moves for a single square? */
+   if (options != null &amp;&amp; options.containsKey('square')) {
+     if (SQUARES.containsKey(options['square'])) {
+       first_sq = last_sq = SQUARES[options['square']];
+       single_square = true;
+     } else {
+       /* invalid square */
+       return [];
+     }
+   }
+
+   for (int i = first_sq; i &lt;= last_sq; i++) {
+     /* did we run off the end of the board */
+     if ((i &amp; 0x88) != 0) { i += 7; continue; }
+
+     var piece = board[i];
+     if (piece == null || piece['color'] != us) {
+       continue;
+     }
+
+     if (piece['type'] == PAWN) {
+       /* single square, non-capturing */
+       int square = i + PAWN_OFFSETS[us][0];
+       if (board[square] == null) {
+         add_move(board, moves, i, square, BITS['NORMAL']);
+
+         /* double square */
+         var square2 = i + PAWN_OFFSETS[us][1];
+         if (second_rank[us] == rank(i) &amp;&amp; board[square2] == null) {
+           add_move(board, moves, i, square2, BITS['BIG_PAWN']);
+         }
+       }
+
+       /* pawn captures */
+       for (int j = 2; j &lt; 4; j++) {
+         var square = i + PAWN_OFFSETS[us][j];
+         if ((square &amp; 0x88) != 0) continue;
+
+         if (board[square] != null &amp;&amp;
+             board[square]['color'] == them) {
+             add_move(board, moves, i, square, BITS['CAPTURE']);
+         } else if (square == ep_square) {
+             add_move(board, moves, i, ep_square, BITS['EP_CAPTURE']);
+         }
+       }
+     } else {
+       for (int j = 0, len = PIECE_OFFSETS[piece['type']].length; j &lt; len; j++) {
+         var offset = PIECE_OFFSETS[piece['type']][j];
+         var square = i;
+
+         while (true) {
+           square += offset;
+           if ((square &amp; 0x88) != 0) break;
+
+           if (board[square] == null) {
+             add_move(board, moves, i, square, BITS['NORMAL']);
+           } else {
+             if (board[square]['color'] == us) {
+               break;
+             }
+             add_move(board, moves, i, square, BITS['CAPTURE']);
+             break;
+           }
+
+           /* break, if knight or king */
+           if (piece['type'] == 'n' || piece['type'] == 'k') break;
+         }
+       }
+     }
+   }
+
+   // check for castling if: a) we're generating all moves, or b) we're doing
+   // single square move generation on the king's square
+   if ((!single_square) || last_sq == kings[us]) {
+     /* king-side castling */
+     if ((castling[us] &amp; BITS['KSIDE_CASTLE']) != 0) {
+       var castling_from = kings[us];
+       var castling_to = castling_from + 2;
+
+       if (board[castling_from + 1] == null &amp;&amp;
+           board[castling_to]       == null &amp;&amp;
+           !attacked(them, kings[us]) &amp;&amp;
+           !attacked(them, castling_from + 1) &amp;&amp;
+           !attacked(them, castling_to)) {
+         add_move(board, moves, kings[us] , castling_to,
+                  BITS['KSIDE_CASTLE']);
+       }
+     }
+
+     /* queen-side castling */
+     if ((castling[us] &amp; BITS['QSIDE_CASTLE']) != 0) {
+       var castling_from = kings[us];
+       var castling_to = castling_from - 2;
+
+       if (board[castling_from - 1] == null &amp;&amp;
+           board[castling_from - 2] == null &amp;&amp;
+           board[castling_from - 3] == null &amp;&amp;
+           !attacked(them, kings[us]) &amp;&amp;
+           !attacked(them, castling_from - 1) &amp;&amp;
+           !attacked(them, castling_to)) {
+         add_move(board, moves, kings[us], castling_to,
+                  BITS['QSIDE_CASTLE']);
+       }
+     }
+   }
+
+   /* return all pseudo-legal moves (this includes moves that allow the king
+    * to be captured)
+    */
+   if (!legal) {
+     return moves;
+   }
+
+   /* filter out illegal moves */
+   var legal_moves = [];
+   for (int i = 0, len = moves.length; i &lt; len; i++) {
+     make_move(moves[i]);
+     if (!king_attacked(us)) {
+       legal_moves.add(moves[i]);
+     }
+     undo_move();
+   }
+
+   return legal_moves;
+ }
+
+ /// Convert a move from 0x88 coordinates to Standard Algebraic Notation(SAN)
+ String move_to_san(Map move) {
+   String output = '';
+
+   if ((move['flags'] &amp; BITS['KSIDE_CASTLE']) != 0) {
+     output = 'O-O';
+   } else if ((move["flags"] &amp; BITS['QSIDE_CASTLE']) != 0) {
+     output = 'O-O-O';
+   } else {
+     var disambiguator = get_disambiguator(move);
+
+     if (move['piece'] != PAWN) {
+       output += move['piece'].toUpperCase() + disambiguator;
+     }
+
+     if ((move['flags'] &amp; (BITS['CAPTURE'] | BITS['EP_CAPTURE'])) != 0) {
+       if (move['piece'] == PAWN) {
+         output += algebraic(move['from'])[0];
+       }
+       output += 'x';
+     }
+
+     output += algebraic(move['to']);
+
+     if ((move['flags'] &amp; BITS['PROMOTION']) != 0) {
+       output += '=' + move['promotion'].toUpperCase();
+     }
+   }
+
+   make_move(move);
+   if (in_check()) {
+     if (in_checkmate()) {
+       output += '#';
+     } else {
+       output += '+';
+     }
+   }
+   undo_move();
+
+   return output;
+ }
+
+ bool attacked(String color, int square) {
+   for (int i = SQUARES['a8']; i &lt;= SQUARES['h1']; i++) {
+     /* did we run off the end of the board */
+     if ((i &amp; 0x88) != 0) { i += 7; continue; }
+
+     /* if empty square or wrong color */
+     if (board[i] == null || board[i]['color'] != color) continue;
+
+     var piece = board[i];
+     var difference = i - square;
+     var index = difference + 119;
+
+     if ((ATTACKS[index] &amp; (1 &lt;&lt; SHIFTS[piece['type']])) != 0) {
+       if (piece['type'] == PAWN) {
+         if (difference &gt; 0) {
+           if (piece['color'] == WHITE) return true;
+         } else {
+           if (piece['color'] == BLACK) return true;
+         }
+         continue;
+       }
+
+       /* if the piece is a knight or a king */
+       if (piece['type'] == 'n' || piece['type'] == 'k') return true;
+
+       var offset = RAYS[index];
+       var j = i + offset;
+
+       var blocked = false;
+       while (j != square) {
+         if (board[j] != null) { blocked = true; break; }
+         j += offset;
+       }
+
+       if (!blocked) return true;
+     }
+   }
+
+   return false;
+ }
+
+ bool king_attacked(String color) {
+   return attacked(swap_color(color), kings[color]);
+ }
+
+ bool in_check() {
+   return king_attacked(turn);
+ }
+
+ bool in_checkmate() {
+   return in_check() &amp;&amp; generate_moves().length == 0;
+ }
+
+ bool in_stalemate() {
+   return !in_check() &amp;&amp; generate_moves().length == 0;
+ }
+
+ bool insufficient_material() {
+   Map pieces = {};
+   List bishops = [];
+   int num_pieces = 0;
+   var sq_color = 0;
+
+   for (int i = SQUARES['a8']; i&lt;= SQUARES['h1']; i++) {
+     sq_color = (sq_color + 1) % 2;
+     if ((i &amp; 0x88) != 0) { i += 7; continue; }
+
+     var piece = board[i];
+     if (piece != null) {
+       pieces[piece['type']] = (pieces.containsKey(piece['type'])) ?
+                             pieces[piece['type']] + 1 : 1;
+       if (piece['type'] == BISHOP) {
+         bishops.add(sq_color);
+       }
+       num_pieces++;
+     }
+   }
+
+   /* k vs. k */
+   if (num_pieces == 2) { return true; }
+
+   /* k vs. kn .... or .... k vs. kb */
+   else if (num_pieces == 3 &amp;&amp; (pieces[BISHOP] == 1 ||
+                                pieces[KNIGHT] == 1)) { return true; }
+
+   /* kb vs. kb where any number of bishops are all on the same color */
+   else if (pieces.containsKey(BISHOP) &amp;&amp; num_pieces == (pieces[BISHOP] + 2)) {
+     var sum = 0;
+     var len = bishops.length;
+     for (int i = 0; i &lt; len; i++) {
+       sum += bishops[i];
+     }
+     if (sum == 0 || sum == len) { return true; }
+   }
+
+   return false;
+ }
+
+ bool in_threefold_repetition() {
+   /* TODO: while this function is fine for casual use, a better
+    * implementation would use a Zobrist key (instead of FEN). the
+    * Zobrist key would be maintained in the make_move/undo_move functions,
+    * avoiding the costly that we do below.
+    */
+   List moves = [];
+   Map positions = {};
+   bool repetition = false;
+
+   while (true) {
+     var move = undo_move();
+     if (move == null) {
+       break;
+     }
+     moves.add(move);
+   }
+
+   while (true) {
+     /* remove the last two fields in the FEN string, they're not needed
+      * when checking for draw by rep */
+     var fen = generate_fen().split(' ').sublist(0,4).join(' ');
+
+     /* has the position occurred three or move times */
+     positions[fen] = (positions.containsKey(fen)) ? positions[fen] + 1 : 1;
+     if (positions[fen] &gt;= 3) {
+       repetition = true;
+     }
+
+     if (moves.length == 0) {
+       break;
+     }
+     make_move(moves.removeLast());
+   }
+
+   return repetition;
+ }
+
+ void push(move) {
+   history.add({
+     'move': move,
+     'kings': {'b': kings['b'], 'w': kings['w']},
+     'turn': turn,
+     'castling': {'b': castling['b'], 'w': castling['w']},
+     'ep_square': ep_square,
+     'half_moves': half_moves,
+     'move_number': move_number
+   });
+ }
+
+ make_move(move) {
+   var us = turn;
+   var them = swap_color(us);
+   push(move);
+
+   board[move['to']] = board[move['from']];
+   board[move['from']] = null;
+
+   /* if ep capture, remove the captured pawn */
+   if ((move['flags'] &amp; BITS['EP_CAPTURE']) != 0) {
+     if (turn == BLACK) {
+       board[move['to'] - 16] = null;
+     } else {
+       board[move['to'] + 16] = null;
+     }
+   }
+
+   /* if pawn promotion, replace with new piece */
+   if ((move['flags'] &amp; BITS['PROMOTION']) != 0) {
+     board[move['to']] = {'type': move['promotion'], 'color': us};
+   }
+
+   /* if we moved the king */
+   if (board[move['to']]['type'] == KING) {
+     kings[board[move['to']]['color']] = move['to'];
+
+     /* if we castled, move the rook next to the king */
+     if ((move['flags'] &amp; BITS['KSIDE_CASTLE']) != 0) {
+       var castling_to = move['to'] - 1;
+       var castling_from = move['to'] + 1;
+       board[castling_to] = board[castling_from];
+       board[castling_from] = null;
+     } else if ((move['flags'] &amp; BITS['QSIDE_CASTLE']) != 0) {
+       var castling_to = move['to'] + 1;
+       var castling_from = move['to'] - 2;
+       board[castling_to] = board[castling_from];
+       board[castling_from] = null;
+     }
+
+     /* turn off castling */
+     castling[us] = 0;
+   }
+
+   /* turn off castling if we move a rook */
+   if (castling[us] != 0) {
+     for (int i = 0, len = ROOKS[us].length; i &lt; len; i++) {
+       if (move['from'] == ROOKS[us][i]['square'] &amp;&amp;
+           ((castling[us] &amp; ROOKS[us][i]['flag']) != 0)) {
+         castling[us] ^= ROOKS[us][i]['flag'];
+         break;
+       }
+     }
+   }
+
+   /* turn off castling if we capture a rook */
+   if (castling[them] != 0) {
+     for (int i = 0, len = ROOKS[them].length; i &lt; len; i++) {
+       if (move['to'] == ROOKS[them][i]['square'] &amp;&amp;
+           ((castling[them] &amp; ROOKS[them][i]['flag']) != 0)) {
+         castling[them] ^= ROOKS[them][i]['flag'];
+         break;
+       }
+     }
+   }
+
+   /* if big pawn move, update the en passant square */
+   if ((move['flags'] &amp; BITS['BIG_PAWN']) != 0) {
+     if (turn == 'b') {
+       ep_square = move['to'] - 16;
+     } else {
+       ep_square = move['to'] + 16;
+     }
+   } else {
+     ep_square = EMPTY;
+   }
+
+   /* reset the 50 move counter if a pawn is moved or a piece is captured */
+   if (move['piece'] == PAWN) {
+     half_moves = 0;
+   } else if ((move['flags'] &amp; (BITS['CAPTURE'] | BITS['EP_CAPTURE'])) != 0) {
+     half_moves = 0;
+   } else {
+     half_moves++;
+   }
+
+   if (turn == BLACK) {
+     move_number++;
+   }
+   turn = swap_color(turn);
+ }
+
+ /// Undoes a move and returns it, or null if move history is empty
+ Map undo_move() {
+   if (history.isEmpty) {
+     return null;
+   }
+   var old = history.removeLast();
+   if (old == null) { return null; }
+
+   var move = old['move'];
+   kings = old['kings'];
+   turn = old['turn'];
+   castling = old['castling'];
+   ep_square = old['ep_square'];
+   half_moves = old['half_moves'];
+   move_number = old['move_number'];
+
+   var us = turn;
+   var them = swap_color(turn);
+
+   board[move['from']] = board[move['to']];
+   board[move['from']]['type'] = move['piece'];  // to undo any promotions
+   board[move['to']] = null;
+
+   if ((move['flags'] &amp; BITS['CAPTURE']) != 0) {
+     board[move['to']] = {'type': move['captured'], 'color': them};
+   } else if ((move['flags'] &amp; BITS['EP_CAPTURE']) != 0) {
+     var index;
+     if (us == BLACK) {
+       index = move['to'] - 16;
+     } else {
+       index = move['to'] + 16;
+     }
+     board[index] = {'type': PAWN, 'color': them};
+   }
+
+
+   if ((move['flags'] &amp; (BITS['KSIDE_CASTLE'] | BITS['QSIDE_CASTLE'])) != 0) {
+     var castling_to, castling_from;
+     if ((move['flags'] &amp; BITS['KSIDE_CASTLE']) != 0) {
+       castling_to = move['to'] + 1;
+       castling_from = move['to'] - 1;
+     } else if ((move['flags'] &amp; BITS['QSIDE_CASTLE']) != 0) {
+       castling_to = move['to'] - 2;
+       castling_from = move['to'] + 1;
+     }
+
+     board[castling_to] = board[castling_from];
+     board[castling_from] = null;
+   }
+
+   return move;
+ }
+
+ /* this function is used to uniquely identify ambiguous moves */
+ get_disambiguator(move) {
+   var moves = generate_moves();
+
+   var from = move['from'];
+   var to = move['to'];
+   var piece = move['piece'];
+
+   var ambiguities = 0;
+   var same_rank = 0;
+   var same_file = 0;
+
+   for (int i = 0, len = moves.length; i &lt; len; i++) {
+     var ambig_from = moves[i]['from'];
+     var ambig_to = moves[i]['to'];
+     var ambig_piece = moves[i]['piece'];
+
+     /* if a move of the same piece type ends on the same to square, we'll
+      * need to add a disambiguator to the algebraic notation
+      */
+     if (piece == ambig_piece &amp;&amp; from != ambig_from &amp;&amp; to == ambig_to) {
+       ambiguities++;
+
+       if (rank(from) == rank(ambig_from)) {
+         same_rank++;
+       }
+
+       if (file(from) == file(ambig_from)) {
+         same_file++;
+       }
+     }
+   }
+
+   if (ambiguities &gt; 0) {
+     /* if there exists a similar moving piece on the same rank and file as
+      * the move in question, use the square as the disambiguator
+      */
+     if (same_rank &gt; 0 &amp;&amp; same_file &gt; 0) {
+       return algebraic(from);
+     }
+     /* if the moving piece rests on the same file, use the rank symbol as the
+      * disambiguator
+      */
+     else if (same_file &gt; 0) {
+       return algebraic(from)[1];
+     }
+     /* else use the file symbol */
+     else {
+       return algebraic(from)[0];
+     }
+   }
+
+   return '';
+ }
+
+ /// Returns a String representation of the current position
+ /// complete with ascii art
+ String ascii() {
+   String s = '   +------------------------+\n';
+   for (var i = SQUARES['a8']; i &lt;= SQUARES['h1']; i++) {
+     /* display the rank */
+     if (file(i) == 0) {
+       s += ' ' + '87654321'[rank(i)] + ' |';
+     }
+
+     /* empty piece */
+     if (board[i] == null) {
+       s += ' . ';
+     } else {
+       var piece = board[i]['type'];
+       var color = board[i]['color'];
+       var symbol = (color == WHITE) ?
+                    piece.toUpperCase() : piece.toLowerCase();
+       s += ' ' + symbol + ' ';
+     }
+
+     if (((i + 1) &amp; 0x88) != 0) {
+       s += '|\n';
+       i += 8;
+     }
+   }
+   s += '   +------------------------+\n';
+   s += '     a  b  c  d  e  f  g  h\n';
+
+   return s;
+ }
+
+ // Utility Functions
+ int rank(int i) {
+   return i &gt;&gt; 4;
+ }
+
+ int file(int i) {
+   return i &amp; 15;
+ }
+
+ String algebraic(int i){
+   var f = file(i), r = rank(i);
+   return 'abcdefgh'.substring(f,f+1) + '87654321'.substring(r,r+1);
+ }
+
+ String swap_color(String c) {
+   return c == WHITE ? BLACK : WHITE;
+ }
+
+ bool is_digit(String c) {
+   return '0123456789'.contains(c);
+ }
+
+ /// pretty = external move object
+ make_pretty(ugly_move) {
+   var move = clone(ugly_move);
+   move['san'] = move_to_san(move);
+   move['to'] = algebraic(move['to']);
+   move['from'] = algebraic(move['from']);
+
+   var flags = '';
+
+   for (var flag in BITS.keys) {
+     if ((BITS[flag] &amp; move['flags']) != 0) {
+       flags += FLAGS[flag];
+     }
+   }
+   move['flags'] = flags;
+
+   return move;
+ }
+
+ /// Duplicate a Map or List
+ clone(obj) {
+   var dupe;
+   if (obj is List) {
+     dupe = new List.from(obj);
+   } else {
+     dupe = new Map.from(obj);
+   }
+   
+   /*for (var property in obj) {
+     if (typeof property === 'object') {
+       dupe[property] = clone(obj[property]);
+     } else {
+       dupe[property] = obj[property];
+     }
+   }*/
+
+   return dupe;
+ }
+
+ String trim(String str) {
+   return str.replaceAll(new RegExp(r"^\s+|\s+$"), '');
+ }
+
+ // debug utility
+ perft(depth) {
+   var moves = generate_moves({'legal': false});
+   var nodes = 0;
+   var color = turn;
+
+   for (var i = 0, len = moves.length; i &lt; len; i++) {
+     make_move(moves[i]);
+     if (!king_attacked(color)) {
+       if (depth - 1 &gt; 0) {
+         var child_nodes = perft(depth - 1);
+         nodes += child_nodes;
+       } else {
+         nodes++;
+       }
+     }
+     undo_move();
+   }
+
+   return nodes;
+ }
+ 
+ //Public APIs
+ 
+ ///  Returns a list of legals moves from the current position. 
+ ///  The function takes an optional parameter which controls the 
+ ///  single-square move generation and verbosity.
+ ///
+ ///  The piece, captured, and promotion fields contain the lowercase 
+ ///  representation of the applicable piece.
+ ///
+ ///  The flags field in verbose mode may contain one or more of the following values:
+ ///
+ ///  'n' - a non-capture
+ ///  'b' - a pawn push of two squares
+ ///  'e' - an en passant capture
+ ///  'c' - a standard capture
+ ///  'p' - a promotion
+ ///  'k' - kingside castling
+ ///  'q' - queenside castling
+ ///  A flag of 'pc' would mean that a pawn captured a piece on the 8th rank and promoted.
+   moves([Map options]) {
+     /* The internal representation of a chess move is in 0x88 format, and
+      * not meant to be human-readable.  The code below converts the 0x88
+      * square coordinates to algebraic coordinates.  It also prunes an
+      * unnecessary move keys resulting from a verbose call.
+      */
+
+     var ugly_moves = generate_moves(options);
+     List moves = [];
+
+     for (int i = 0, len = ugly_moves.length; i &lt; len; i++) {
+
+       /* does the user want a full move object (most likely not), or just
+        * SAN
+        */
+       if (options != null &amp;&amp; options.containsKey('verbose') &amp;&amp;
+           options['verbose'] == true) {
+         moves.add(make_pretty(ugly_moves[i]));
+       } else {
+         moves.add(move_to_san(ugly_moves[i]));
+       }
+     }
+
+     return moves;
+   }
+
+   in_draw() {
+     return half_moves &gt;= 100 ||
+            in_stalemate() ||
+            insufficient_material() ||
+            in_threefold_repetition();
+   }
+
+   game_over() {
+     return half_moves &gt;= 100 ||
+            in_checkmate() ||
+            in_stalemate() ||
+            insufficient_material() ||
+            in_threefold_repetition();
+   }
+
+   fen() {
+     return generate_fen();
+   }
+
+   /// Return the PGN representation of the game thus far
+   pgn([Map options]) {
+     /* using the specification from http://www.chessclub.com/help/PGN-spec
+      * example for html usage: .pgn({ max_width: 72, newline_char: "&lt;br /&gt;" })
+      */
+     var newline = (options != null &amp;&amp;
+                    options.containsKey("newline_char") &amp;&amp; options["newline_char"] != null) ?
+                    options['newline_char'] : '\n';
+     var max_width = (options != null &amp;&amp;
+                    options.containsKey("max_width") &amp;&amp; options["max_width"] != null) ?
+                      options["max_width"] : 0;
+     var result = [];
+     var header_exists = false;
+
+     /* add the PGN header headerrmation */
+     for (var i in header.keys) {
+       /* TODO: order of enumerated properties in header object is not
+        * guaranteed, see ECMA-262 spec (section 12.6.4)
+        */
+       result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
+       header_exists = true;
+     }
+
+     if (header_exists &amp;&amp; (history.length != 0)) {
+       result.add(newline);
+     }
+
+     /* pop all of history onto reversed_history */
+     var reversed_history = [];
+     while (history.length &gt; 0) {
+       reversed_history.add(undo_move());
+     }
+
+     List moves = [];
+     String move_string = '';
+     int pgn_move_number = 1;
+
+     /* build the list of moves.  a move_string looks like: "3. e3 e6" */
+     while (reversed_history.length &gt; 0) {
+       var move = reversed_history.removeLast();
+
+       /* if the position started with black to move, start PGN with 1. ... */
+       if (pgn_move_number == 1 &amp;&amp; move['color'] == 'b') {
+         move_string = '1. ...';
+         pgn_move_number++;
+       } else if (move['color'] == 'w') {
+         /* store the previous generated move_string if we have one */
+         if (move_string.length != 0) {
+           moves.add(move_string);
+         }
+         move_string = pgn_move_number.toString() + '.';
+         pgn_move_number++;
+       }
+
+       move_string = move_string + ' ' + move_to_san(move);
+       make_move(move);
+     }
+
+     /* are there any other leftover moves? */
+     if (move_string.length != 0) {
+       moves.add(move_string);
+     }
+
+     /* is there a result? */
+     if (header['Result'] != null) {
+       moves.add(header['Result']);
+     }
+
+     /* history should be back to what is was before we started generating PGN,
+      * so join together moves
+      */
+     if (max_width == 0) {
+       return result.join('') + moves.join(' ');
+     }
+
+     /* wrap the PGN output at max_width */
+     var current_width = 0;
+     for (int i = 0; i &lt; moves.length; i++) {
+       /* if the current move will push past max_width */
+       if (current_width + moves[i].length &gt; max_width &amp;&amp; i != 0) {
+
+         /* don't end the line with whitespace */
+         if (result[result.length - 1] == ' ') {
+           result.removeLast();
+         }
+
+         result.add(newline);
+         current_width = 0;
+       } else if (i != 0) {
+         result.add(' ');
+         current_width++;
+       }
+       result.add(moves[i]);
+       current_width += moves[i].length;
+     }
+
+     return result.join('');
+   }
+
+   /// Load the moves of a game stored in Portable Game Notation. 
+   /// [options] is an optional parameter that contains a 'newline_char' 
+   /// which is a string representation of a RegExp (and should not be pre-escaped) 
+   /// and defaults to '\r?\n'). 
+   /// Returns [true] if the PGN was parsed successfully, otherwise [false].
+   load_pgn(String pgn, [Map options]) {
+     mask(str) {
+       return str.replaceAll(new RegExp(r"\\"), '\\');
+     }
+
+     /* convert a move from Standard Algebraic Notation (SAN) to 0x88
+      * coordinates
+     */
+     move_from_san(move) {
+       var moves = generate_moves();
+       for (var i = 0, len = moves.length; i &lt; len; i++) {
+         /* strip off any trailing move decorations: e.g Nf3+?! */
+         if (move.replaceAll(new RegExp(r"[+#?!=]+$"),'') ==
+             move_to_san(moves[i]).replaceAll(new RegExp(r"[+#?!=]+$"),'')) {
+           return moves[i];
+         }
+       }
+       return null;
+     }
+
+     get_move_obj(move) {
+       return move_from_san(trim(move));
+     }
+
+     /*has_keys(object) {
+       bool has_keys = false;
+       for (var key in object) {
+         has_keys = true;
+       }
+       return has_keys;
+     }*/
+
+     parse_pgn_header(header, [Map options]) {
+       var newline_char = (options != null &amp;&amp;
+                           options.containsKey("newline_char")) ?
+                           options['newline_char'] : '\r?\n';
+       var header_obj = {};
+       var headers = header.split(newline_char);
+       var key = '';
+       var value = '';
+
+       for (var i = 0; i &lt; headers.length; i++) {
+         RegExp keyMatch = new RegExp(r"^\[([A-Z][A-Za-z]*)\s.*\]$");
+         var temp = keyMatch.firstMatch(headers[i]);
+         if (temp != null) {
+           key = temp[1];
+         }
+         //print(key);
+         RegExp valueMatch = new RegExp(r'^\[[A-Za-z]+\s"(.*)"\]$');
+         temp = valueMatch.firstMatch(headers[i]);
+         if (temp != null) {
+           value = temp[1];
+         }
+         //print(value);
+         if (trim(key).length &gt; 0) {
+           header_obj[key] = value;
+         }
+       }
+
+       return header_obj;
+     }
+
+     var newline_char = (options != null &amp;&amp;
+                         options.containsKey("newline_char")) ?
+                         options["newline_char"] : '\r?\n';
+     //var regex = new RegExp(r'^(\[.*\]).*' + r'1\.'); //+ r"1\."); //+ mask(newline_char));
+
+     int indexOfMoveStart = pgn.indexOf(new RegExp(newline_char + r"1\."));
+     
+     /* get header part of the PGN file */
+     String header_string = null;
+     if (indexOfMoveStart != -1) {
+        header_string = pgn.substring(0, indexOfMoveStart).trim();
+     }
+
+     /* no info part given, begins with moves */
+     if (header_string == null || header_string[0] != '[') {
+       header_string = '';
+     }
+
+    reset();
+
+     /* parse PGN header */
+     var headers = parse_pgn_header(header_string, options);
+     for (var key in headers.keys) {
+       set_header([key, headers[key]]);
+     }
+
+     /* delete header to get the moves */
+     var ms = pgn.replaceAll(header_string, '').replaceAll(new RegExp(mask(newline_char)), ' ');
+
+     /* delete comments */
+     ms = ms.replaceAll(new RegExp(r"(\{[^}]+\})+?"), '');
+
+     /* delete move numbers */
+     ms = ms.replaceAll(new RegExp(r"\d+\."), '');
+
+
+     /* trim and get array of moves */
+     var moves = trim(ms).split(new RegExp(r"\s+"));
+
+     /* delete empty entries */
+     moves = moves.join(',').replaceAll(new RegExp(r",,+"), ',').split(',');
+     var move = '';
+
+     for (var half_move = 0; half_move &lt; moves.length - 1; half_move++) {
+       move = get_move_obj(moves[half_move]);
+
+       /* move not possible! (don't clear the board to examine to show the
+        * latest valid position)
+        */
+       if (move == null) {
+         return false;
+       } else {
+         make_move(move);
+       }
+     }
+
+     /* examine last move */
+     move = moves[moves.length - 1];
+     if (POSSIBLE_RESULTS.contains(move)) {
+       if (!header.containsKey("Result")) {
+         set_header(['Result', move]);
+       }
+     }
+     else {
+       move = get_move_obj(move);
+       if (move == null) {
+         return false;
+       } else {
+         make_move(move);
+       }
+     }
+     return true;
+   }
+   
+   /// The move function can be called with in the following parameters:
+   /// .move('Nxb7')      &lt;- where 'move' is a case-sensitive SAN string
+   /// .move({ from: 'h7', &lt;- where the 'move' is a move object (additional
+   ///      to :'h8',      fields are ignored)
+   ///      promotion: 'q',
+   ///      })
+   move(move) {
+     
+     var move_obj = null;
+     var moves = generate_moves();
+
+     if (move is String) {
+       /* convert the move string to a move object */
+       for (var i = 0, len = moves.length; i &lt; len; i++) {
+         if (move == move_to_san(moves[i])) {
+           move_obj = moves[i];
+           break;
+         }
+       }
+     } else if (move is Map) {
+       /* convert the pretty move object to an ugly move object */
+       for (var i = 0, len = moves.length; i &lt; len; i++) {
+         if (move['from'] == algebraic(moves[i]['from']) &amp;&amp;
+             move['to'] == algebraic(moves[i]['to']) &amp;&amp;
+             (!(moves[i].containsKey("promotion")) ||
+             move['promotion'] == moves[i]['promotion'])) {
+           move_obj = moves[i];
+           break;
+         }
+       }
+     }
+
+     /* failed to find move */
+     if (move_obj == null) {
+       return null;
+     }
+
+     /* need to make a copy of move because we can't generate SAN after the
+      * move is made
+      */
+     var pretty_move = make_pretty(move_obj);
+
+     make_move(move_obj);
+
+     return pretty_move;
+   }
+
+   /// Takeback the last half-move, returning a move Map if successful, otherwise null.
+   undo() {
+     var move = undo_move();
+     return (move != null) ? make_pretty(move) : null;
+   }
+
+   /// Returns the color of the square ('light' or 'dark'), or null if [square] is invalid
+   String square_color(square) {
+     if (SQUARES.containsKey(square)) {
+       var sq_0x88 = SQUARES[square];
+       return ((rank(sq_0x88) + file(sq_0x88)) % 2 == 0) ? 'light' : 'dark';
+     }
+
+     return null;
+   }
+
+   getHistory([Map options]) {
+     var reversed_history = [];
+     var move_history = [];
+     var verbose = (options != null &amp;&amp; options.containsKey("verbose") &amp;&amp;
+                    options["verbose"] == true);
+
+     while (history.length &gt; 0) {
+       reversed_history.add(undo_move());
+     }
+
+     while (reversed_history.length &gt; 0) {
+       var move = reversed_history.removeLast();
+       if (verbose) {
+         move_history.add(make_pretty(move));
+       } else {
+         move_history.add(move_to_san(move));
+       }
+       make_move(move);
+     }
+
+     return move_history;
+   }
+
+}
+</pre>
+</div>
+<div>
+<h3>Static Properties</h3>
+<div class="field"><h4 id="ATTACKS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>         <strong>ATTACKS</strong> <a class="anchor-link"
+            href="#ATTACKS"
+            title="Permalink to Chess.ATTACKS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const List ATTACKS = const [
+ 20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20, 0,
+  0,20, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0,20, 0, 0,
+  0, 0,20, 0, 0, 0, 0, 24,  0, 0, 0, 0,20, 0, 0, 0,
+  0, 0, 0,20, 0, 0, 0, 24,  0, 0, 0,20, 0, 0, 0, 0,
+  0, 0, 0, 0,20, 0, 0, 24,  0, 0,20, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0,20, 2, 24,  2,20, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 2,53, 56, 53, 2, 0, 0, 0, 0, 0, 0,
+ 24,24,24,24,24,24,56,  0, 56,24,24,24,24,24,24, 0,
+  0, 0, 0, 0, 0, 2,53, 56, 53, 2, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0,20, 2, 24,  2,20, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0,20, 0, 0, 24,  0, 0,20, 0, 0, 0, 0, 0,
+  0, 0, 0,20, 0, 0, 0, 24,  0, 0, 0,20, 0, 0, 0, 0,
+  0, 0,20, 0, 0, 0, 0, 24,  0, 0, 0, 0,20, 0, 0, 0,
+  0,20, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0,20, 0, 0,
+ 20, 0, 0, 0, 0, 0, 0, 24,  0, 0, 0, 0, 0, 0,20
+]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BISHOP">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>BISHOP</strong> <a class="anchor-link"
+            href="#BISHOP"
+            title="Permalink to Chess.BISHOP">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String BISHOP = 'b'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BITS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>BITS</strong> <a class="anchor-link"
+            href="#BITS"
+            title="Permalink to Chess.BITS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const Map BITS = const {
+ 'NORMAL': 1,
+ 'CAPTURE': 2,
+ 'BIG_PAWN': 4,
+ 'EP_CAPTURE': 8,
+ 'PROMOTION': 16,
+ 'KSIDE_CASTLE': 32,
+ 'QSIDE_CASTLE': 64
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="BLACK">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>BLACK</strong> <a class="anchor-link"
+            href="#BLACK"
+            title="Permalink to Chess.BLACK">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String BLACK = 'b'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="DEFAULT_POSITION">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>DEFAULT_POSITION</strong> <a class="anchor-link"
+            href="#DEFAULT_POSITION"
+            title="Permalink to Chess.DEFAULT_POSITION">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String DEFAULT_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="EMPTY">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>EMPTY</strong> <a class="anchor-link"
+            href="#EMPTY"
+            title="Permalink to Chess.EMPTY">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int EMPTY = -1
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="FLAGS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>FLAGS</strong> <a class="anchor-link"
+            href="#FLAGS"
+            title="Permalink to Chess.FLAGS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const Map FLAGS = const {
+ 'NORMAL': 'n',
+ 'CAPTURE': 'c',
+ 'BIG_PAWN': 'b',
+ 'EP_CAPTURE': 'e',
+ 'PROMOTION': 'p',
+ 'KSIDE_CASTLE': 'k',
+ 'QSIDE_CASTLE': 'q'
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="KING">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>KING</strong> <a class="anchor-link"
+            href="#KING"
+            title="Permalink to Chess.KING">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String KING = 'k'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="KNIGHT">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>KNIGHT</strong> <a class="anchor-link"
+            href="#KNIGHT"
+            title="Permalink to Chess.KNIGHT">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String KNIGHT = 'n'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="PAWN">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>PAWN</strong> <a class="anchor-link"
+            href="#PAWN"
+            title="Permalink to Chess.PAWN">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String PAWN = 'p'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="PAWN_OFFSETS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>PAWN_OFFSETS</strong> <a class="anchor-link"
+            href="#PAWN_OFFSETS"
+            title="Permalink to Chess.PAWN_OFFSETS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const Map PAWN_OFFSETS = const {
+ 'b': const [16, 32, 17, 15],
+ 'w': const [-16, -32, -17, -15]
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="PIECE_OFFSETS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>PIECE_OFFSETS</strong> <a class="anchor-link"
+            href="#PIECE_OFFSETS"
+            title="Permalink to Chess.PIECE_OFFSETS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const Map PIECE_OFFSETS = const {
+ 'n': const [-18, -33, -31, -14,  18, 33, 31,  14],
+ 'b': const [-17, -15,  17,  15],
+ 'r': const [-16,   1,  16,  -1],
+ 'q': const [-17, -16, -15,   1,  17, 16, 15,  -1],
+ 'k': const [-17, -16, -15,   1,  17, 16, 15,  -1]
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="POSSIBLE_RESULTS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>         <strong>POSSIBLE_RESULTS</strong> <a class="anchor-link"
+            href="#POSSIBLE_RESULTS"
+            title="Permalink to Chess.POSSIBLE_RESULTS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const List POSSIBLE_RESULTS = const ['1-0', '0-1', '1/2-1/2', '*']
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="QUEEN">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>QUEEN</strong> <a class="anchor-link"
+            href="#QUEEN"
+            title="Permalink to Chess.QUEEN">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String QUEEN = 'q'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_1">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_1</strong> <a class="anchor-link"
+            href="#RANK_1"
+            title="Permalink to Chess.RANK_1">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_1 = 7
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_2">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_2</strong> <a class="anchor-link"
+            href="#RANK_2"
+            title="Permalink to Chess.RANK_2">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_2 = 6
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_3">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_3</strong> <a class="anchor-link"
+            href="#RANK_3"
+            title="Permalink to Chess.RANK_3">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_3 = 5
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_4">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_4</strong> <a class="anchor-link"
+            href="#RANK_4"
+            title="Permalink to Chess.RANK_4">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_4 = 4
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_5">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_5</strong> <a class="anchor-link"
+            href="#RANK_5"
+            title="Permalink to Chess.RANK_5">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_5 = 3
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_6">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_6</strong> <a class="anchor-link"
+            href="#RANK_6"
+            title="Permalink to Chess.RANK_6">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_6 = 2
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_7">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_7</strong> <a class="anchor-link"
+            href="#RANK_7"
+            title="Permalink to Chess.RANK_7">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_7 = 1
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RANK_8">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>RANK_8</strong> <a class="anchor-link"
+            href="#RANK_8"
+            title="Permalink to Chess.RANK_8">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const int RANK_8 = 0
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="RAYS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>         <strong>RAYS</strong> <a class="anchor-link"
+            href="#RAYS"
+            title="Permalink to Chess.RAYS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const List RAYS = const [
+  17,  0,  0,  0,  0,  0,  0, 16,  0,  0,  0,  0,  0,  0, 15, 0,
+   0, 17,  0,  0,  0,  0,  0, 16,  0,  0,  0,  0,  0, 15,  0, 0,
+   0,  0, 17,  0,  0,  0,  0, 16,  0,  0,  0,  0, 15,  0,  0, 0,
+   0,  0,  0, 17,  0,  0,  0, 16,  0,  0,  0, 15,  0,  0,  0, 0,
+   0,  0,  0,  0, 17,  0,  0, 16,  0,  0, 15,  0,  0,  0,  0, 0,
+   0,  0,  0,  0,  0, 17,  0, 16,  0, 15,  0,  0,  0,  0,  0, 0,
+   0,  0,  0,  0,  0,  0, 17, 16, 15,  0,  0,  0,  0,  0,  0, 0,
+   1,  1,  1,  1,  1,  1,  1,  0, -1, -1,  -1,-1, -1, -1, -1, 0,
+   0,  0,  0,  0,  0,  0,-15,-16,-17,  0,  0,  0,  0,  0,  0, 0,
+   0,  0,  0,  0,  0,-15,  0,-16,  0,-17,  0,  0,  0,  0,  0, 0,
+   0,  0,  0,  0,-15,  0,  0,-16,  0,  0,-17,  0,  0,  0,  0, 0,
+   0,  0,  0,-15,  0,  0,  0,-16,  0,  0,  0,-17,  0,  0,  0, 0,
+   0,  0,-15,  0,  0,  0,  0,-16,  0,  0,  0,  0,-17,  0,  0, 0,
+   0,-15,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,-17,  0, 0,
+ -15,  0,  0,  0,  0,  0,  0,-16,  0,  0,  0,  0,  0,  0,-17
+]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="ROOK">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>ROOK</strong> <a class="anchor-link"
+            href="#ROOK"
+            title="Permalink to Chess.ROOK">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String ROOK = 'r'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="ROOKS">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>ROOKS</strong> <a class="anchor-link"
+            href="#ROOKS"
+            title="Permalink to Chess.ROOKS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static final Map ROOKS = {
+ 'w': [{'square': SQUARES['a1'], 'flag': BITS['QSIDE_CASTLE']},
+     {'square': SQUARES['h1'], 'flag': BITS['KSIDE_CASTLE']}],
+ 'b': [{'square': SQUARES['a8'], 'flag': BITS['QSIDE_CASTLE']},
+     {'square': SQUARES['h8'], 'flag': BITS['KSIDE_CASTLE']}]
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SHIFTS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>SHIFTS</strong> <a class="anchor-link"
+            href="#SHIFTS"
+            title="Permalink to Chess.SHIFTS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const Map SHIFTS = const { 'p': 0, 'n': 1, 'b': 2, 'r': 3, 'q': 4, 'k': 5 }
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SQUARES">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>SQUARES</strong> <a class="anchor-link"
+            href="#SQUARES"
+            title="Permalink to Chess.SQUARES">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const Map SQUARES = const {
+ 'a8':   0, 'b8':   1, 'c8':   2, 'd8':   3, 'e8':   4, 'f8':   5, 'g8':   6, 'h8':   7,
+ 'a7':  16, 'b7':  17, 'c7':  18, 'd7':  19, 'e7':  20, 'f7':  21, 'g7':  22, 'h7':  23,
+ 'a6':  32, 'b6':  33, 'c6':  34, 'd6':  35, 'e6':  36, 'f6':  37, 'g6':  38, 'h6':  39,
+ 'a5':  48, 'b5':  49, 'c5':  50, 'd5':  51, 'e5':  52, 'f5':  53, 'g5':  54, 'h5':  55,
+ 'a4':  64, 'b4':  65, 'c4':  66, 'd4':  67, 'e4':  68, 'f4':  69, 'g4':  70, 'h4':  71,
+ 'a3':  80, 'b3':  81, 'c3':  82, 'd3':  83, 'e3':  84, 'f3':  85, 'g3':  86, 'h3':  87,
+ 'a2':  96, 'b2':  97, 'c2':  98, 'd2':  99, 'e2': 100, 'f2': 101, 'g2': 102, 'h2': 103,
+ 'a1': 112, 'b1': 113, 'c1': 114, 'd1': 115, 'e1': 116, 'f1': 117, 'g1': 118, 'h1': 119
+}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="SYMBOLS">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>SYMBOLS</strong> <a class="anchor-link"
+            href="#SYMBOLS"
+            title="Permalink to Chess.SYMBOLS">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String SYMBOLS = 'pnbrqkPNBRQK'
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="WHITE">
+<button class="show-code">Code</button>
+const <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>WHITE</strong> <a class="anchor-link"
+            href="#WHITE"
+            title="Permalink to Chess.WHITE">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+static const String WHITE = 'w'
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>Chess</strong>() <a class="anchor-link" href="#"
+              title="Permalink to Chess.Chess">#</a></h4>
+<div class="doc">
+<p>By default start with the standard chess starting position</p>
+<pre class="source">
+Chess() {
+ load(DEFAULT_POSITION);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="fromFEN">
+<button class="show-code">Code</button>
+new <strong>Chess.fromFEN</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fen) <a class="anchor-link" href="#fromFEN"
+              title="Permalink to Chess.Chess.fromFEN">#</a></h4>
+<div class="doc">
+<p>Start with a position from a FEN</p>
+<pre class="source">
+Chess.fromFEN(String fen) {
+ load(fen);
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="board">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>         <strong>board</strong> <a class="anchor-link"
+            href="#board"
+            title="Permalink to Chess.board">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List board = new List(128)
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="castling">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>castling</strong> <a class="anchor-link"
+            href="#castling"
+            title="Permalink to Chess.castling">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map castling = {'w': 0, 'b': 0}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="ep_square">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>ep_square</strong> <a class="anchor-link"
+            href="#ep_square"
+            title="Permalink to Chess.ep_square">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int ep_square = EMPTY
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="half_moves">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>half_moves</strong> <a class="anchor-link"
+            href="#half_moves"
+            title="Permalink to Chess.half_moves">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int half_moves = 0
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="header">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>header</strong> <a class="anchor-link"
+            href="#header"
+            title="Permalink to Chess.header">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map header = {}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="history">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>         <strong>history</strong> <a class="anchor-link"
+            href="#history"
+            title="Permalink to Chess.history">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+List history = []
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="kings">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>kings</strong> <a class="anchor-link"
+            href="#kings"
+            title="Permalink to Chess.kings">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map kings = {'w': EMPTY, 'b': EMPTY}
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="move_number">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>move_number</strong> <a class="anchor-link"
+            href="#move_number"
+            title="Permalink to Chess.move_number">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int move_number = 1
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="turn">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>turn</strong> <a class="anchor-link"
+            href="#turn"
+            title="Permalink to Chess.turn">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String turn = WHITE
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="algebraic">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>algebraic</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> i) <a class="anchor-link" href="#algebraic"
+              title="Permalink to Chess.algebraic">#</a></h4>
+<div class="doc">
+<pre class="source">
+String algebraic(int i){
+ var f = file(i), r = rank(i);
+ return 'abcdefgh'.substring(f,f+1) + '87654321'.substring(r,r+1);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ascii">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>ascii</strong>() <a class="anchor-link" href="#ascii"
+              title="Permalink to Chess.ascii">#</a></h4>
+<div class="doc">
+<p>Returns a String representation of the current position
+complete with ascii art</p>
+<pre class="source">
+String ascii() {
+ String s = '   +------------------------+\n';
+ for (var i = SQUARES['a8']; i &lt;= SQUARES['h1']; i++) {
+   /* display the rank */
+   if (file(i) == 0) {
+     s += ' ' + '87654321'[rank(i)] + ' |';
+   }
+
+   /* empty piece */
+   if (board[i] == null) {
+     s += ' . ';
+   } else {
+     var piece = board[i]['type'];
+     var color = board[i]['color'];
+     var symbol = (color == WHITE) ?
+                  piece.toUpperCase() : piece.toLowerCase();
+     s += ' ' + symbol + ' ';
+   }
+
+   if (((i + 1) &amp; 0x88) != 0) {
+     s += '|\n';
+     i += 8;
+   }
+ }
+ s += '   +------------------------+\n';
+ s += '     a  b  c  d  e  f  g  h\n';
+
+ return s;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="attacked">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>attacked</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> color, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> square) <a class="anchor-link" href="#attacked"
+              title="Permalink to Chess.attacked">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool attacked(String color, int square) {
+ for (int i = SQUARES['a8']; i &lt;= SQUARES['h1']; i++) {
+   /* did we run off the end of the board */
+   if ((i &amp; 0x88) != 0) { i += 7; continue; }
+
+   /* if empty square or wrong color */
+   if (board[i] == null || board[i]['color'] != color) continue;
+
+   var piece = board[i];
+   var difference = i - square;
+   var index = difference + 119;
+
+   if ((ATTACKS[index] &amp; (1 &lt;&lt; SHIFTS[piece['type']])) != 0) {
+     if (piece['type'] == PAWN) {
+       if (difference &gt; 0) {
+         if (piece['color'] == WHITE) return true;
+       } else {
+         if (piece['color'] == BLACK) return true;
+       }
+       continue;
+     }
+
+     /* if the piece is a knight or a king */
+     if (piece['type'] == 'n' || piece['type'] == 'k') return true;
+
+     var offset = RAYS[index];
+     var j = i + offset;
+
+     var blocked = false;
+     while (j != square) {
+       if (board[j] != null) { blocked = true; break; }
+       j += offset;
+     }
+
+     if (!blocked) return true;
+   }
+ }
+
+ return false;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="build_move">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>build_move</strong>(board, from, to, flags, [promotion]) <a class="anchor-link" href="#build_move"
+              title="Permalink to Chess.build_move">#</a></h4>
+<div class="doc">
+<pre class="source">
+Map build_move(board, from, to, flags, [promotion]) {
+ Map move = {
+   'color': turn,
+   'from': from,
+   'to': to,
+   'flags': flags,
+   'piece': board[from]['type']
+ };
+
+ if (promotion != null) {
+   move['flags'] |= BITS['PROMOTION'];
+   move['promotion'] = promotion;
+ }
+
+ if (board[to] != null) {
+   move['captured'] = board[to]['type'];
+ } else if ((flags &amp; BITS['EP_CAPTURE']) != 0) {
+     move['captured'] = PAWN;
+ }
+ return move;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="clear">
+<button class="show-code">Code</button>
+dynamic <strong>clear</strong>() <a class="anchor-link" href="#clear"
+              title="Permalink to Chess.clear">#</a></h4>
+<div class="doc">
+<p>Reset all of the instance variables</p>
+<pre class="source">
+clear() {
+ board = new List(128);
+ kings = {'w': EMPTY, 'b': EMPTY};
+ turn = WHITE;
+ castling = {'w': 0, 'b': 0};
+ ep_square = EMPTY;
+ half_moves = 0;
+ move_number = 1;
+ history = [];
+ header = {};
+ update_setup(generate_fen());
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="clone">
+<button class="show-code">Code</button>
+dynamic <strong>clone</strong>(obj) <a class="anchor-link" href="#clone"
+              title="Permalink to Chess.clone">#</a></h4>
+<div class="doc">
+<p>Duplicate a Map or List</p>
+<pre class="source">
+clone(obj) {
+ var dupe;
+ if (obj is List) {
+   dupe = new List.from(obj);
+ } else {
+   dupe = new Map.from(obj);
+ }
+ 
+ /*for (var property in obj) {
+   if (typeof property === 'object') {
+     dupe[property] = clone(obj[property]);
+   } else {
+     dupe[property] = obj[property];
+   }
+ }*/
+
+ return dupe;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="fen">
+<button class="show-code">Code</button>
+dynamic <strong>fen</strong>() <a class="anchor-link" href="#fen"
+              title="Permalink to Chess.fen">#</a></h4>
+<div class="doc">
+<pre class="source">
+fen() {
+ return generate_fen();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="file">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> <strong>file</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> i) <a class="anchor-link" href="#file"
+              title="Permalink to Chess.file">#</a></h4>
+<div class="doc">
+<pre class="source">
+int file(int i) {
+ return i &amp; 15;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="game_over">
+<button class="show-code">Code</button>
+dynamic <strong>game_over</strong>() <a class="anchor-link" href="#game_over"
+              title="Permalink to Chess.game_over">#</a></h4>
+<div class="doc">
+<pre class="source">
+game_over() {
+ return half_moves &gt;= 100 ||
+        in_checkmate() ||
+        in_stalemate() ||
+        insufficient_material() ||
+        in_threefold_repetition();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="generate_fen">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>generate_fen</strong>() <a class="anchor-link" href="#generate_fen"
+              title="Permalink to Chess.generate_fen">#</a></h4>
+<div class="doc">
+<p>Returns a FEN String representing the current position</p>
+<pre class="source">
+String generate_fen() {
+ int empty = 0;
+ String fen = '';
+
+ for (int i = SQUARES["a8"]; i &lt;= SQUARES["h1"]; i++) {
+   if (board[i] == null) {
+     empty++;
+   } else {
+     if (empty &gt; 0) {
+       fen += empty.toString();
+       empty = 0;
+     }
+     String color = board[i]["color"];
+     String piece = board[i]["type"];
+
+     fen += (color == WHITE) ?
+              piece.toUpperCase() : piece.toLowerCase();
+   }
+
+   if (((i + 1) &amp; 0x88) != 0) {
+     if (empty &gt; 0) {
+       fen += empty.toString();
+     }
+
+     if (i != SQUARES["h1"]) {
+       fen += '/';
+     }
+
+     empty = 0;
+     i += 8;
+   }
+ }
+
+ String cflags = '';
+ if ((castling[WHITE] &amp; BITS['KSIDE_CASTLE']) != 0) { cflags += 'K'; }
+ if ((castling[WHITE] &amp; BITS['QSIDE_CASTLE']) != 0) { cflags += 'Q'; }
+ if ((castling[BLACK] &amp; BITS['KSIDE_CASTLE']) != 0) { cflags += 'k'; }
+ if ((castling[BLACK] &amp; BITS['QSIDE_CASTLE']) != 0) { cflags += 'q'; }
+
+ /* do we have an empty castling flag? */
+ if (cflags == "") {
+   cflags = '-';
+ }
+ String epflags = (ep_square == EMPTY) ? '-' : algebraic(ep_square);
+
+ return [fen, turn, cflags, epflags, half_moves, move_number].join(' ');
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="generate_moves">
+<button class="show-code">Code</button>
+dynamic <strong>generate_moves</strong>([<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> options]) <a class="anchor-link" href="#generate_moves"
+              title="Permalink to Chess.generate_moves">#</a></h4>
+<div class="doc">
+<pre class="source">
+generate_moves([Map options]) {
+ add_move(board, moves, from, to, flags) {
+   /* if pawn promotion */
+   if (board[from]['type'] == PAWN &amp;&amp;
+      (rank(to) == RANK_8 || rank(to) == RANK_1)) {
+       List pieces = [QUEEN, ROOK, BISHOP, KNIGHT];
+       for (var i = 0, len = pieces.length; i &lt; len; i++) {
+         moves.add(build_move(board, from, to, flags, pieces[i]));
+       }
+   } else {
+    moves.add(build_move(board, from, to, flags));
+   }
+ }
+
+ List moves = [];
+ var us = turn;
+ var them = swap_color(us);
+ Map second_rank = {'b': RANK_7, 'w': RANK_2};
+
+ var first_sq = SQUARES['a8'];
+ var last_sq = SQUARES['h1'];
+ bool single_square = false;
+
+ /* do we want legal moves? */
+ var legal = (options != null &amp;&amp; options.containsKey('legal')) ?
+             options['legal'] : true;
+
+ /* are we generating moves for a single square? */
+ if (options != null &amp;&amp; options.containsKey('square')) {
+   if (SQUARES.containsKey(options['square'])) {
+     first_sq = last_sq = SQUARES[options['square']];
+     single_square = true;
+   } else {
+     /* invalid square */
+     return [];
+   }
+ }
+
+ for (int i = first_sq; i &lt;= last_sq; i++) {
+   /* did we run off the end of the board */
+   if ((i &amp; 0x88) != 0) { i += 7; continue; }
+
+   var piece = board[i];
+   if (piece == null || piece['color'] != us) {
+     continue;
+   }
+
+   if (piece['type'] == PAWN) {
+     /* single square, non-capturing */
+     int square = i + PAWN_OFFSETS[us][0];
+     if (board[square] == null) {
+       add_move(board, moves, i, square, BITS['NORMAL']);
+
+       /* double square */
+       var square2 = i + PAWN_OFFSETS[us][1];
+       if (second_rank[us] == rank(i) &amp;&amp; board[square2] == null) {
+         add_move(board, moves, i, square2, BITS['BIG_PAWN']);
+       }
+     }
+
+     /* pawn captures */
+     for (int j = 2; j &lt; 4; j++) {
+       var square = i + PAWN_OFFSETS[us][j];
+       if ((square &amp; 0x88) != 0) continue;
+
+       if (board[square] != null &amp;&amp;
+           board[square]['color'] == them) {
+           add_move(board, moves, i, square, BITS['CAPTURE']);
+       } else if (square == ep_square) {
+           add_move(board, moves, i, ep_square, BITS['EP_CAPTURE']);
+       }
+     }
+   } else {
+     for (int j = 0, len = PIECE_OFFSETS[piece['type']].length; j &lt; len; j++) {
+       var offset = PIECE_OFFSETS[piece['type']][j];
+       var square = i;
+
+       while (true) {
+         square += offset;
+         if ((square &amp; 0x88) != 0) break;
+
+         if (board[square] == null) {
+           add_move(board, moves, i, square, BITS['NORMAL']);
+         } else {
+           if (board[square]['color'] == us) {
+             break;
+           }
+           add_move(board, moves, i, square, BITS['CAPTURE']);
+           break;
+         }
+
+         /* break, if knight or king */
+         if (piece['type'] == 'n' || piece['type'] == 'k') break;
+       }
+     }
+   }
+ }
+
+ // check for castling if: a) we're generating all moves, or b) we're doing
+ // single square move generation on the king's square
+ if ((!single_square) || last_sq == kings[us]) {
+   /* king-side castling */
+   if ((castling[us] &amp; BITS['KSIDE_CASTLE']) != 0) {
+     var castling_from = kings[us];
+     var castling_to = castling_from + 2;
+
+     if (board[castling_from + 1] == null &amp;&amp;
+         board[castling_to]       == null &amp;&amp;
+         !attacked(them, kings[us]) &amp;&amp;
+         !attacked(them, castling_from + 1) &amp;&amp;
+         !attacked(them, castling_to)) {
+       add_move(board, moves, kings[us] , castling_to,
+                BITS['KSIDE_CASTLE']);
+     }
+   }
+
+   /* queen-side castling */
+   if ((castling[us] &amp; BITS['QSIDE_CASTLE']) != 0) {
+     var castling_from = kings[us];
+     var castling_to = castling_from - 2;
+
+     if (board[castling_from - 1] == null &amp;&amp;
+         board[castling_from - 2] == null &amp;&amp;
+         board[castling_from - 3] == null &amp;&amp;
+         !attacked(them, kings[us]) &amp;&amp;
+         !attacked(them, castling_from - 1) &amp;&amp;
+         !attacked(them, castling_to)) {
+       add_move(board, moves, kings[us], castling_to,
+                BITS['QSIDE_CASTLE']);
+     }
+   }
+ }
+
+ /* return all pseudo-legal moves (this includes moves that allow the king
+  * to be captured)
+  */
+ if (!legal) {
+   return moves;
+ }
+
+ /* filter out illegal moves */
+ var legal_moves = [];
+ for (int i = 0, len = moves.length; i &lt; len; i++) {
+   make_move(moves[i]);
+   if (!king_attacked(us)) {
+     legal_moves.add(moves[i]);
+   }
+   undo_move();
+ }
+
+ return legal_moves;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="get">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>get</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> square) <a class="anchor-link" href="#get"
+              title="Permalink to Chess.get">#</a></h4>
+<div class="doc">
+<p>Returns the piece at the square in question or null
+if there is none</p>
+<pre class="source">
+Map get(String square) {
+ Map piece = board[SQUARES[square]];
+ return (piece != null) ? {'type': piece['type'], 'color': piece['color']} : null;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="get_disambiguator">
+<button class="show-code">Code</button>
+dynamic <strong>get_disambiguator</strong>(move) <a class="anchor-link" href="#get_disambiguator"
+              title="Permalink to Chess.get_disambiguator">#</a></h4>
+<div class="doc">
+<pre class="source">
+get_disambiguator(move) {
+ var moves = generate_moves();
+
+ var from = move['from'];
+ var to = move['to'];
+ var piece = move['piece'];
+
+ var ambiguities = 0;
+ var same_rank = 0;
+ var same_file = 0;
+
+ for (int i = 0, len = moves.length; i &lt; len; i++) {
+   var ambig_from = moves[i]['from'];
+   var ambig_to = moves[i]['to'];
+   var ambig_piece = moves[i]['piece'];
+
+   /* if a move of the same piece type ends on the same to square, we'll
+    * need to add a disambiguator to the algebraic notation
+    */
+   if (piece == ambig_piece &amp;&amp; from != ambig_from &amp;&amp; to == ambig_to) {
+     ambiguities++;
+
+     if (rank(from) == rank(ambig_from)) {
+       same_rank++;
+     }
+
+     if (file(from) == file(ambig_from)) {
+       same_file++;
+     }
+   }
+ }
+
+ if (ambiguities &gt; 0) {
+   /* if there exists a similar moving piece on the same rank and file as
+    * the move in question, use the square as the disambiguator
+    */
+   if (same_rank &gt; 0 &amp;&amp; same_file &gt; 0) {
+     return algebraic(from);
+   }
+   /* if the moving piece rests on the same file, use the rank symbol as the
+    * disambiguator
+    */
+   else if (same_file &gt; 0) {
+     return algebraic(from)[1];
+   }
+   /* else use the file symbol */
+   else {
+     return algebraic(from)[0];
+   }
+ }
+
+ return '';
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getHistory">
+<button class="show-code">Code</button>
+dynamic <strong>getHistory</strong>([<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> options]) <a class="anchor-link" href="#getHistory"
+              title="Permalink to Chess.getHistory">#</a></h4>
+<div class="doc">
+<pre class="source">
+getHistory([Map options]) {
+ var reversed_history = [];
+ var move_history = [];
+ var verbose = (options != null &amp;&amp; options.containsKey("verbose") &amp;&amp;
+                options["verbose"] == true);
+
+ while (history.length &gt; 0) {
+   reversed_history.add(undo_move());
+ }
+
+ while (reversed_history.length &gt; 0) {
+   var move = reversed_history.removeLast();
+   if (verbose) {
+     move_history.add(make_pretty(move));
+   } else {
+     move_history.add(move_to_san(move));
+   }
+   make_move(move);
+ }
+
+ return move_history;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="in_check">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>in_check</strong>() <a class="anchor-link" href="#in_check"
+              title="Permalink to Chess.in_check">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool in_check() {
+ return king_attacked(turn);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="in_checkmate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>in_checkmate</strong>() <a class="anchor-link" href="#in_checkmate"
+              title="Permalink to Chess.in_checkmate">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool in_checkmate() {
+ return in_check() &amp;&amp; generate_moves().length == 0;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="in_draw">
+<button class="show-code">Code</button>
+dynamic <strong>in_draw</strong>() <a class="anchor-link" href="#in_draw"
+              title="Permalink to Chess.in_draw">#</a></h4>
+<div class="doc">
+<pre class="source">
+in_draw() {
+ return half_moves &gt;= 100 ||
+        in_stalemate() ||
+        insufficient_material() ||
+        in_threefold_repetition();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="in_stalemate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>in_stalemate</strong>() <a class="anchor-link" href="#in_stalemate"
+              title="Permalink to Chess.in_stalemate">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool in_stalemate() {
+ return !in_check() &amp;&amp; generate_moves().length == 0;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="in_threefold_repetition">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>in_threefold_repetition</strong>() <a class="anchor-link" href="#in_threefold_repetition"
+              title="Permalink to Chess.in_threefold_repetition">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool in_threefold_repetition() {
+ /* TODO: while this function is fine for casual use, a better
+  * implementation would use a Zobrist key (instead of FEN). the
+  * Zobrist key would be maintained in the make_move/undo_move functions,
+  * avoiding the costly that we do below.
+  */
+ List moves = [];
+ Map positions = {};
+ bool repetition = false;
+
+ while (true) {
+   var move = undo_move();
+   if (move == null) {
+     break;
+   }
+   moves.add(move);
+ }
+
+ while (true) {
+   /* remove the last two fields in the FEN string, they're not needed
+    * when checking for draw by rep */
+   var fen = generate_fen().split(' ').sublist(0,4).join(' ');
+
+   /* has the position occurred three or move times */
+   positions[fen] = (positions.containsKey(fen)) ? positions[fen] + 1 : 1;
+   if (positions[fen] &gt;= 3) {
+     repetition = true;
+   }
+
+   if (moves.length == 0) {
+     break;
+   }
+   make_move(moves.removeLast());
+ }
+
+ return repetition;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="insufficient_material">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>insufficient_material</strong>() <a class="anchor-link" href="#insufficient_material"
+              title="Permalink to Chess.insufficient_material">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool insufficient_material() {
+ Map pieces = {};
+ List bishops = [];
+ int num_pieces = 0;
+ var sq_color = 0;
+
+ for (int i = SQUARES['a8']; i&lt;= SQUARES['h1']; i++) {
+   sq_color = (sq_color + 1) % 2;
+   if ((i &amp; 0x88) != 0) { i += 7; continue; }
+
+   var piece = board[i];
+   if (piece != null) {
+     pieces[piece['type']] = (pieces.containsKey(piece['type'])) ?
+                           pieces[piece['type']] + 1 : 1;
+     if (piece['type'] == BISHOP) {
+       bishops.add(sq_color);
+     }
+     num_pieces++;
+   }
+ }
+
+ /* k vs. k */
+ if (num_pieces == 2) { return true; }
+
+ /* k vs. kn .... or .... k vs. kb */
+ else if (num_pieces == 3 &amp;&amp; (pieces[BISHOP] == 1 ||
+                              pieces[KNIGHT] == 1)) { return true; }
+
+ /* kb vs. kb where any number of bishops are all on the same color */
+ else if (pieces.containsKey(BISHOP) &amp;&amp; num_pieces == (pieces[BISHOP] + 2)) {
+   var sum = 0;
+   var len = bishops.length;
+   for (int i = 0; i &lt; len; i++) {
+     sum += bishops[i];
+   }
+   if (sum == 0 || sum == len) { return true; }
+ }
+
+ return false;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="is_digit">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>is_digit</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> c) <a class="anchor-link" href="#is_digit"
+              title="Permalink to Chess.is_digit">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool is_digit(String c) {
+ return '0123456789'.contains(c);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="king_attacked">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>king_attacked</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> color) <a class="anchor-link" href="#king_attacked"
+              title="Permalink to Chess.king_attacked">#</a></h4>
+<div class="doc">
+<pre class="source">
+bool king_attacked(String color) {
+ return attacked(swap_color(color), kings[color]);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="load">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>load</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fen) <a class="anchor-link" href="#load"
+              title="Permalink to Chess.load">#</a></h4>
+<div class="doc">
+<p>Load a position from a FEN String</p>
+<pre class="source">
+bool load(String fen) {
+ List tokens = fen.split(new RegExp(r"\s+"));
+ String position = tokens[0];
+ int square = 0;
+ String valid = SYMBOLS + '12345678/';
+
+ Map validMap = validate_fen(fen);
+ if (!validMap["valid"]) {
+   print(validMap["error"]);
+   return false;
+ }
+
+ clear();
+
+ for (int i = 0; i &lt; position.length; i++) {
+   String piece = position[i];
+
+   if (piece == '/') {
+     square += 8;
+   } else if (is_digit(piece)) {
+     square += int.parse(piece);
+   } else {
+     String color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
+     put({'type': piece.toLowerCase(), 'color': color}, algebraic(square));
+     square++;
+   }
+ }
+
+ turn = tokens[1];
+
+ if (tokens[2].indexOf('K') &gt; -1) {
+   castling['w'] |= BITS['KSIDE_CASTLE'];
+ }
+ if (tokens[2].indexOf('Q') &gt; -1) {
+   castling['w'] |= BITS['QSIDE_CASTLE'];
+ }
+ if (tokens[2].indexOf('k') &gt; -1) {
+   castling['b'] |= BITS['KSIDE_CASTLE'];
+ }
+ if (tokens[2].indexOf('q') &gt; -1) {
+   castling['b'] |= BITS['QSIDE_CASTLE'];
+ }
+
+ ep_square = (tokens[3] == '-') ? EMPTY : SQUARES[tokens[3]];
+ half_moves = int.parse(tokens[4]);
+ move_number = int.parse(tokens[5]);
+
+ update_setup(generate_fen());
+
+ return true;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="load_pgn">
+<button class="show-code">Code</button>
+dynamic <strong>load_pgn</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> pgn, [<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> options]) <a class="anchor-link" href="#load_pgn"
+              title="Permalink to Chess.load_pgn">#</a></h4>
+<div class="doc">
+<p>Load the moves of a game stored in Portable Game Notation. 
+
+<span class="param">options</span> is an optional parameter that contains a 'newline_char' 
+which is a string representation of a RegExp (and should not be pre-escaped) 
+and defaults to '\r?\n'). 
+Returns <code>true</code> if the PGN was parsed successfully, otherwise <code>false</code>.</p>
+<pre class="source">
+load_pgn(String pgn, [Map options]) {
+ mask(str) {
+   return str.replaceAll(new RegExp(r"\\"), '\\');
+ }
+
+ /* convert a move from Standard Algebraic Notation (SAN) to 0x88
+  * coordinates
+ */
+ move_from_san(move) {
+   var moves = generate_moves();
+   for (var i = 0, len = moves.length; i &lt; len; i++) {
+     /* strip off any trailing move decorations: e.g Nf3+?! */
+     if (move.replaceAll(new RegExp(r"[+#?!=]+$"),'') ==
+         move_to_san(moves[i]).replaceAll(new RegExp(r"[+#?!=]+$"),'')) {
+       return moves[i];
+     }
+   }
+   return null;
+ }
+
+ get_move_obj(move) {
+   return move_from_san(trim(move));
+ }
+
+ /*has_keys(object) {
+   bool has_keys = false;
+   for (var key in object) {
+     has_keys = true;
+   }
+   return has_keys;
+ }*/
+
+ parse_pgn_header(header, [Map options]) {
+   var newline_char = (options != null &amp;&amp;
+                       options.containsKey("newline_char")) ?
+                       options['newline_char'] : '\r?\n';
+   var header_obj = {};
+   var headers = header.split(newline_char);
+   var key = '';
+   var value = '';
+
+   for (var i = 0; i &lt; headers.length; i++) {
+     RegExp keyMatch = new RegExp(r"^\[([A-Z][A-Za-z]*)\s.*\]$");
+     var temp = keyMatch.firstMatch(headers[i]);
+     if (temp != null) {
+       key = temp[1];
+     }
+     //print(key);
+     RegExp valueMatch = new RegExp(r'^\[[A-Za-z]+\s"(.*)"\]$');
+     temp = valueMatch.firstMatch(headers[i]);
+     if (temp != null) {
+       value = temp[1];
+     }
+     //print(value);
+     if (trim(key).length &gt; 0) {
+       header_obj[key] = value;
+     }
+   }
+
+   return header_obj;
+ }
+
+ var newline_char = (options != null &amp;&amp;
+                     options.containsKey("newline_char")) ?
+                     options["newline_char"] : '\r?\n';
+ //var regex = new RegExp(r'^(\[.*\]).*' + r'1\.'); //+ r"1\."); //+ mask(newline_char));
+
+ int indexOfMoveStart = pgn.indexOf(new RegExp(newline_char + r"1\."));
+ 
+ /* get header part of the PGN file */
+ String header_string = null;
+ if (indexOfMoveStart != -1) {
+    header_string = pgn.substring(0, indexOfMoveStart).trim();
+ }
+
+ /* no info part given, begins with moves */
+ if (header_string == null || header_string[0] != '[') {
+   header_string = '';
+ }
+
+reset();
+
+ /* parse PGN header */
+ var headers = parse_pgn_header(header_string, options);
+ for (var key in headers.keys) {
+   set_header([key, headers[key]]);
+ }
+
+ /* delete header to get the moves */
+ var ms = pgn.replaceAll(header_string, '').replaceAll(new RegExp(mask(newline_char)), ' ');
+
+ /* delete comments */
+ ms = ms.replaceAll(new RegExp(r"(\{[^}]+\})+?"), '');
+
+ /* delete move numbers */
+ ms = ms.replaceAll(new RegExp(r"\d+\."), '');
+
+
+ /* trim and get array of moves */
+ var moves = trim(ms).split(new RegExp(r"\s+"));
+
+ /* delete empty entries */
+ moves = moves.join(',').replaceAll(new RegExp(r",,+"), ',').split(',');
+ var move = '';
+
+ for (var half_move = 0; half_move &lt; moves.length - 1; half_move++) {
+   move = get_move_obj(moves[half_move]);
+
+   /* move not possible! (don't clear the board to examine to show the
+    * latest valid position)
+    */
+   if (move == null) {
+     return false;
+   } else {
+     make_move(move);
+   }
+ }
+
+ /* examine last move */
+ move = moves[moves.length - 1];
+ if (POSSIBLE_RESULTS.contains(move)) {
+   if (!header.containsKey("Result")) {
+     set_header(['Result', move]);
+   }
+ }
+ else {
+   move = get_move_obj(move);
+   if (move == null) {
+     return false;
+   } else {
+     make_move(move);
+   }
+ }
+ return true;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="make_move">
+<button class="show-code">Code</button>
+dynamic <strong>make_move</strong>(move) <a class="anchor-link" href="#make_move"
+              title="Permalink to Chess.make_move">#</a></h4>
+<div class="doc">
+<pre class="source">
+make_move(move) {
+ var us = turn;
+ var them = swap_color(us);
+ push(move);
+
+ board[move['to']] = board[move['from']];
+ board[move['from']] = null;
+
+ /* if ep capture, remove the captured pawn */
+ if ((move['flags'] &amp; BITS['EP_CAPTURE']) != 0) {
+   if (turn == BLACK) {
+     board[move['to'] - 16] = null;
+   } else {
+     board[move['to'] + 16] = null;
+   }
+ }
+
+ /* if pawn promotion, replace with new piece */
+ if ((move['flags'] &amp; BITS['PROMOTION']) != 0) {
+   board[move['to']] = {'type': move['promotion'], 'color': us};
+ }
+
+ /* if we moved the king */
+ if (board[move['to']]['type'] == KING) {
+   kings[board[move['to']]['color']] = move['to'];
+
+   /* if we castled, move the rook next to the king */
+   if ((move['flags'] &amp; BITS['KSIDE_CASTLE']) != 0) {
+     var castling_to = move['to'] - 1;
+     var castling_from = move['to'] + 1;
+     board[castling_to] = board[castling_from];
+     board[castling_from] = null;
+   } else if ((move['flags'] &amp; BITS['QSIDE_CASTLE']) != 0) {
+     var castling_to = move['to'] + 1;
+     var castling_from = move['to'] - 2;
+     board[castling_to] = board[castling_from];
+     board[castling_from] = null;
+   }
+
+   /* turn off castling */
+   castling[us] = 0;
+ }
+
+ /* turn off castling if we move a rook */
+ if (castling[us] != 0) {
+   for (int i = 0, len = ROOKS[us].length; i &lt; len; i++) {
+     if (move['from'] == ROOKS[us][i]['square'] &amp;&amp;
+         ((castling[us] &amp; ROOKS[us][i]['flag']) != 0)) {
+       castling[us] ^= ROOKS[us][i]['flag'];
+       break;
+     }
+   }
+ }
+
+ /* turn off castling if we capture a rook */
+ if (castling[them] != 0) {
+   for (int i = 0, len = ROOKS[them].length; i &lt; len; i++) {
+     if (move['to'] == ROOKS[them][i]['square'] &amp;&amp;
+         ((castling[them] &amp; ROOKS[them][i]['flag']) != 0)) {
+       castling[them] ^= ROOKS[them][i]['flag'];
+       break;
+     }
+   }
+ }
+
+ /* if big pawn move, update the en passant square */
+ if ((move['flags'] &amp; BITS['BIG_PAWN']) != 0) {
+   if (turn == 'b') {
+     ep_square = move['to'] - 16;
+   } else {
+     ep_square = move['to'] + 16;
+   }
+ } else {
+   ep_square = EMPTY;
+ }
+
+ /* reset the 50 move counter if a pawn is moved or a piece is captured */
+ if (move['piece'] == PAWN) {
+   half_moves = 0;
+ } else if ((move['flags'] &amp; (BITS['CAPTURE'] | BITS['EP_CAPTURE'])) != 0) {
+   half_moves = 0;
+ } else {
+   half_moves++;
+ }
+
+ if (turn == BLACK) {
+   move_number++;
+ }
+ turn = swap_color(turn);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="make_pretty">
+<button class="show-code">Code</button>
+dynamic <strong>make_pretty</strong>(ugly_move) <a class="anchor-link" href="#make_pretty"
+              title="Permalink to Chess.make_pretty">#</a></h4>
+<div class="doc">
+<p>pretty = external move object</p>
+<pre class="source">
+make_pretty(ugly_move) {
+ var move = clone(ugly_move);
+ move['san'] = move_to_san(move);
+ move['to'] = algebraic(move['to']);
+ move['from'] = algebraic(move['from']);
+
+ var flags = '';
+
+ for (var flag in BITS.keys) {
+   if ((BITS[flag] &amp; move['flags']) != 0) {
+     flags += FLAGS[flag];
+   }
+ }
+ move['flags'] = flags;
+
+ return move;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="move">
+<button class="show-code">Code</button>
+dynamic <strong>move</strong>(move) <a class="anchor-link" href="#move"
+              title="Permalink to Chess.move">#</a></h4>
+<div class="doc">
+<p>The move function can be called with in the following parameters:
+.move('Nxb7')      &lt;- where 'move' is a case-sensitive SAN string
+.move({ from: 'h7', &lt;- where the 'move' is a move object (additional</p>
+<pre><code> to :'h8',      fields are ignored)
+ promotion: 'q',
+ })
+</code></pre>
+<pre class="source">
+move(move) {
+ 
+ var move_obj = null;
+ var moves = generate_moves();
+
+ if (move is String) {
+   /* convert the move string to a move object */
+   for (var i = 0, len = moves.length; i &lt; len; i++) {
+     if (move == move_to_san(moves[i])) {
+       move_obj = moves[i];
+       break;
+     }
+   }
+ } else if (move is Map) {
+   /* convert the pretty move object to an ugly move object */
+   for (var i = 0, len = moves.length; i &lt; len; i++) {
+     if (move['from'] == algebraic(moves[i]['from']) &amp;&amp;
+         move['to'] == algebraic(moves[i]['to']) &amp;&amp;
+         (!(moves[i].containsKey("promotion")) ||
+         move['promotion'] == moves[i]['promotion'])) {
+       move_obj = moves[i];
+       break;
+     }
+   }
+ }
+
+ /* failed to find move */
+ if (move_obj == null) {
+   return null;
+ }
+
+ /* need to make a copy of move because we can't generate SAN after the
+  * move is made
+  */
+ var pretty_move = make_pretty(move_obj);
+
+ make_move(move_obj);
+
+ return pretty_move;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="move_to_san">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>move_to_san</strong>(<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> move) <a class="anchor-link" href="#move_to_san"
+              title="Permalink to Chess.move_to_san">#</a></h4>
+<div class="doc">
+<p>Convert a move from 0x88 coordinates to Standard Algebraic Notation(SAN)</p>
+<pre class="source">
+String move_to_san(Map move) {
+ String output = '';
+
+ if ((move['flags'] &amp; BITS['KSIDE_CASTLE']) != 0) {
+   output = 'O-O';
+ } else if ((move["flags"] &amp; BITS['QSIDE_CASTLE']) != 0) {
+   output = 'O-O-O';
+ } else {
+   var disambiguator = get_disambiguator(move);
+
+   if (move['piece'] != PAWN) {
+     output += move['piece'].toUpperCase() + disambiguator;
+   }
+
+   if ((move['flags'] &amp; (BITS['CAPTURE'] | BITS['EP_CAPTURE'])) != 0) {
+     if (move['piece'] == PAWN) {
+       output += algebraic(move['from'])[0];
+     }
+     output += 'x';
+   }
+
+   output += algebraic(move['to']);
+
+   if ((move['flags'] &amp; BITS['PROMOTION']) != 0) {
+     output += '=' + move['promotion'].toUpperCase();
+   }
+ }
+
+ make_move(move);
+ if (in_check()) {
+   if (in_checkmate()) {
+     output += '#';
+   } else {
+     output += '+';
+   }
+ }
+ undo_move();
+
+ return output;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="moves">
+<button class="show-code">Code</button>
+dynamic <strong>moves</strong>([<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> options]) <a class="anchor-link" href="#moves"
+              title="Permalink to Chess.moves">#</a></h4>
+<div class="doc">
+<p> Returns a list of legals moves from the current position. 
+ The function takes an optional parameter which controls the 
+ single-square move generation and verbosity.</p>
+<p> The piece, captured, and promotion fields contain the lowercase 
+ representation of the applicable piece.</p>
+<p> The flags field in verbose mode may contain one or more of the following values:</p>
+<p> 'n' - a non-capture
+ 'b' - a pawn push of two squares
+ 'e' - an en passant capture
+ 'c' - a standard capture
+ 'p' - a promotion
+ 'k' - kingside castling
+ 'q' - queenside castling
+ A flag of 'pc' would mean that a pawn captured a piece on the 8th rank and promoted.</p>
+<pre class="source">
+moves([Map options]) {
+ /* The internal representation of a chess move is in 0x88 format, and
+  * not meant to be human-readable.  The code below converts the 0x88
+  * square coordinates to algebraic coordinates.  It also prunes an
+  * unnecessary move keys resulting from a verbose call.
+  */
+
+ var ugly_moves = generate_moves(options);
+ List moves = [];
+
+ for (int i = 0, len = ugly_moves.length; i &lt; len; i++) {
+
+   /* does the user want a full move object (most likely not), or just
+    * SAN
+    */
+   if (options != null &amp;&amp; options.containsKey('verbose') &amp;&amp;
+       options['verbose'] == true) {
+     moves.add(make_pretty(ugly_moves[i]));
+   } else {
+     moves.add(move_to_san(ugly_moves[i]));
+   }
+ }
+
+ return moves;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="perft">
+<button class="show-code">Code</button>
+dynamic <strong>perft</strong>(depth) <a class="anchor-link" href="#perft"
+              title="Permalink to Chess.perft">#</a></h4>
+<div class="doc">
+<pre class="source">
+perft(depth) {
+ var moves = generate_moves({'legal': false});
+ var nodes = 0;
+ var color = turn;
+
+ for (var i = 0, len = moves.length; i &lt; len; i++) {
+   make_move(moves[i]);
+   if (!king_attacked(color)) {
+     if (depth - 1 &gt; 0) {
+       var child_nodes = perft(depth - 1);
+       nodes += child_nodes;
+     } else {
+       nodes++;
+     }
+   }
+   undo_move();
+ }
+
+ return nodes;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="pgn">
+<button class="show-code">Code</button>
+dynamic <strong>pgn</strong>([<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> options]) <a class="anchor-link" href="#pgn"
+              title="Permalink to Chess.pgn">#</a></h4>
+<div class="doc">
+<p>Return the PGN representation of the game thus far</p>
+<pre class="source">
+pgn([Map options]) {
+ /* using the specification from http://www.chessclub.com/help/PGN-spec
+  * example for html usage: .pgn({ max_width: 72, newline_char: "&lt;br /&gt;" })
+  */
+ var newline = (options != null &amp;&amp;
+                options.containsKey("newline_char") &amp;&amp; options["newline_char"] != null) ?
+                options['newline_char'] : '\n';
+ var max_width = (options != null &amp;&amp;
+                options.containsKey("max_width") &amp;&amp; options["max_width"] != null) ?
+                  options["max_width"] : 0;
+ var result = [];
+ var header_exists = false;
+
+ /* add the PGN header headerrmation */
+ for (var i in header.keys) {
+   /* TODO: order of enumerated properties in header object is not
+    * guaranteed, see ECMA-262 spec (section 12.6.4)
+    */
+   result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
+   header_exists = true;
+ }
+
+ if (header_exists &amp;&amp; (history.length != 0)) {
+   result.add(newline);
+ }
+
+ /* pop all of history onto reversed_history */
+ var reversed_history = [];
+ while (history.length &gt; 0) {
+   reversed_history.add(undo_move());
+ }
+
+ List moves = [];
+ String move_string = '';
+ int pgn_move_number = 1;
+
+ /* build the list of moves.  a move_string looks like: "3. e3 e6" */
+ while (reversed_history.length &gt; 0) {
+   var move = reversed_history.removeLast();
+
+   /* if the position started with black to move, start PGN with 1. ... */
+   if (pgn_move_number == 1 &amp;&amp; move['color'] == 'b') {
+     move_string = '1. ...';
+     pgn_move_number++;
+   } else if (move['color'] == 'w') {
+     /* store the previous generated move_string if we have one */
+     if (move_string.length != 0) {
+       moves.add(move_string);
+     }
+     move_string = pgn_move_number.toString() + '.';
+     pgn_move_number++;
+   }
+
+   move_string = move_string + ' ' + move_to_san(move);
+   make_move(move);
+ }
+
+ /* are there any other leftover moves? */
+ if (move_string.length != 0) {
+   moves.add(move_string);
+ }
+
+ /* is there a result? */
+ if (header['Result'] != null) {
+   moves.add(header['Result']);
+ }
+
+ /* history should be back to what is was before we started generating PGN,
+  * so join together moves
+  */
+ if (max_width == 0) {
+   return result.join('') + moves.join(' ');
+ }
+
+ /* wrap the PGN output at max_width */
+ var current_width = 0;
+ for (int i = 0; i &lt; moves.length; i++) {
+   /* if the current move will push past max_width */
+   if (current_width + moves[i].length &gt; max_width &amp;&amp; i != 0) {
+
+     /* don't end the line with whitespace */
+     if (result[result.length - 1] == ' ') {
+       result.removeLast();
+     }
+
+     result.add(newline);
+     current_width = 0;
+   } else if (i != 0) {
+     result.add(' ');
+     current_width++;
+   }
+   result.add(moves[i]);
+   current_width += moves[i].length;
+ }
+
+ return result.join('');
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="push">
+<button class="show-code">Code</button>
+void <strong>push</strong>(move) <a class="anchor-link" href="#push"
+              title="Permalink to Chess.push">#</a></h4>
+<div class="doc">
+<pre class="source">
+void push(move) {
+ history.add({
+   'move': move,
+   'kings': {'b': kings['b'], 'w': kings['w']},
+   'turn': turn,
+   'castling': {'b': castling['b'], 'w': castling['w']},
+   'ep_square': ep_square,
+   'half_moves': half_moves,
+   'move_number': move_number
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="put">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>put</strong>(<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> piece, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> square) <a class="anchor-link" href="#put"
+              title="Permalink to Chess.put">#</a></h4>
+<div class="doc">
+<p>Put 
+<span class="param">piece</span> on 
+<span class="param">square</span></p>
+<pre class="source">
+bool put(Map piece, String square) {
+ /* check for valid piece object */
+ if (!(piece.containsKey('type') &amp;&amp; piece.containsKey('color'))) {
+   return false;
+ }
+
+ /* check for piece */
+ if (SYMBOLS.indexOf(piece['type'].toLowerCase()) == -1) {
+   return false;
+ }
+
+ /* check for valid square */
+ if (!(SQUARES.containsKey(square))) {
+   return false;
+ }
+
+ int sq = SQUARES[square];
+ board[sq] = {'type': piece['type'], 'color': piece['color']};
+ if (piece['type'] == KING) {
+   kings[piece['color']] = sq;
+ }
+
+ update_setup(generate_fen());
+
+ return true;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="rank">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> <strong>rank</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> i) <a class="anchor-link" href="#rank"
+              title="Permalink to Chess.rank">#</a></h4>
+<div class="doc">
+<pre class="source">
+int rank(int i) {
+ return i &gt;&gt; 4;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="remove">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>remove</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> square) <a class="anchor-link" href="#remove"
+              title="Permalink to Chess.remove">#</a></h4>
+<div class="doc">
+<p>Removes a piece from a square and returns it,
+or null if none is present</p>
+<pre class="source">
+Map remove(String square) {
+ Map piece = get(square);
+ board[SQUARES[square]] = null;
+ if (piece != null &amp;&amp; piece['type'] == KING) {
+   kings[piece['color']] = EMPTY;
+ }
+
+ update_setup(generate_fen());
+
+ return piece;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="reset">
+<button class="show-code">Code</button>
+dynamic <strong>reset</strong>() <a class="anchor-link" href="#reset"
+              title="Permalink to Chess.reset">#</a></h4>
+<div class="doc">
+<p>Go back to the chess starting position</p>
+<pre class="source">
+reset() {
+ load(DEFAULT_POSITION);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="set_header">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>set_header</strong>(args) <a class="anchor-link" href="#set_header"
+              title="Permalink to Chess.set_header">#</a></h4>
+<div class="doc">
+<p>Updates <a class="crossref" href="../chess/Chess.html#header">header</a> with the List of args and returns it</p>
+<pre class="source">
+Map set_header(args) {
+ for (int i = 0; i &lt; args.length; i += 2) {
+   if (args[i] is String &amp;&amp;
+       args[i + 1] is String) {
+     header[args[i]] = args[i + 1];
+   }
+ }
+ return header;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="square_color">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>square_color</strong>(square) <a class="anchor-link" href="#square_color"
+              title="Permalink to Chess.square_color">#</a></h4>
+<div class="doc">
+<p>Returns the color of the square ('light' or 'dark'), or null if 
+<span class="param">square</span> is invalid</p>
+<pre class="source">
+String square_color(square) {
+ if (SQUARES.containsKey(square)) {
+   var sq_0x88 = SQUARES[square];
+   return ((rank(sq_0x88) + file(sq_0x88)) % 2 == 0) ? 'light' : 'dark';
+ }
+
+ return null;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="swap_color">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>swap_color</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> c) <a class="anchor-link" href="#swap_color"
+              title="Permalink to Chess.swap_color">#</a></h4>
+<div class="doc">
+<pre class="source">
+String swap_color(String c) {
+ return c == WHITE ? BLACK : WHITE;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="trim">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>trim</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> str) <a class="anchor-link" href="#trim"
+              title="Permalink to Chess.trim">#</a></h4>
+<div class="doc">
+<pre class="source">
+String trim(String str) {
+ return str.replaceAll(new RegExp(r"^\s+|\s+$"), '');
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="undo">
+<button class="show-code">Code</button>
+dynamic <strong>undo</strong>() <a class="anchor-link" href="#undo"
+              title="Permalink to Chess.undo">#</a></h4>
+<div class="doc">
+<p>Takeback the last half-move, returning a move Map if successful, otherwise null.</p>
+<pre class="source">
+undo() {
+ var move = undo_move();
+ return (move != null) ? make_pretty(move) : null;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="undo_move">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>undo_move</strong>() <a class="anchor-link" href="#undo_move"
+              title="Permalink to Chess.undo_move">#</a></h4>
+<div class="doc">
+<p>Undoes a move and returns it, or null if move history is empty</p>
+<pre class="source">
+Map undo_move() {
+ if (history.isEmpty) {
+   return null;
+ }
+ var old = history.removeLast();
+ if (old == null) { return null; }
+
+ var move = old['move'];
+ kings = old['kings'];
+ turn = old['turn'];
+ castling = old['castling'];
+ ep_square = old['ep_square'];
+ half_moves = old['half_moves'];
+ move_number = old['move_number'];
+
+ var us = turn;
+ var them = swap_color(turn);
+
+ board[move['from']] = board[move['to']];
+ board[move['from']]['type'] = move['piece'];  // to undo any promotions
+ board[move['to']] = null;
+
+ if ((move['flags'] &amp; BITS['CAPTURE']) != 0) {
+   board[move['to']] = {'type': move['captured'], 'color': them};
+ } else if ((move['flags'] &amp; BITS['EP_CAPTURE']) != 0) {
+   var index;
+   if (us == BLACK) {
+     index = move['to'] - 16;
+   } else {
+     index = move['to'] + 16;
+   }
+   board[index] = {'type': PAWN, 'color': them};
+ }
+
+
+ if ((move['flags'] &amp; (BITS['KSIDE_CASTLE'] | BITS['QSIDE_CASTLE'])) != 0) {
+   var castling_to, castling_from;
+   if ((move['flags'] &amp; BITS['KSIDE_CASTLE']) != 0) {
+     castling_to = move['to'] + 1;
+     castling_from = move['to'] - 1;
+   } else if ((move['flags'] &amp; BITS['QSIDE_CASTLE']) != 0) {
+     castling_to = move['to'] - 2;
+     castling_from = move['to'] + 1;
+   }
+
+   board[castling_to] = board[castling_from];
+   board[castling_from] = null;
+ }
+
+ return move;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="update_setup">
+<button class="show-code">Code</button>
+void <strong>update_setup</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fen) <a class="anchor-link" href="#update_setup"
+              title="Permalink to Chess.update_setup">#</a></h4>
+<div class="doc">
+<p>called when the initial board setup is changed with put() or remove().
+modifies the SetUp and FEN properties of the header object.  if the FEN is
+equal to the default position, the SetUp and FEN are deleted
+the setup is only updated if history.length is zero, ie moves haven't been
+made.</p>
+<pre class="source">
+void update_setup(String fen) {
+ if (history.length &gt; 0) return;
+
+ if (fen != DEFAULT_POSITION) {
+   header['SetUp'] = '1';
+   header['FEN'] = fen;
+ } else {
+   header.remove('SetUp');
+   header.remove('FEN');
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="validate_fen">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>validate_fen</strong>(fen) <a class="anchor-link" href="#validate_fen"
+              title="Permalink to Chess.validate_fen">#</a></h4>
+<div class="doc">
+<p>Check the formatting of a FEN String is correct
+Returns a Map with keys valid, error_number, and error</p>
+<pre class="source">
+Map validate_fen(fen) {
+ Map errors = {
+    0: 'No errors.',
+    1: 'FEN string must contain six space-delimited fields.',
+    2: '6th field (move number) must be a positive integer.',
+    3: '5th field (half move counter) must be a non-negative integer.',
+    4: '4th field (en-passant square) is invalid.',
+    5: '3rd field (castling availability) is invalid.',
+    6: '2nd field (side to move) is invalid.',
+    7: '1st field (piece positions) does not contain 8 \'/\'-delimited rows.',
+    8: '1st field (piece positions) is invalid [consecutive numbers].',
+    9: '1st field (piece positions) is invalid [invalid piece].',
+   10: '1st field (piece positions) is invalid [row too large].',
+ };
+
+ /* 1st criterion: 6 space-seperated fields? */
+ List tokens = fen.split(new RegExp(r"\s+"));
+ if (tokens.length != 6) {
+   return {'valid': false, 'error_number': 1, 'error': errors[1]};
+ }
+
+ /* 2nd criterion: move number field is a integer value &gt; 0? */
+ try {
+   int temp = int.parse(tokens[5]);
+   if (temp &lt;= 0) {
+     return {'valid': false, 'error_number': 2, 'error': errors[2]};
+   }
+ } on FormatException {
+   return {'valid': false, 'error_number': 2, 'error': errors[2]};
+ }
+
+ /* 3rd criterion: half move counter is an integer &gt;= 0? */
+ try {
+   int temp = int.parse(tokens[4]);
+   if (temp &lt; 0) {
+     return {'valid': false, 'error_number': 3, 'error': errors[3]};
+   }
+ } on FormatException {
+   return {'valid': false, 'error_number': 3, 'error': errors[3]};
+ }
+
+ /* 4th criterion: 4th field is a valid e.p.-string? */
+ RegExp check4 = new RegExp(r"^(-|[abcdefgh][36])$");
+ if (check4.firstMatch(tokens[3]) == null) {
+   return {'valid': false, 'error_number': 4, 'error': errors[4]};
+ }
+
+ /* 5th criterion: 3th field is a valid castle-string? */
+ RegExp check5 = new RegExp(r"^(KQ?k?q?|Qk?q?|kq?|q|-)$");
+ if (check5.firstMatch(tokens[2]) == null) {
+   return {'valid': false, 'error_number': 5, 'error': errors[5]};
+ }
+
+ /* 6th criterion: 2nd field is "w" (white) or "b" (black)? */
+ RegExp check6 = new RegExp(r"^(w|b)$");
+ if (check6.firstMatch(tokens[1]) == null) {
+   return {'valid': false, 'error_number': 6, 'error': errors[6]};
+ }
+
+ /* 7th criterion: 1st field contains 8 rows? */
+ List rows = tokens[0].split('/');
+ if (rows.length != 8) {
+   return {'valid': false, 'error_number': 7, 'error': errors[7]};
+ }
+
+ /* 8th criterion: every row is valid? */
+ for (int i = 0; i &lt; rows.length; i++) {
+   /* check for right sum of fields AND not two numbers in succession */
+   int sum_fields = 0;
+   bool previous_was_number = false;
+
+   for (int k = 0; k &lt; rows[i].length; k++) {
+     
+     try {
+       int temp2 = int.parse(rows[i][k]);
+       if (previous_was_number) {
+         return {'valid': false, 'error_number': 8, 'error': errors[8]};
+       }
+       sum_fields += temp2;
+       previous_was_number = true;
+     } on FormatException {
+       RegExp checkOM = new RegExp(r"^[prnbqkPRNBQK]$");
+       if (checkOM.firstMatch(rows[i][k]) == null) {
+         return {'valid': false, 'error_number': 9, 'error': errors[9]};
+       }
+       sum_fields += 1;
+       previous_was_number = false;
+     }
+     
+   }
+   
+   if (sum_fields != 8) {
+     return {'valid': false, 'error_number': 10, 'error': errors[10]};
+   }
+ }
+
+ /* everything's okay! */
+ return {'valid': true, 'error_number': 0, 'error': errors[0]};
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          <div>This page was generated at 2014-02-01 15:02:53.731</div>
+        </div>
+        <script async src="../client-static.js"></script>
+        </body></html>
+        

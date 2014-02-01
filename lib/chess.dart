@@ -1046,9 +1046,7 @@ class Chess {
     return s;
   }
 
-  /*****************************************************************************
-   * UTILITY FUNCTIONS
-   ****************************************************************************/
+  // Utility Functions
   int rank(int i) {
     return i >> 4;
   }
@@ -1113,9 +1111,7 @@ class Chess {
     return str.replaceAll(new RegExp(r"^\s+|\s+$"), '');
   }
 
-  /*****************************************************************************
-   * DEBUGGING UTILITIES
-   ****************************************************************************/
+  // debug utility
   perft(depth) {
     var moves = generate_moves({'legal': false});
     var nodes = 0;
@@ -1136,11 +1132,26 @@ class Chess {
 
     return nodes;
   }
-
-    /***************************************************************************
-     * PUBLIC API
-     **************************************************************************/
-
+  
+  //Public APIs
+  
+  ///  Returns a list of legals moves from the current position. 
+  ///  The function takes an optional parameter which controls the 
+  ///  single-square move generation and verbosity.
+  ///
+  ///  The piece, captured, and promotion fields contain the lowercase 
+  ///  representation of the applicable piece.
+  ///
+  ///  The flags field in verbose mode may contain one or more of the following values:
+  ///
+  ///  'n' - a non-capture
+  ///  'b' - a pawn push of two squares
+  ///  'e' - an en passant capture
+  ///  'c' - a standard capture
+  ///  'p' - a promotion
+  ///  'k' - kingside castling
+  ///  'q' - queenside castling
+  ///  A flag of 'pc' would mean that a pawn captured a piece on the 8th rank and promoted.
     moves([Map options]) {
       /* The internal representation of a chess move is in 0x88 format, and
        * not meant to be human-readable.  The code below converts the 0x88
@@ -1285,6 +1296,11 @@ class Chess {
       return result.join('');
     }
 
+    /// Load the moves of a game stored in Portable Game Notation. 
+    /// [options] is an optional parameter that contains a 'newline_char' 
+    /// which is a string representation of a RegExp (and should not be pre-escaped) 
+    /// and defaults to '\r?\n'). 
+    /// Returns [true] if the PGN was parsed successfully, otherwise [false].
     load_pgn(String pgn, [Map options]) {
       mask(str) {
         return str.replaceAll(new RegExp(r"\\"), '\\');
@@ -1468,12 +1484,14 @@ class Chess {
       return pretty_move;
     }
 
+    /// Takeback the last half-move, returning a move Map if successful, otherwise null.
     undo() {
       var move = undo_move();
       return (move != null) ? make_pretty(move) : null;
     }
 
-    square_color(square) {
+    /// Returns the color of the square ('light' or 'dark'), or null if [square] is invalid
+    String square_color(square) {
       if (SQUARES.containsKey(square)) {
         var sq_0x88 = SQUARES[square];
         return ((rank(sq_0x88) + file(sq_0x88)) % 2 == 0) ? 'light' : 'dark';
