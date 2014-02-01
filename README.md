@@ -28,7 +28,7 @@ void main() {
 ```
 ## Documentation
 
-The chess.js documentation is largely relevant, but there are also DartDocs generated within the lib/doc directory.
+The chess.js documentation is largely relevant, but there are also DartDocs generated within the lib/docs directory.
 
 ## Links
 - [chess.js](https://github.com/jhlywa/chess.js)
