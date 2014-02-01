@@ -12,8 +12,7 @@ library chess;
 
 class Chess {
 
-  /* jshint indent: false */
-
+  // Constants/Class Variables
   static const String BLACK = 'b';
   static const String WHITE = 'w';
 
@@ -130,6 +129,7 @@ class Chess {
         {'square': SQUARES['h8'], 'flag': BITS['KSIDE_CASTLE']}]
   };
 
+  // Instance Variables
   List board = new List(128);
   Map kings = {'w': EMPTY, 'b': EMPTY};
   String turn = WHITE;
@@ -140,17 +140,17 @@ class Chess {
   List history = [];
   Map header = {};
 
-  /* if the user passes in a fen string, load it, else default to
-   * starting position
-   */
+  /// By default start with the standard chess starting position
   Chess() {
     load(DEFAULT_POSITION);
   }
   
+  /// Start with a position from a FEN
   Chess.fromFEN(String fen) {
     load(fen);
   }
 
+  /// Reset all of the instance variables
   clear() {
     board = new List(128);
     kings = {'w': EMPTY, 'b': EMPTY};
@@ -164,11 +164,13 @@ class Chess {
     update_setup(generate_fen());
   }
 
+  /// Go back to the chess starting position
   reset() {
     load(DEFAULT_POSITION);
   }
 
-  load(String fen) {
+  /// Load a position from a FEN String
+  bool load(String fen) {
     List tokens = fen.split(new RegExp(r"\s+"));
     String position = tokens[0];
     int square = 0;
@@ -190,7 +192,7 @@ class Chess {
       } else if (is_digit(piece)) {
         square += int.parse(piece);
       } else {
-        var color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
+        String color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
         put({'type': piece.toLowerCase(), 'color': color}, algebraic(square));
         square++;
       }
@@ -220,8 +222,10 @@ class Chess {
     return true;
   }
 
-  validate_fen(fen) {
-    var errors = {
+  /// Check the formatting of a FEN String is correct
+  /// Returns a Map with keys valid, error_number, and error
+  Map validate_fen(fen) {
+    Map errors = {
        0: 'No errors.',
        1: 'FEN string must contain six space-delimited fields.',
        2: '6th field (move number) must be a positive integer.',
@@ -320,7 +324,8 @@ class Chess {
     return {'valid': true, 'error_number': 0, 'error': errors[0]};
   }
 
-  generate_fen() {
+  /// Returns a FEN String representing the current position
+  String generate_fen() {
     int empty = 0;
     String fen = '';
 
@@ -368,7 +373,8 @@ class Chess {
     return [fen, turn, cflags, epflags, half_moves, move_number].join(' ');
   }
 
-  set_header(args) {
+  /// Updates [header] with the List of args and returns it
+  Map set_header(args) {
     for (int i = 0; i < args.length; i += 2) {
       if (args[i] is String &&
           args[i + 1] is String) {
@@ -378,13 +384,12 @@ class Chess {
     return header;
   }
 
-  /* called when the initial board setup is changed with put() or remove().
-   * modifies the SetUp and FEN properties of the header object.  if the FEN is
-   * equal to the default position, the SetUp and FEN are deleted
-   * the setup is only updated if history.length is zero, ie moves haven't been
-   * made.
-   */
-  update_setup(fen) {
+  /// called when the initial board setup is changed with put() or remove().
+  /// modifies the SetUp and FEN properties of the header object.  if the FEN is
+  /// equal to the default position, the SetUp and FEN are deleted
+  /// the setup is only updated if history.length is zero, ie moves haven't been
+  /// made.
+  void update_setup(String fen) {
     if (history.length > 0) return;
 
     if (fen != DEFAULT_POSITION) {
@@ -396,12 +401,15 @@ class Chess {
     }
   }
 
-  get(square) {
+  /// Returns the piece at the square in question or null
+  /// if there is none
+  Map get(String square) {
     Map piece = board[SQUARES[square]];
     return (piece != null) ? {'type': piece['type'], 'color': piece['color']} : null;
   }
 
-  bool put(Map piece, square) {
+  /// Put [piece] on [square]
+  bool put(Map piece, String square) {
     /* check for valid piece object */
     if (!(piece.containsKey('type') && piece.containsKey('color'))) {
       return false;
@@ -428,7 +436,9 @@ class Chess {
     return true;
   }
 
-  remove(square) {
+  /// Removes a piece from a square and returns it,
+  /// or null if none is present
+  Map remove(String square) {
     Map piece = get(square);
     board[SQUARES[square]] = null;
     if (piece != null && piece['type'] == KING) {
@@ -439,8 +449,8 @@ class Chess {
 
     return piece;
   }
-
-  build_move(board, from, to, flags, [promotion]) {
+  
+  Map build_move(board, from, to, flags, [promotion]) {
     Map move = {
       'color': turn,
       'from': from,
@@ -560,9 +570,8 @@ class Chess {
       }
     }
 
-    /* check for castling if: a) we're generating all moves, or b) we're doing
-     * single square move generation on the king's square
-     */
+    // check for castling if: a) we're generating all moves, or b) we're doing
+    // single square move generation on the king's square
     if ((!single_square) || last_sq == kings[us]) {
       /* king-side castling */
       if ((castling[us] & BITS['KSIDE_CASTLE']) != 0) {
@@ -616,10 +625,8 @@ class Chess {
     return legal_moves;
   }
 
-  /* convert a move from 0x88 coordinates to Standard Algebraic Notation
-   * (SAN)
-   */
-  move_to_san(move) {
+  /// Convert a move from 0x88 coordinates to Standard Algebraic Notation(SAN)
+  String move_to_san(Map move) {
     String output = '';
 
     if ((move['flags'] & BITS['KSIDE_CASTLE']) != 0) {
@@ -660,7 +667,7 @@ class Chess {
     return output;
   }
 
-  attacked(color, square) {
+  bool attacked(String color, int square) {
     for (int i = SQUARES['a8']; i <= SQUARES['h1']; i++) {
       /* did we run off the end of the board */
       if ((i & 0x88) != 0) { i += 7; continue; }
@@ -701,23 +708,23 @@ class Chess {
     return false;
   }
 
-  king_attacked(color) {
+  bool king_attacked(String color) {
     return attacked(swap_color(color), kings[color]);
   }
 
-  in_check() {
+  bool in_check() {
     return king_attacked(turn);
   }
 
-  in_checkmate() {
+  bool in_checkmate() {
     return in_check() && generate_moves().length == 0;
   }
 
-  in_stalemate() {
+  bool in_stalemate() {
     return !in_check() && generate_moves().length == 0;
   }
 
-  insufficient_material() {
+  bool insufficient_material() {
     Map pieces = {};
     List bishops = [];
     int num_pieces = 0;
@@ -758,7 +765,7 @@ class Chess {
     return false;
   }
 
-  in_threefold_repetition() {
+  bool in_threefold_repetition() {
     /* TODO: while this function is fine for casual use, a better
      * implementation would use a Zobrist key (instead of FEN). the
      * Zobrist key would be maintained in the make_move/undo_move functions,
@@ -796,7 +803,7 @@ class Chess {
     return repetition;
   }
 
-  push(move) {
+  void push(move) {
     history.add({
       'move': move,
       'kings': {'b': kings['b'], 'w': kings['w']},
@@ -899,7 +906,8 @@ class Chess {
     turn = swap_color(turn);
   }
 
-  undo_move() {
+  /// Undoes a move and returns it, or null if move history is empty
+  Map undo_move() {
     if (history.isEmpty) {
       return null;
     }
@@ -1006,7 +1014,9 @@ class Chess {
     return '';
   }
 
-  ascii() {
+  /// Returns a String representation of the current position
+  /// complete with ascii art
+  String ascii() {
     String s = '   +------------------------+\n';
     for (var i = SQUARES['a8']; i <= SQUARES['h1']; i++) {
       /* display the rank */
@@ -1039,28 +1049,28 @@ class Chess {
   /*****************************************************************************
    * UTILITY FUNCTIONS
    ****************************************************************************/
-  rank(i) {
+  int rank(int i) {
     return i >> 4;
   }
 
-  file(i) {
+  int file(int i) {
     return i & 15;
   }
 
-  algebraic(i){
+  String algebraic(int i){
     var f = file(i), r = rank(i);
     return 'abcdefgh'.substring(f,f+1) + '87654321'.substring(r,r+1);
   }
 
-  swap_color(c) {
+  String swap_color(String c) {
     return c == WHITE ? BLACK : WHITE;
   }
 
-  is_digit(c) {
+  bool is_digit(String c) {
     return '0123456789'.contains(c);
   }
 
-  /* pretty = external move object */
+  /// pretty = external move object
   make_pretty(ugly_move) {
     var move = clone(ugly_move);
     move['san'] = move_to_san(move);
@@ -1079,6 +1089,7 @@ class Chess {
     return move;
   }
 
+  /// Duplicate a Map or List
   clone(obj) {
     var dupe;
     if (obj is List) {
@@ -1098,7 +1109,7 @@ class Chess {
     return dupe;
   }
 
-  trim(str) {
+  String trim(String str) {
     return str.replaceAll(new RegExp(r"^\s+|\s+$"), '');
   }
 
@@ -1175,6 +1186,7 @@ class Chess {
       return generate_fen();
     }
 
+    /// Return the PGN representation of the game thus far
     pgn([Map options]) {
       /* using the specification from http://www.chessclub.com/help/PGN-spec
        * example for html usage: .pgn({ max_width: 72, newline_char: "<br />" })
@@ -1408,17 +1420,15 @@ class Chess {
       }
       return true;
     }
-
+    
+    /// The move function can be called with in the following parameters:
+    /// .move('Nxb7')      <- where 'move' is a case-sensitive SAN string
+    /// .move({ from: 'h7', <- where the 'move' is a move object (additional
+    ///      to :'h8',      fields are ignored)
+    ///      promotion: 'q',
+    ///      })
     move(move) {
-      /* The move function can be called with in the following parameters:
-       *
-       * .move('Nxb7')      <- where 'move' is a case-sensitive SAN string
-       *
-       * .move({ from: 'h7', <- where the 'move' is a move object (additional
-       *         to :'h8',      fields are ignored)
-       *         promotion: 'q',
-       *      })
-       */
+      
       var move_obj = null;
       var moves = generate_moves();
 
