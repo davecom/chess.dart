@@ -20,8 +20,8 @@ void main() {
   if (chess.in_stalemate()) {
     print("Stalemate");
   }
-  if (chess.in_threefold_repetition()) {
-    print("Threefold repetition.");
+  if (chess.in_draw()) {
+    print("Draw");
   }
   if (chess.insufficient_material()) {
     print("Insufficient Material");
