@@ -1099,7 +1099,7 @@ class Chess {
   }
 
   trim(str) {
-    return str.replaceAll(new RegExp(r"/^\s+|\s+$/g"), '');
+    return str.replaceAll(new RegExp(r"^\s+|\s+$"), '');
   }
 
   /*****************************************************************************
@@ -1180,20 +1180,20 @@ class Chess {
        * example for html usage: .pgn({ max_width: 72, newline_char: "<br />" })
        */
       var newline = (options != null &&
-                     options.containsKey("newline_char")) ?
+                     options.containsKey("newline_char") && options["newline_char"] != null) ?
                      options['newline_char'] : '\n';
       var max_width = (options != null &&
-                     options.containsKey("max_width")) ?
+                     options.containsKey("max_width") && options["max_width"] != null) ?
                        options["max_width"] : 0;
       var result = [];
       var header_exists = false;
 
       /* add the PGN header headerrmation */
-      for (var i in header) {
+      for (var i in header.keys) {
         /* TODO: order of enumerated properties in header object is not
          * guaranteed, see ECMA-262 spec (section 12.6.4)
          */
-        result.add('[' + i + ' \"' + header[i] + '\"]' + newline);
+        result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
         header_exists = true;
       }
 
@@ -1273,9 +1273,9 @@ class Chess {
       return result.join('');
     }
 
-    load_pgn(pgn, [Map options]) {
+    load_pgn(String pgn, [Map options]) {
       mask(str) {
-        return str.replaceAll(new RegExp(r"/\\/g"), '\\');
+        return str.replaceAll(new RegExp(r"\\"), '\\');
       }
 
       /* convert a move from Standard Algebraic Notation (SAN) to 0x88
@@ -1285,8 +1285,8 @@ class Chess {
         var moves = generate_moves();
         for (var i = 0, len = moves.length; i < len; i++) {
           /* strip off any trailing move decorations: e.g Nf3+?! */
-          if (move.replaceAll(new RegExp(r"/[+#?!=]+$/"),'') ==
-              move_to_san(moves[i]).replaceAll(new RegExp(r"/[+#?!=]+$/"),'')) {
+          if (move.replaceAll(new RegExp(r"[+#?!=]+$"),'') ==
+              move_to_san(moves[i]).replaceAll(new RegExp(r"[+#?!=]+$"),'')) {
             return moves[i];
           }
         }
@@ -1297,26 +1297,36 @@ class Chess {
         return move_from_san(trim(move));
       }
 
-      has_keys(object) {
+      /*has_keys(object) {
         bool has_keys = false;
         for (var key in object) {
           has_keys = true;
         }
         return has_keys;
-      }
+      }*/
 
       parse_pgn_header(header, [Map options]) {
         var newline_char = (options != null &&
                             options.containsKey("newline_char")) ?
                             options['newline_char'] : '\r?\n';
         var header_obj = {};
-        var headers = header.split(new RegExp(mask(newline_char)));
+        var headers = header.split(newline_char);
         var key = '';
         var value = '';
 
         for (var i = 0; i < headers.length; i++) {
-          key = headers[i].replaceAll(new RegExp(r"/^\[([A-Z][A-Za-z]*)\s.*\]$/"), r'$1');
-          value = headers[i].replaceAll(new RegExp(r'/^\[[A-Za-z]+\s"(.*)"\]$/'), r'$1');
+          RegExp keyMatch = new RegExp(r"^\[([A-Z][A-Za-z]*)\s.*\]$");
+          var temp = keyMatch.firstMatch(headers[i]);
+          if (temp != null) {
+            key = temp[1];
+          }
+          //print(key);
+          RegExp valueMatch = new RegExp(r'^\[[A-Za-z]+\s"(.*)"\]$');
+          temp = valueMatch.firstMatch(headers[i]);
+          if (temp != null) {
+            value = temp[1];
+          }
+          //print(value);
           if (trim(key).length > 0) {
             header_obj[key] = value;
           }
@@ -1328,15 +1338,18 @@ class Chess {
       var newline_char = (options != null &&
                           options.containsKey("newline_char")) ?
                           options["newline_char"] : '\r?\n';
-        var regex = new RegExp(r'^(\\[(.|' + mask(newline_char) + r')*\\])' +
-                               r'(' + mask(newline_char) + r')*' +
-                               r'1.(' + mask(newline_char) + r'|.)*$');
+      //var regex = new RegExp(r'^(\[.*\]).*' + r'1\.'); //+ r"1\."); //+ mask(newline_char));
 
+      int indexOfMoveStart = pgn.indexOf(new RegExp(newline_char + r"1\."));
+      
       /* get header part of the PGN file */
-      var header_string = pgn.replaceAll(regex, r'$1');
+      String header_string = null;
+      if (indexOfMoveStart != -1) {
+         header_string = pgn.substring(0, indexOfMoveStart).trim();
+      }
 
       /* no info part given, begins with moves */
-      if (header_string[0] != '[') {
+      if (header_string == null || header_string[0] != '[') {
         header_string = '';
       }
 
@@ -1344,7 +1357,7 @@ class Chess {
 
       /* parse PGN header */
       var headers = parse_pgn_header(header_string, options);
-      for (var key in headers) {
+      for (var key in headers.keys) {
         set_header([key, headers[key]]);
       }
 
@@ -1352,17 +1365,17 @@ class Chess {
       var ms = pgn.replaceAll(header_string, '').replaceAll(new RegExp(mask(newline_char)), ' ');
 
       /* delete comments */
-      ms = ms.replaceAll(new RegExp(r"/(\{[^}]+\})+?/g"), '');
+      ms = ms.replaceAll(new RegExp(r"(\{[^}]+\})+?"), '');
 
       /* delete move numbers */
-      ms = ms.replaceAll(new RegExp(r"/\d+\./g"), '');
+      ms = ms.replaceAll(new RegExp(r"\d+\."), '');
 
 
       /* trim and get array of moves */
-      var moves = trim(ms).split(new RegExp(r"/\s+/"));
+      var moves = trim(ms).split(new RegExp(r"\s+"));
 
       /* delete empty entries */
-      moves = moves.join(',').replaceAll(new RegExp(r"/,,+/g"), ',').split(',');
+      moves = moves.join(',').replaceAll(new RegExp(r",,+"), ',').split(',');
       var move = '';
 
       for (var half_move = 0; half_move < moves.length - 1; half_move++) {
@@ -1381,7 +1394,7 @@ class Chess {
       /* examine last move */
       move = moves[moves.length - 1];
       if (POSSIBLE_RESULTS.contains(move)) {
-        if (has_keys(header) && !header.containsKey("Result")) {
+        if (!header.containsKey("Result")) {
           set_header(['Result', move]);
         }
       }
