@@ -5,7 +5,7 @@ chess.dart is a library for legal chess move generation, maintenance of chess ga
 
 It is a port of chess.js to Dart.  It aims to include all of the functionality in the original library.  Most of the variable and method names are unchanged.  Indeed, the code is largely a line for line translation from JavaScript to Dart.  It requires cleanup to become more Dart like.
 
-At this early stage, it is working, but bug ridden and largely untested. It is definitely not fit for production.
+At this early stage, it is working, and passes all of the unit tests which come with chess.js (which you can find in the test directory). However, beyond this, it is not tested in production.
 
 ## A Random Game
 
@@ -28,7 +28,7 @@ void main() {
 ```
 ## Documentation
 
-The chess.js documentation is largely relevant, but there are also DartDocs generated within the lib/docs directory.
+The chess.js documentation is largely relevant, but there are also DartDocs generated within the lib/docs directory. The only change in naming from chess.js, is that history() has been changed to getHistory() due to a conflict with the history ivar.
 
 ## Links
 - [chess.js](https://github.com/jhlywa/chess.js)
