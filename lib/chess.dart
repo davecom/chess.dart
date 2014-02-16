@@ -1074,10 +1074,7 @@ class Chess {
     board[move.to] = null;
 
     if ((move.flags & BITS['CAPTURE']) != 0) {
-      board[move.to] = {
-        'type': move.captured,
-        'color': them
-      };
+      board[move.to] = new Piece(move.captured, them);
     } else if ((move.flags & BITS['EP_CAPTURE']) != 0) {
       var index;
       if (us == BLACK) {
@@ -1597,7 +1594,7 @@ class Chess {
   Map move(move) {
 
     var move_obj = null;
-    var moves = generate_moves();
+    List<Move> moves = generate_moves();
 
     if (move is String) {
       /* convert the move string to a move object */
@@ -1610,9 +1607,9 @@ class Chess {
     } else if (move is Move) {
       /* convert the pretty move object to an ugly move object */
       for (var i = 0, len = moves.length; i < len; i++) {
-        if (move.from == algebraic(moves[i].from) && move.to ==
-            algebraic(moves[i].to) && (moves[i].promotion != null) ||
-            move.promotion == moves[i].promotion) {
+        if (move.from == moves[i].from && move.to ==
+            moves[i].to && ((moves[i].promotion != null) ||
+            move.promotion == moves[i].promotion)) {
           move_obj = moves[i];
           break;
         }

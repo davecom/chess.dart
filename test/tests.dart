@@ -291,7 +291,7 @@ void main() {
   
         /* places the pieces */
         for (var square in position['pieces'].keys) {
-          passed = passed && chess.put(position['pieces'][square], square);
+          passed = passed && chess.put(new Piece(position['pieces'][square]['type'], position['pieces'][square]['color']), square);
         }
   
         /* iterate over every square to make sure get returns the proper
@@ -304,10 +304,10 @@ void main() {
               break;
             }
           } else {
-            var piece = chess.get(square);
+            Piece piece = chess.get(square);
             if (!(piece != null &&
-                piece['type'] == position['pieces'][square]['type'] &&
-                piece['color'] == position['pieces'][square]['color'])) {
+                piece.type == position['pieces'][square]['type'] &&
+                piece.color == position['pieces'][square]['color'])) {
               passed = false;
               break;
             }
@@ -324,8 +324,8 @@ void main() {
             }
   
             if (piece != null &&
-               (position['pieces'][square]['type'] != piece['type'] ||
-                position['pieces'][square]['color'] != piece['color'])) {
+               (position['pieces'][square]['type'] != piece.type ||
+                position['pieces'][square]['color'] != piece.color)) {
               passed = false;
               break;
             }
@@ -887,7 +887,14 @@ void main() {
         chess.reset();
   
         for (int j = 0; j < t['moves'].length; j++) {
-          chess.move(t['moves'][j]);
+          var tempMove = t['moves'][j];
+          if (tempMove is String) {
+            chess.move(t['moves'][j]);
+          } else if (tempMove is Map) {
+            Move m = new Move(tempMove['color'], Chess.SQUARES[tempMove['from']], Chess.SQUARES[tempMove['to']], 0, tempMove['piece']);
+            m.captured = tempMove['captured'];
+            chess.move(m);
+          }
         }
   
         var history = chess.getHistory({'verbose': t['verbose']});
@@ -923,7 +930,7 @@ void main() {
     // Github Issue #32 reported by AlgoTrader
     test('Issue #32 - castling flag reappearing', () {
       Chess chess = new Chess.fromFEN('b3k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qNP/6QK b k - 2 28');
-      chess.move({'from':'a8', 'to':'g2'});
+      chess.move(new Move(null, Chess.SQUARES["a8"], Chess.SQUARES["g2"], null, null));
       expect(chess.fen(), equals('4k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qbP/6QK w k - 0 29'));
     });
   });
