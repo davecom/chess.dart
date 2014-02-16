@@ -1270,10 +1270,10 @@ class Chess {
 
   // debug utility
   perft(depth) {
-    var moves = generate_moves({
+    List<Move> moves = generate_moves({
       'legal': false
     });
-    var nodes = 0;
+    int nodes = 0;
     var color = turn;
 
     for (int i = 0, len = moves.length; i < len; i++) {
