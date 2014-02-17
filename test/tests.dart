@@ -19,16 +19,12 @@ void main() {
       chess.load(perft['fen']);
 
       test(perft['fen'], () {
-        Stopwatch watch = new Stopwatch()..start();
         var nodes = chess.perft(perft['depth']);
-        var elapsed = watch.elapsedMilliseconds;
-        print('${perft["fen"]}: $elapsed ms.');
         expect(nodes, equals(perft['nodes']));
       });
 
     });
   });
-  return;
 
   group("Single Square Move Generation", () {
 
