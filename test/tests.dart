@@ -17,17 +17,17 @@ void main() {
     perfts.forEach((perft) {
       Chess chess = new Chess();
       chess.load(perft['fen']);
-  
+
       test(perft['fen'], () {
         var nodes = chess.perft(perft['depth']);
         expect(nodes, equals(perft['nodes']));
       });
-  
+
     });
   });
-  
+
   group("Single Square Move Generation", () {
-  
+
     List positions = [
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         'square': 'e2', 'verbose': false, 'moves': ['e3', 'e4']},
@@ -46,24 +46,24 @@ void main() {
       {'fen': '8/7K/8/8/1R6/k7/1R1p4/8 b - - 0 1',
         'square': 'd2', 'verbose': true,
         'moves':
-          [{'color':'b', 'from':'d2', 'to':'d1', 'flags':'np', 'piece':'p', 'promotion':'q', 'san':'d1=Q'},
-           {'color':'b', 'from':'d2', 'to':'d1', 'flags':'np', 'piece':'p', 'promotion':'r', 'san':'d1=R'},
-           {'color':'b', 'from':'d2', 'to':'d1', 'flags':'np', 'piece':'p', 'promotion':'b', 'san':'d1=B'},
-           {'color':'b', 'from':'d2', 'to':'d1', 'flags':'np', 'piece':'p', 'promotion':'n', 'san':'d1=N'}]
+          [{'color':Chess.BLACK, 'from':'d2', 'to':'d1', 'flags':'np', 'piece':Chess.PAWN, 'promotion':Chess.QUEEN, 'san':'d1=Q'},
+           {'color':Chess.BLACK, 'from':'d2', 'to':'d1', 'flags':'np', 'piece':Chess.PAWN, 'promotion':Chess.ROOK, 'san':'d1=R'},
+           {'color':Chess.BLACK, 'from':'d2', 'to':'d1', 'flags':'np', 'piece':Chess.PAWN, 'promotion':Chess.BISHOP, 'san':'d1=B'},
+           {'color':Chess.BLACK, 'from':'d2', 'to':'d1', 'flags':'np', 'piece':Chess.PAWN, 'promotion':Chess.KNIGHT, 'san':'d1=N'}]
       }, // verbose
       {'fen': 'rnbqk2r/ppp1pp1p/5n1b/3p2pQ/1P2P3/B1N5/P1PP1PPP/R3KBNR b KQkq - 3 5',
         'square': 'f1', 'verbose': true, 'moves': []},  // issue #30
     ];
-  
+
     positions.forEach((position) {
       Chess chess = new Chess();
       chess.load(position['fen']);
-  
+
       test(position['fen'] + ' ' + position['square'], () {
-  
+
         var moves = chess.moves({'square': position['square'], 'verbose': position['verbose']});
         var passed = position['moves'].length == moves.length;
-  
+
         for (int j = 0; j < moves.length; j++) {
           if (!position['verbose']) {
             passed = passed && moves[j] == position['moves'][j];
@@ -74,16 +74,16 @@ void main() {
           }
         }
         expect(passed, isTrue);
-  
+
       });
-  
+
     });
-  
+
   });
 
-  
+
   group("Checkmate", () {
-  
+
     Chess chess = new Chess();
     List checkmates = [
       '8/5r2/4K1q1/4p3/3k4/8/8/8 w - - 0 7',
@@ -91,41 +91,41 @@ void main() {
       'r3k2r/ppp2p1p/2n1p1p1/8/2B2P1q/2NPb1n1/PP4PP/R2Q3K w kq - 0 8',
       '8/6R1/pp1r3p/6p1/P3R1Pk/1P4P1/7K/8 b - - 0 4'
     ];
-  
+
     checkmates.forEach((checkmate) {
       chess.load(checkmate);
-  
+
       test(checkmate, () {
         expect(chess.in_checkmate(), isTrue);
       });
     });
-  
+
   });
 
-  
+
   group("Stalemate", () {
-  
+
     List stalemates = [
       '1R6/8/8/8/8/8/7R/k6K b - - 0 1',
       '8/8/5k2/p4p1p/P4K1P/1r6/8/8 w - - 0 2',
     ];
-  
+
     stalemates.forEach((stalemate) {
       Chess chess = new Chess();
       chess.load(stalemate);
-  
+
       test(stalemate, () {
         expect(chess.in_stalemate(), isTrue);
       });
-  
+
     });
-  
+
   });
 
 
 
   group("Insufficient Material", () {
-  
+
     List positions = [
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'draw': false},
       {'fen': '8/8/8/8/8/8/8/k6K w - - 0 1', 'draw': true},
@@ -137,11 +137,11 @@ void main() {
       {'fen': '8/b1B1b1B1/1b1B1b1B/8/8/8/8/1k5K w - - 0 1', 'draw': true},
       {'fen': '8/bB2b1B1/1b1B1b1B/8/8/8/8/1k5K w - - 0 1', 'draw': false}
     ];
-  
+
     positions.forEach( (position) {
       Chess chess = new Chess();
       chess.load(position['fen']);
-  
+
       test(position['fen'], () {
         if (position['draw']) {
           expect(chess.insufficient_material() && chess.in_draw(), isTrue);
@@ -149,29 +149,29 @@ void main() {
           expect(!chess.insufficient_material() && !chess.in_draw(), isTrue);
         }
       });
-  
+
     });
-  
+
   });
 
-  
+
   group("Threefold Repetition", () {
-  
+
     List positions = [
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
        'moves': ['Nf3', 'Nf6', 'Ng1', 'Ng8', 'Nf3', 'Nf6', 'Ng1', 'Ng8']},
-  
+
       /* Fischer - Petrosian, Buenos Aires, 1971 */
       {'fen': '8/pp3p1k/2p2q1p/3r1P2/5R2/7P/P1P1QP2/7K b - - 2 30',
        'moves': ['Qe5', 'Qh5', 'Qf6', 'Qe2', 'Re5', 'Qd3', 'Rd5', 'Qe2']},
     ];
-  
+
     positions.forEach( (position) {
       Chess chess = new Chess();
       chess.load(position['fen']);
-  
+
       test(position['fen'], () {
-  
+
         bool passed = true;
         for (int j = 0; j < position['moves'].length; j++) {
           if (chess.in_threefold_repetition()) {
@@ -180,18 +180,18 @@ void main() {
           }
           chess.move(position['moves'][j]);
         }
-  
+
         expect(passed && chess.in_threefold_repetition() && chess.in_draw(), isTrue);
-  
+
       });
-  
+
     });
-  
+
   });
 
 
   group("Algebraic Notation", () {
-  
+
     List positions = [
       {'fen': '7k/3R4/3p2Q1/6Q1/2N1N3/8/8/3R3K w - - 0 1',
        'moves': ['Rd8#', 'Re7', 'Rf7', 'Rg7', 'Rh7#', 'R7xd6', 'Rc7', 'Rb7', 'Ra7',
@@ -229,12 +229,12 @@ void main() {
                'Nhf5', 'Ng6', 'Ng2', 'Nb5', 'Nc6', 'Ne6', 'Ndf5', 'Ne2', 'Nc2',
                'N4b3', 'Kb8']},
     ];
-  
+
     positions.forEach( (position) {
       Chess chess = new Chess();
       bool passed = true;
       chess.load(position['fen']);
-  
+
       test(position['fen'], () {
         var moves = chess.moves();
         if (moves.length != position['moves'].length) {
@@ -249,51 +249,48 @@ void main() {
         }
         expect(passed, isTrue);
       });
-  
+
     });
-  
+
   });
 
 
 
   group("Get/Put/Remove", () {
-  
+
     Chess chess = new Chess();
     bool passed = true;
     List positions = [
-      {'pieces': {'a7': {'type': Chess.PAWN, 'color': Chess.WHITE},
-                'b7': {'type': Chess.PAWN, 'color': Chess.BLACK},
-                'c7': {'type': Chess.KNIGHT, 'color': Chess.WHITE},
-                'd7': {'type': Chess.KNIGHT, 'color': Chess.BLACK},
-                'e7': {'type': Chess.BISHOP, 'color': Chess.WHITE},
-                'f7': {'type': Chess.BISHOP, 'color': Chess.BLACK},
-                'g7': {'type': Chess.ROOK, 'color': Chess.WHITE},
-                'h7': {'type': Chess.ROOK, 'color': Chess.BLACK},
-                'a6': {'type': Chess.QUEEN, 'color': Chess.WHITE},
-                'b6': {'type': Chess.QUEEN, 'color': Chess.BLACK},
-                'a4': {'type': Chess.KING, 'color': Chess.WHITE},
-                'h4': {'type': Chess.KING, 'color': Chess.BLACK}},
+      {'pieces': {'a7': new Piece(Chess.PAWN, Chess.WHITE),
+                'b7': new Piece(Chess.PAWN, Chess.BLACK),
+                'c7': new Piece(Chess.KNIGHT, Chess.WHITE),
+                'd7': new Piece(Chess.KNIGHT, Chess.BLACK),
+                'e7': new Piece(Chess.BISHOP, Chess.WHITE),
+                'f7': new Piece(Chess.BISHOP, Chess.BLACK),
+                'g7': new Piece(Chess.ROOK, Chess.WHITE),
+                'h7': new Piece(Chess.ROOK, Chess.BLACK),
+                'a6': new Piece(Chess.QUEEN, Chess.WHITE),
+                'b6': new Piece(Chess.QUEEN, Chess.BLACK),
+                'a4': new Piece(Chess.KING, Chess.WHITE),
+                'h4': new Piece(Chess.KING, Chess.BLACK)},
        'should_pass': true},
-  
-      {'pieces': {'a7': {'type': 'z', 'color': Chess.WHITE}}, // bad piece
-       'should_pass': false},
-  
-      {'pieces': {'j4': {'type': Chess.PAWN, 'color': Chess.WHITE}}, // bad square
+
+      {'pieces': {'j4': new Piece(Chess.PAWN, Chess.WHITE)}, // bad square
        'should_pass': false},
     ];
-  
+
     positions.forEach( (position) {
-  
+
       passed = true;
       chess.clear();
-  
+
       test("position should pass - " + position['should_pass'].toString(), () {
-  
+
         /* places the pieces */
         for (var square in position['pieces'].keys) {
           passed = passed && chess.put(position['pieces'][square], square);
         }
-  
+
         /* iterate over every square to make sure get returns the proper
          * piece values/color
          */
@@ -306,82 +303,82 @@ void main() {
           } else {
             var piece = chess.get(square);
             if (!(piece != null &&
-                piece['type'] == position['pieces'][square]['type'] &&
-                piece['color'] == position['pieces'][square]['color'])) {
+                piece.type == position['pieces'][square].type &&
+                piece.color == position['pieces'][square].color)) {
               passed = false;
               break;
             }
           }
         }
-  
+
         if (passed) {
           /* remove the pieces */
           for (var square in Chess.SQUARES.keys) {
-            var piece = chess.remove(square);
+            Piece piece = chess.remove(square);
             if ((!(position['pieces'].containsKey(square))) && piece != null) {
               passed = false;
               break;
             }
-  
+
             if (piece != null &&
-               (position['pieces'][square]['type'] != piece['type'] ||
-                position['pieces'][square]['color'] != piece['color'])) {
+               (position['pieces'][square].type != piece.type ||
+                position['pieces'][square].color != piece.color)) {
               passed = false;
               break;
             }
           }
         }
-  
+
         /* finally, check for an empty board */
         passed = passed && (chess.fen() == '8/8/8/8/8/8/8/8 w - - 0 1');
-  
+
         /* some tests should fail, so make sure we're supposed to pass/fail each
          * test
          */
         passed = (passed == position['should_pass']);
-  
+
         expect(passed, isTrue);
       });
-  
+
     });
-  
+
   });
 
 
   group("FEN", () {
-  
+
     var positions = [
       {'fen': '8/8/8/8/8/8/8/8 w - - 0 1', 'should_pass': true},
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'should_pass': true},
       {'fen': 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1', 'should_pass': true},
       {'fen': '1nbqkbn1/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/1NBQKBN1 b - - 1 2', 'should_pass': true},
-  
+
       /* incomplete FEN string */
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN w KQkq - 0 1', 'should_pass': false},
-  
+
       /* bad digit (9)*/
       {'fen': 'rnbqkbnr/pppppppp/9/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'should_pass': false},
- 
+
       /* bad piece (X)*/
       {'fen': '1nbqkbn1/pppp1ppX/8/4p3/4P3/8/PPPP1PPP/1NBQKBN1 b - - 1 2', 'should_pass': false},
     ];
-  
+
     positions.forEach( (position) {
       Chess chess = new Chess();
-  
+
       test(position['fen'] + ' (' + position['should_pass'].toString() + ')', () {
         chess.load(position['fen']);
         expect((chess.fen() == position['fen']) == position['should_pass'], isTrue);
       });
-  
+
     });
-  
+
   });
 
 
 
   group("PGN", () {
-  
+
     bool passed = true;
     var error_message;
     List positions = [
@@ -423,9 +420,9 @@ void main() {
        'starting_position': 'r1bqk1nr/pppp1ppp/2n5/4p3/1bB1P3/2P2N2/P2P1PPP/RNBQK2R b KQkq - 0 1',
        'fen': 'r1bqk1nr/ppp2ppp/2np4/b3p3/2BPP3/2P2N2/P4PPP/RNBQ1RK1 b kq d3 0 3'}
       ];
-  
+
     positions.forEach((position) {
-  
+
       test(position["fen"], () {
         Chess chess = (position.containsKey("starting_position")) ? new Chess.fromFEN(position['starting_position']) : new Chess();
         bool passed = true;
@@ -436,7 +433,7 @@ void main() {
             break;
           }
         }
-  
+
         for (int k = 0; k < position['header'].length; k+=2) {
           chess.header[position['header'][k]] = position['header'][k+1];
         }
@@ -446,13 +443,13 @@ void main() {
         passed = pgn == position['pgn'] && fen == position['fen'];
         expect(passed && error_message.length == 0, isTrue);
       });
-  
+
     });
-  
+
   });
 
   group("Load PGN", () {
-  
+
     Chess chess = new Chess();
     List tests = [
        {'pgn': [
@@ -517,31 +514,31 @@ void main() {
       {'pgn': ['1. e4 Qxd7 1/2-1/2'],
         'expect': false},
     ];
-  
+
     var newline_chars = ['\n', '<br />', '\r\n', 'BLAH'];
-  
+
     tests.forEach( (t) {
       newline_chars.forEach( (newline) {
         test(t['fen'], () {
-  
+
           var result = chess.load_pgn(t['pgn'].join(newline), { 'newline_char': newline });
           bool should_pass = t['expect'];
-  
+
           /* some tests are expected to fail */
           if (should_pass) {
-  
+
           /* some PGN's tests contain comments which are stripped during parsing,
            * so we'll need compare the results of the load against a FEN string
            * (instead of the reconstructed PGN [e.g. test.pgn.join(newline)])
            */
-  
+
             if (t.containsKey("fen")) {
               expect(result, isTrue);
               expect(chess.fen(), equals(t["fen"]));
               //print(chess.fen());
               //print(t["fen"]);
             } else {
-              expect(result, isTrue); 
+              expect(result, isTrue);
               expect(chess.pgn({ 'max_width': 65, 'newline_char': newline }), equals(t['pgn'].join(newline)));
               //print(chess.pgn({ 'max_width': 65, 'newline_char': newline }));
               //print(t['pgn'].join(newline));
@@ -551,11 +548,11 @@ void main() {
             expect(result, equals(should_pass));
           }
         });
-  
+
       });
-  
+
     });
-  
+
   // special case dirty file containing a mix of \n and \r\n
     test('dirty pgn', () {
       var pgn =
@@ -580,14 +577,14 @@ void main() {
            '27. Rxf5 Nh7 28. Rcf1 Qd8 29. Qg3 Re7 30. h4 Rbb7 31. e6 Rbc7\n' +
            '32. Qe5 Qe8 33. a4 Qd8 34. R1f2 Qe8 35. R2f3 Qd8 36. Bd3 Qe8\n' +
            '37. Qe4 Nf6 38. Rxf6 gxf6 39. Rxf6 Kg8 40. Bc4 Kh8 41. Qf4 1-0\n';
-  
+
       var result = chess.load_pgn(pgn, { 'newline_char': '\r?\n' });
       expect(result, isNotNull);
-  
+
       expect(chess.load_pgn(pgn), isNotNull);
       expect(!chess.pgn().contains(new RegExp(r"^\[\[")), isTrue);
     });
-  
+
   });
 
 
@@ -595,7 +592,7 @@ void main() {
 
 
   group("Make Move", () {
-  
+
     List positions = [
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
        'legal': true,
@@ -612,14 +609,14 @@ void main() {
        'legal': true,
        'move': 'fxe6',
        'next': 'rnbqkbnr/pp3ppp/2ppP3/8/4P3/8/PPPP2PP/RNBQKBNR b KQkq - 0 1',
-       'captured': 'p'},
+       'captured': Chess.PAWN},
       {'fen': 'rnbqkbnr/pppp2pp/8/4p3/4Pp2/2PP4/PP3PPP/RNBQKBNR b KQkq e3 0 1',
        'legal': true,
        'move': 'fxe3',
        'next': 'rnbqkbnr/pppp2pp/8/4p3/8/2PPp3/PP3PPP/RNBQKBNR w KQkq - 0 2',
-       'captured': 'p'}
+       'captured': Chess.PAWN}
     ];
-  
+
     positions.forEach( (position) {
       Chess chess = new Chess();
       chess.load(position['fen']);
@@ -635,13 +632,13 @@ void main() {
           expect(result, isNull);
         }
       });
-  
+
     });
-  
+
   });
 
   group("Validate FEN", () {
-  
+
     Chess chess = new Chess();
     List positions = [
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNRw KQkq - 0 1',   'error_number': 1},
@@ -767,20 +764,20 @@ void main() {
       {'fen': 'r1rb2k1/5ppp/pqp5/3pPb2/QB1P4/2R2N2/P4PPP/2R3K1 b - - 7 23', 'error_number': 0},
       {'fen': '3r1r2/3P2pk/1p1R3p/1Bp2p2/6q1/4Q3/PP3P1P/7K w - - 4 30', 'error_number': 0},
     ];
-  
+
     positions.forEach((position) {
-  
+
       test(position['fen'] + ' (valid: ' + (position['error_number']  == 0).toString() + ')', () {
         var result = chess.validate_fen(position['fen']);
         expect(result['error_number'], equals(position['error_number']));
       });
-  
+
     });
   });
 
 
   group("History", () {
-  
+
     Chess chess = new Chess();
     List tests = [
        {'verbose': false,
@@ -796,100 +793,100 @@ void main() {
        {'verbose': true,
         'fen': '4q2k/2r1r3/4PR1p/p1p5/P1Bp1Q1P/1P6/6P1/6K1 b - - 4 41',
         'moves': [
-          {'color': 'w', 'from': 'c2', 'to': 'c4', 'flags': 'b', 'piece': 'p', 'san': 'c4'},
-          {'color': 'b', 'from': 'e7', 'to': 'e6', 'flags': 'n', 'piece': 'p', 'san': 'e6'},
-          {'color': 'w', 'from': 'g1', 'to': 'f3', 'flags': 'n', 'piece': 'n', 'san': 'Nf3'},
-          {'color': 'b', 'from': 'd7', 'to': 'd5', 'flags': 'b', 'piece': 'p', 'san': 'd5'},
-          {'color': 'w', 'from': 'd2', 'to': 'd4', 'flags': 'b', 'piece': 'p', 'san': 'd4'},
-          {'color': 'b', 'from': 'g8', 'to': 'f6', 'flags': 'n', 'piece': 'n', 'san': 'Nf6'},
-          {'color': 'w', 'from': 'b1', 'to': 'c3', 'flags': 'n', 'piece': 'n', 'san': 'Nc3'},
-          {'color': 'b', 'from': 'f8', 'to': 'e7', 'flags': 'n', 'piece': 'b', 'san': 'Be7'},
-          {'color': 'w', 'from': 'c1', 'to': 'g5', 'flags': 'n', 'piece': 'b', 'san': 'Bg5'},
-          {'color': 'b', 'from': 'e8', 'to': 'g8', 'flags': 'k', 'piece': 'k', 'san': 'O-O'},
-          {'color': 'w', 'from': 'e2', 'to': 'e3', 'flags': 'n', 'piece': 'p', 'san': 'e3'},
-          {'color': 'b', 'from': 'h7', 'to': 'h6', 'flags': 'n', 'piece': 'p', 'san': 'h6'},
-          {'color': 'w', 'from': 'g5', 'to': 'h4', 'flags': 'n', 'piece': 'b', 'san': 'Bh4'},
-          {'color': 'b', 'from': 'b7', 'to': 'b6', 'flags': 'n', 'piece': 'p', 'san': 'b6'},
-          {'color': 'w', 'from': 'c4', 'to': 'd5', 'flags': 'c', 'piece': 'p', 'captured': 'p', 'san': 'cxd5'},
-          {'color': 'b', 'from': 'f6', 'to': 'd5', 'flags': 'c', 'piece': 'n', 'captured': 'p', 'san': 'Nxd5'},
-          {'color': 'w', 'from': 'h4', 'to': 'e7', 'flags': 'c', 'piece': 'b', 'captured': 'b', 'san': 'Bxe7'},
-          {'color': 'b', 'from': 'd8', 'to': 'e7', 'flags': 'c', 'piece': 'q', 'captured': 'b', 'san': 'Qxe7'},
-          {'color': 'w', 'from': 'c3', 'to': 'd5', 'flags': 'c', 'piece': 'n', 'captured': 'n', 'san': 'Nxd5'},
-          {'color': 'b', 'from': 'e6', 'to': 'd5', 'flags': 'c', 'piece': 'p', 'captured': 'n', 'san': 'exd5'},
-          {'color': 'w', 'from': 'a1', 'to': 'c1', 'flags': 'n', 'piece': 'r', 'san': 'Rc1'},
-          {'color': 'b', 'from': 'c8', 'to': 'e6', 'flags': 'n', 'piece': 'b', 'san': 'Be6'},
-          {'color': 'w', 'from': 'd1', 'to': 'a4', 'flags': 'n', 'piece': 'q', 'san': 'Qa4'},
-          {'color': 'b', 'from': 'c7', 'to': 'c5', 'flags': 'b', 'piece': 'p', 'san': 'c5'},
-          {'color': 'w', 'from': 'a4', 'to': 'a3', 'flags': 'n', 'piece': 'q', 'san': 'Qa3'},
-          {'color': 'b', 'from': 'f8', 'to': 'c8', 'flags': 'n', 'piece': 'r', 'san': 'Rc8'},
-          {'color': 'w', 'from': 'f1', 'to': 'b5', 'flags': 'n', 'piece': 'b', 'san': 'Bb5'},
-          {'color': 'b', 'from': 'a7', 'to': 'a6', 'flags': 'n', 'piece': 'p', 'san': 'a6'},
-          {'color': 'w', 'from': 'd4', 'to': 'c5', 'flags': 'c', 'piece': 'p', 'captured': 'p', 'san': 'dxc5'},
-          {'color': 'b', 'from': 'b6', 'to': 'c5', 'flags': 'c', 'piece': 'p', 'captured': 'p', 'san': 'bxc5'},
-          {'color': 'w', 'from': 'e1', 'to': 'g1', 'flags': 'k', 'piece': 'k', 'san': 'O-O'},
-          {'color': 'b', 'from': 'a8', 'to': 'a7', 'flags': 'n', 'piece': 'r', 'san': 'Ra7'},
-          {'color': 'w', 'from': 'b5', 'to': 'e2', 'flags': 'n', 'piece': 'b', 'san': 'Be2'},
-          {'color': 'b', 'from': 'b8', 'to': 'd7', 'flags': 'n', 'piece': 'n', 'san': 'Nd7'},
-          {'color': 'w', 'from': 'f3', 'to': 'd4', 'flags': 'n', 'piece': 'n', 'san': 'Nd4'},
-          {'color': 'b', 'from': 'e7', 'to': 'f8', 'flags': 'n', 'piece': 'q', 'san': 'Qf8'},
-          {'color': 'w', 'from': 'd4', 'to': 'e6', 'flags': 'c', 'piece': 'n', 'captured': 'b', 'san': 'Nxe6'},
-          {'color': 'b', 'from': 'f7', 'to': 'e6', 'flags': 'c', 'piece': 'p', 'captured': 'n', 'san': 'fxe6'},
-          {'color': 'w', 'from': 'e3', 'to': 'e4', 'flags': 'n', 'piece': 'p', 'san': 'e4'},
-          {'color': 'b', 'from': 'd5', 'to': 'd4', 'flags': 'n', 'piece': 'p', 'san': 'd4'},
-          {'color': 'w', 'from': 'f2', 'to': 'f4', 'flags': 'b', 'piece': 'p', 'san': 'f4'},
-          {'color': 'b', 'from': 'f8', 'to': 'e7', 'flags': 'n', 'piece': 'q', 'san': 'Qe7'},
-          {'color': 'w', 'from': 'e4', 'to': 'e5', 'flags': 'n', 'piece': 'p', 'san': 'e5'},
-          {'color': 'b', 'from': 'c8', 'to': 'b8', 'flags': 'n', 'piece': 'r', 'san': 'Rb8'},
-          {'color': 'w', 'from': 'e2', 'to': 'c4', 'flags': 'n', 'piece': 'b', 'san': 'Bc4'},
-          {'color': 'b', 'from': 'g8', 'to': 'h8', 'flags': 'n', 'piece': 'k', 'san': 'Kh8'},
-          {'color': 'w', 'from': 'a3', 'to': 'h3', 'flags': 'n', 'piece': 'q', 'san': 'Qh3'},
-          {'color': 'b', 'from': 'd7', 'to': 'f8', 'flags': 'n', 'piece': 'n', 'san': 'Nf8'},
-          {'color': 'w', 'from': 'b2', 'to': 'b3', 'flags': 'n', 'piece': 'p', 'san': 'b3'},
-          {'color': 'b', 'from': 'a6', 'to': 'a5', 'flags': 'n', 'piece': 'p', 'san': 'a5'},
-          {'color': 'w', 'from': 'f4', 'to': 'f5', 'flags': 'n', 'piece': 'p', 'san': 'f5'},
-          {'color': 'b', 'from': 'e6', 'to': 'f5', 'flags': 'c', 'piece': 'p', 'captured': 'p', 'san': 'exf5'},
-          {'color': 'w', 'from': 'f1', 'to': 'f5', 'flags': 'c', 'piece': 'r', 'captured': 'p', 'san': 'Rxf5'},
-          {'color': 'b', 'from': 'f8', 'to': 'h7', 'flags': 'n', 'piece': 'n', 'san': 'Nh7'},
-          {'color': 'w', 'from': 'c1', 'to': 'f1', 'flags': 'n', 'piece': 'r', 'san': 'Rcf1'},
-          {'color': 'b', 'from': 'e7', 'to': 'd8', 'flags': 'n', 'piece': 'q', 'san': 'Qd8'},
-          {'color': 'w', 'from': 'h3', 'to': 'g3', 'flags': 'n', 'piece': 'q', 'san': 'Qg3'},
-          {'color': 'b', 'from': 'a7', 'to': 'e7', 'flags': 'n', 'piece': 'r', 'san': 'Re7'},
-          {'color': 'w', 'from': 'h2', 'to': 'h4', 'flags': 'b', 'piece': 'p', 'san': 'h4'},
-          {'color': 'b', 'from': 'b8', 'to': 'b7', 'flags': 'n', 'piece': 'r', 'san': 'Rbb7'},
-          {'color': 'w', 'from': 'e5', 'to': 'e6', 'flags': 'n', 'piece': 'p', 'san': 'e6'},
-          {'color': 'b', 'from': 'b7', 'to': 'c7', 'flags': 'n', 'piece': 'r', 'san': 'Rbc7'},
-          {'color': 'w', 'from': 'g3', 'to': 'e5', 'flags': 'n', 'piece': 'q', 'san': 'Qe5'},
-          {'color': 'b', 'from': 'd8', 'to': 'e8', 'flags': 'n', 'piece': 'q', 'san': 'Qe8'},
-          {'color': 'w', 'from': 'a2', 'to': 'a4', 'flags': 'b', 'piece': 'p', 'san': 'a4'},
-          {'color': 'b', 'from': 'e8', 'to': 'd8', 'flags': 'n', 'piece': 'q', 'san': 'Qd8'},
-          {'color': 'w', 'from': 'f1', 'to': 'f2', 'flags': 'n', 'piece': 'r', 'san': 'R1f2'},
-          {'color': 'b', 'from': 'd8', 'to': 'e8', 'flags': 'n', 'piece': 'q', 'san': 'Qe8'},
-          {'color': 'w', 'from': 'f2', 'to': 'f3', 'flags': 'n', 'piece': 'r', 'san': 'R2f3'},
-          {'color': 'b', 'from': 'e8', 'to': 'd8', 'flags': 'n', 'piece': 'q', 'san': 'Qd8'},
-          {'color': 'w', 'from': 'c4', 'to': 'd3', 'flags': 'n', 'piece': 'b', 'san': 'Bd3'},
-          {'color': 'b', 'from': 'd8', 'to': 'e8', 'flags': 'n', 'piece': 'q', 'san': 'Qe8'},
-          {'color': 'w', 'from': 'e5', 'to': 'e4', 'flags': 'n', 'piece': 'q', 'san': 'Qe4'},
-          {'color': 'b', 'from': 'h7', 'to': 'f6', 'flags': 'n', 'piece': 'n', 'san': 'Nf6'},
-          {'color': 'w', 'from': 'f5', 'to': 'f6', 'flags': 'c', 'piece': 'r', 'captured': 'n', 'san': 'Rxf6'},
-          {'color': 'b', 'from': 'g7', 'to': 'f6', 'flags': 'c', 'piece': 'p', 'captured': 'r', 'san': 'gxf6'},
-          {'color': 'w', 'from': 'f3', 'to': 'f6', 'flags': 'c', 'piece': 'r', 'captured': 'p', 'san': 'Rxf6'},
-          {'color': 'b', 'from': 'h8', 'to': 'g8', 'flags': 'n', 'piece': 'k', 'san': 'Kg8'},
-          {'color': 'w', 'from': 'd3', 'to': 'c4', 'flags': 'n', 'piece': 'b', 'san': 'Bc4'},
-          {'color': 'b', 'from': 'g8', 'to': 'h8', 'flags': 'n', 'piece': 'k', 'san': 'Kh8'},
-          {'color': 'w', 'from': 'e4', 'to': 'f4', 'flags': 'n', 'piece': 'q', 'san': 'Qf4'}],
+          {'color': Chess.WHITE, 'from': 'c2', 'to': 'c4', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'c4'},
+          {'color': Chess.BLACK, 'from': 'e7', 'to': 'e6', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'e6'},
+          {'color': Chess.WHITE, 'from': 'g1', 'to': 'f3', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nf3'},
+          {'color': Chess.BLACK, 'from': 'd7', 'to': 'd5', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'd5'},
+          {'color': Chess.WHITE, 'from': 'd2', 'to': 'd4', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'd4'},
+          {'color': Chess.BLACK, 'from': 'g8', 'to': 'f6', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nf6'},
+          {'color': Chess.WHITE, 'from': 'b1', 'to': 'c3', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nc3'},
+          {'color': Chess.BLACK, 'from': 'f8', 'to': 'e7', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Be7'},
+          {'color': Chess.WHITE, 'from': 'c1', 'to': 'g5', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Bg5'},
+          {'color': Chess.BLACK, 'from': 'e8', 'to': 'g8', 'flags': 'k', 'piece': Chess.KING, 'san': 'O-O'},
+          {'color': Chess.WHITE, 'from': 'e2', 'to': 'e3', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'e3'},
+          {'color': Chess.BLACK, 'from': 'h7', 'to': 'h6', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'h6'},
+          {'color': Chess.WHITE, 'from': 'g5', 'to': 'h4', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Bh4'},
+          {'color': Chess.BLACK, 'from': 'b7', 'to': 'b6', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'b6'},
+          {'color': Chess.WHITE, 'from': 'c4', 'to': 'd5', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.PAWN, 'san': 'cxd5'},
+          {'color': Chess.BLACK, 'from': 'f6', 'to': 'd5', 'flags': 'c', 'piece': Chess.KNIGHT, 'captured': Chess.PAWN, 'san': 'Nxd5'},
+          {'color': Chess.WHITE, 'from': 'h4', 'to': 'e7', 'flags': 'c', 'piece': Chess.BISHOP, 'captured': Chess.BISHOP, 'san': 'Bxe7'},
+          {'color': Chess.BLACK, 'from': 'd8', 'to': 'e7', 'flags': 'c', 'piece': Chess.QUEEN, 'captured': Chess.BISHOP, 'san': 'Qxe7'},
+          {'color': Chess.WHITE, 'from': 'c3', 'to': 'd5', 'flags': 'c', 'piece': Chess.KNIGHT, 'captured': Chess.KNIGHT, 'san': 'Nxd5'},
+          {'color': Chess.BLACK, 'from': 'e6', 'to': 'd5', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.KNIGHT, 'san': 'exd5'},
+          {'color': Chess.WHITE, 'from': 'a1', 'to': 'c1', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Rc1'},
+          {'color': Chess.BLACK, 'from': 'c8', 'to': 'e6', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Be6'},
+          {'color': Chess.WHITE, 'from': 'd1', 'to': 'a4', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qa4'},
+          {'color': Chess.BLACK, 'from': 'c7', 'to': 'c5', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'c5'},
+          {'color': Chess.WHITE, 'from': 'a4', 'to': 'a3', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qa3'},
+          {'color': Chess.BLACK, 'from': 'f8', 'to': 'c8', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Rc8'},
+          {'color': Chess.WHITE, 'from': 'f1', 'to': 'b5', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Bb5'},
+          {'color': Chess.BLACK, 'from': 'a7', 'to': 'a6', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'a6'},
+          {'color': Chess.WHITE, 'from': 'd4', 'to': 'c5', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.PAWN, 'san': 'dxc5'},
+          {'color': Chess.BLACK, 'from': 'b6', 'to': 'c5', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.PAWN, 'san': 'bxc5'},
+          {'color': Chess.WHITE, 'from': 'e1', 'to': 'g1', 'flags': 'k', 'piece': Chess.KING, 'san': 'O-O'},
+          {'color': Chess.BLACK, 'from': 'a8', 'to': 'a7', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Ra7'},
+          {'color': Chess.WHITE, 'from': 'b5', 'to': 'e2', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Be2'},
+          {'color': Chess.BLACK, 'from': 'b8', 'to': 'd7', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nd7'},
+          {'color': Chess.WHITE, 'from': 'f3', 'to': 'd4', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nd4'},
+          {'color': Chess.BLACK, 'from': 'e7', 'to': 'f8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qf8'},
+          {'color': Chess.WHITE, 'from': 'd4', 'to': 'e6', 'flags': 'c', 'piece': Chess.KNIGHT, 'captured': Chess.BISHOP, 'san': 'Nxe6'},
+          {'color': Chess.BLACK, 'from': 'f7', 'to': 'e6', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.KNIGHT, 'san': 'fxe6'},
+          {'color': Chess.WHITE, 'from': 'e3', 'to': 'e4', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'e4'},
+          {'color': Chess.BLACK, 'from': 'd5', 'to': 'd4', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'd4'},
+          {'color': Chess.WHITE, 'from': 'f2', 'to': 'f4', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'f4'},
+          {'color': Chess.BLACK, 'from': 'f8', 'to': 'e7', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qe7'},
+          {'color': Chess.WHITE, 'from': 'e4', 'to': 'e5', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'e5'},
+          {'color': Chess.BLACK, 'from': 'c8', 'to': 'b8', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Rb8'},
+          {'color': Chess.WHITE, 'from': 'e2', 'to': 'c4', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Bc4'},
+          {'color': Chess.BLACK, 'from': 'g8', 'to': 'h8', 'flags': 'n', 'piece': Chess.KING, 'san': 'Kh8'},
+          {'color': Chess.WHITE, 'from': 'a3', 'to': 'h3', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qh3'},
+          {'color': Chess.BLACK, 'from': 'd7', 'to': 'f8', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nf8'},
+          {'color': Chess.WHITE, 'from': 'b2', 'to': 'b3', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'b3'},
+          {'color': Chess.BLACK, 'from': 'a6', 'to': 'a5', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'a5'},
+          {'color': Chess.WHITE, 'from': 'f4', 'to': 'f5', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'f5'},
+          {'color': Chess.BLACK, 'from': 'e6', 'to': 'f5', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.PAWN, 'san': 'exf5'},
+          {'color': Chess.WHITE, 'from': 'f1', 'to': 'f5', 'flags': 'c', 'piece': Chess.ROOK, 'captured': Chess.PAWN, 'san': 'Rxf5'},
+          {'color': Chess.BLACK, 'from': 'f8', 'to': 'h7', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nh7'},
+          {'color': Chess.WHITE, 'from': 'c1', 'to': 'f1', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Rcf1'},
+          {'color': Chess.BLACK, 'from': 'e7', 'to': 'd8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qd8'},
+          {'color': Chess.WHITE, 'from': 'h3', 'to': 'g3', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qg3'},
+          {'color': Chess.BLACK, 'from': 'a7', 'to': 'e7', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Re7'},
+          {'color': Chess.WHITE, 'from': 'h2', 'to': 'h4', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'h4'},
+          {'color': Chess.BLACK, 'from': 'b8', 'to': 'b7', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Rbb7'},
+          {'color': Chess.WHITE, 'from': 'e5', 'to': 'e6', 'flags': 'n', 'piece': Chess.PAWN, 'san': 'e6'},
+          {'color': Chess.BLACK, 'from': 'b7', 'to': 'c7', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'Rbc7'},
+          {'color': Chess.WHITE, 'from': 'g3', 'to': 'e5', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qe5'},
+          {'color': Chess.BLACK, 'from': 'd8', 'to': 'e8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qe8'},
+          {'color': Chess.WHITE, 'from': 'a2', 'to': 'a4', 'flags': 'b', 'piece': Chess.PAWN, 'san': 'a4'},
+          {'color': Chess.BLACK, 'from': 'e8', 'to': 'd8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qd8'},
+          {'color': Chess.WHITE, 'from': 'f1', 'to': 'f2', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'R1f2'},
+          {'color': Chess.BLACK, 'from': 'd8', 'to': 'e8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qe8'},
+          {'color': Chess.WHITE, 'from': 'f2', 'to': 'f3', 'flags': 'n', 'piece': Chess.ROOK, 'san': 'R2f3'},
+          {'color': Chess.BLACK, 'from': 'e8', 'to': 'd8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qd8'},
+          {'color': Chess.WHITE, 'from': 'c4', 'to': 'd3', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Bd3'},
+          {'color': Chess.BLACK, 'from': 'd8', 'to': 'e8', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qe8'},
+          {'color': Chess.WHITE, 'from': 'e5', 'to': 'e4', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qe4'},
+          {'color': Chess.BLACK, 'from': 'h7', 'to': 'f6', 'flags': 'n', 'piece': Chess.KNIGHT, 'san': 'Nf6'},
+          {'color': Chess.WHITE, 'from': 'f5', 'to': 'f6', 'flags': 'c', 'piece': Chess.ROOK, 'captured': Chess.KNIGHT, 'san': 'Rxf6'},
+          {'color': Chess.BLACK, 'from': 'g7', 'to': 'f6', 'flags': 'c', 'piece': Chess.PAWN, 'captured': Chess.ROOK, 'san': 'gxf6'},
+          {'color': Chess.WHITE, 'from': 'f3', 'to': 'f6', 'flags': 'c', 'piece': Chess.ROOK, 'captured': Chess.PAWN, 'san': 'Rxf6'},
+          {'color': Chess.BLACK, 'from': 'h8', 'to': 'g8', 'flags': 'n', 'piece': Chess.KING, 'san': 'Kg8'},
+          {'color': Chess.WHITE, 'from': 'd3', 'to': 'c4', 'flags': 'n', 'piece': Chess.BISHOP, 'san': 'Bc4'},
+          {'color': Chess.BLACK, 'from': 'g8', 'to': 'h8', 'flags': 'n', 'piece': Chess.KING, 'san': 'Kh8'},
+          {'color': Chess.WHITE, 'from': 'e4', 'to': 'f4', 'flags': 'n', 'piece': Chess.QUEEN, 'san': 'Qf4'}],
          }
     ];
-  
+
     tests.forEach((t) {
       bool passed = true;
-  
+
       test(t['fen'], () {
         chess.reset();
-  
+
         for (int j = 0; j < t['moves'].length; j++) {
           chess.move(t['moves'][j]);
         }
-  
+
         var history = chess.getHistory({'verbose': t['verbose']});
         if (t['fen'] != chess.fen()) {
           passed = false;
@@ -914,7 +911,7 @@ void main() {
         }
         expect(passed, isTrue);
       });
-  
+
     });
   });
 
