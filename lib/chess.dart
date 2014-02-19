@@ -157,7 +157,7 @@ class Chess {
   int ep_square = EMPTY;
   int half_moves = 0;
   int move_number = 1;
-  List history = [];
+  List<State> history = [];
   Map header = {};
 
   /// By default start with the standard chess starting position
@@ -820,15 +820,14 @@ class Chess {
   }
 
   void push(Move move) {
-    history.add({
-      'move': move,
-      'kings': new ColorMap.clone(kings),
-      'turn': turn,
-      'castling': new ColorMap.clone(castling),
-      'ep_square': ep_square,
-      'half_moves': half_moves,
-      'move_number': move_number
-    });
+    history.add(new State(
+        move,
+        new ColorMap.clone(kings),
+        turn,
+        new ColorMap.clone(castling),
+        ep_square,
+        half_moves,
+        move_number));
   }
 
   make_move(Move move) {
@@ -927,16 +926,16 @@ class Chess {
     if (history.isEmpty) {
       return null;
     }
-    var old = history.removeLast();
+    State old = history.removeLast();
     if (old == null) { return null; }
 
-    Move move = old['move'];
-    kings = old['kings'];
-    turn = old['turn'];
-    castling = old['castling'];
-    ep_square = old['ep_square'];
-    half_moves = old['half_moves'];
-    move_number = old['move_number'];
+    Move move = old.move;
+    kings = old.kings;
+    turn = old.turn;
+    castling = old.castling;
+    ep_square = old.ep_square;
+    half_moves = old.half_moves;
+    move_number = old.move_number;
 
     Color us = turn;
     Color them = swap_color(turn);
@@ -1605,4 +1604,16 @@ class Move {
   final PieceType promotion;
   const Move(this.color, this.from, this.to, this.flags,
              this.piece, this.captured, this.promotion);
+}
+
+class State {
+  final Move move;
+  final ColorMap kings;
+  final Color turn;
+  final ColorMap castling;
+  final int ep_square;
+  final int half_moves;
+  final int move_number;
+  const State(this.move, this.kings, this.turn, this.castling,
+              this.ep_square, this.half_moves, this.move_number);
 }
