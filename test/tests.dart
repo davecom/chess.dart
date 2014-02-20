@@ -626,7 +626,7 @@ void main() {
           expect(result, isNotNull);
           expect(chess.fen(), equals(position['next']));
           if(position.containsKey("captured")) {
-            expect(position["captured"], equals(result["captured"]));
+            expect(result["captured"], equals(position["captured"]));
           }
         } else {
           expect(result, isNull);

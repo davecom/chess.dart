@@ -157,7 +157,7 @@ class Chess {
   int ep_square = EMPTY;
   int half_moves = 0;
   int move_number = 1;
-  List history = [];
+  List<State> history = [];
   Map header = {};
 
   /// By default start with the standard chess starting position
@@ -470,30 +470,23 @@ class Chess {
     return piece;
   }
 
-  Map build_move(List<Piece> board, from, to, flags, [PieceType promotion]) {
-    Map move = {
-      'color': turn,
-      'from': from,
-      'to': to,
-      'flags': flags,
-      'piece': board[from].type
-    };
-
+  Move build_move(List<Piece> board, from, to, flags, [PieceType promotion]) {
     if (promotion != null) {
-      move['flags'] |= BITS_PROMOTION;
-      move['promotion'] = promotion;
+      flags |= BITS_PROMOTION;
     }
 
-    if (board[to] != null) {
-      move['captured'] = board[to].type;
+    PieceType captured;
+    Piece toPiece = board[to];
+    if (toPiece != null) {
+      captured = toPiece.type;
     } else if ((flags & BITS_EP_CAPTURE) != 0) {
-        move['captured'] = PAWN;
+      captured = PAWN;
     }
-    return move;
+    return new Move(turn, from, to, flags, board[from].type, captured, promotion);
   }
 
-  generate_moves([Map options]) {
-    add_move(List<Piece> board, moves, from, to, flags) {
+  List<Move> generate_moves([Map options]) {
+    add_move(List<Piece> board, List<Move> moves, from, to, flags) {
       /* if pawn promotion */
       if (board[from].type == PAWN &&
          (rank(to) == RANK_8 || rank(to) == RANK_1)) {
@@ -506,7 +499,7 @@ class Chess {
       }
     }
 
-    List moves = [];
+    List<Move> moves = [];
     Color us = turn;
     Color them = swap_color(us);
     ColorMap<int> second_rank = new ColorMap(0);
@@ -648,31 +641,31 @@ class Chess {
   }
 
   /// Convert a move from 0x88 coordinates to Standard Algebraic Notation(SAN)
-  String move_to_san(Map move) {
+  String move_to_san(Move move) {
     String output = '';
-
-    if ((move['flags'] & BITS_KSIDE_CASTLE) != 0) {
+    int flags = move.flags;
+    if ((flags & BITS_KSIDE_CASTLE) != 0) {
       output = 'O-O';
-    } else if ((move["flags"] & BITS_QSIDE_CASTLE) != 0) {
+    } else if ((flags & BITS_QSIDE_CASTLE) != 0) {
       output = 'O-O-O';
     } else {
       var disambiguator = get_disambiguator(move);
 
-      if (move['piece'] != PAWN) {
-        output += move['piece'].toUpperCase() + disambiguator;
+      if (move.piece != PAWN) {
+        output += move.piece.toUpperCase() + disambiguator;
       }
 
-      if ((move['flags'] & (BITS_CAPTURE | BITS_EP_CAPTURE)) != 0) {
-        if (move['piece'] == PAWN) {
-          output += algebraic(move['from'])[0];
+      if ((flags & (BITS_CAPTURE | BITS_EP_CAPTURE)) != 0) {
+        if (move.piece == PAWN) {
+          output += algebraic(move.from)[0];
         }
         output += 'x';
       }
 
-      output += algebraic(move['to']);
+      output += algebraic(move.to);
 
-      if ((move['flags'] & BITS_PROMOTION) != 0) {
-        output += '=' + move['promotion'].toUpperCase();
+      if ((flags & BITS_PROMOTION) != 0) {
+        output += '=' + move.promotion.toUpperCase();
       }
     }
 
@@ -826,53 +819,52 @@ class Chess {
     return repetition;
   }
 
-  void push(move) {
-    history.add({
-      'move': move,
-      'kings': new ColorMap.clone(kings),
-      'turn': turn,
-      'castling': new ColorMap.clone(castling),
-      'ep_square': ep_square,
-      'half_moves': half_moves,
-      'move_number': move_number
-    });
+  void push(Move move) {
+    history.add(new State(
+        move,
+        new ColorMap.clone(kings),
+        turn,
+        new ColorMap.clone(castling),
+        ep_square,
+        half_moves,
+        move_number));
   }
 
-  make_move(move) {
+  make_move(Move move) {
     Color us = turn;
     Color them = swap_color(us);
     push(move);
 
-    board[move['to']] = board[move['from']];
-    board[move['from']] = null;
+    board[move.to] = board[move.from];
+    board[move.from] = null;
 
     /* if ep capture, remove the captured pawn */
-    if ((move['flags'] & BITS_EP_CAPTURE) != 0) {
+    if ((move.flags & BITS_EP_CAPTURE) != 0) {
       if (turn == BLACK) {
-        board[move['to'] - 16] = null;
+        board[move.to - 16] = null;
       } else {
-        board[move['to'] + 16] = null;
+        board[move.to + 16] = null;
       }
     }
 
     /* if pawn promotion, replace with new piece */
-    if ((move['flags'] & BITS_PROMOTION) != 0) {
-      board[move['to']] = new Piece(move['promotion'], us);
+    if ((move.flags & BITS_PROMOTION) != 0) {
+      board[move.to] = new Piece(move.promotion, us);
     }
 
     /* if we moved the king */
-    if (board[move['to']].type == KING) {
-      kings[board[move['to']].color] = move['to'];
+    if (board[move.to].type == KING) {
+      kings[board[move.to].color] = move.to;
 
       /* if we castled, move the rook next to the king */
-      if ((move['flags'] & BITS_KSIDE_CASTLE) != 0) {
-        var castling_to = move['to'] - 1;
-        var castling_from = move['to'] + 1;
+      if ((move.flags & BITS_KSIDE_CASTLE) != 0) {
+        var castling_to = move.to - 1;
+        var castling_from = move.to + 1;
         board[castling_to] = board[castling_from];
         board[castling_from] = null;
-      } else if ((move['flags'] & BITS_QSIDE_CASTLE) != 0) {
-        var castling_to = move['to'] + 1;
-        var castling_from = move['to'] - 2;
+      } else if ((move.flags & BITS_QSIDE_CASTLE) != 0) {
+        var castling_to = move.to + 1;
+        var castling_from = move.to - 2;
         board[castling_to] = board[castling_from];
         board[castling_from] = null;
       }
@@ -884,7 +876,7 @@ class Chess {
     /* turn off castling if we move a rook */
     if (castling[us] != 0) {
       for (int i = 0, len = ROOKS[us].length; i < len; i++) {
-        if (move['from'] == ROOKS[us][i]['square'] &&
+        if (move.from == ROOKS[us][i]['square'] &&
             ((castling[us] & ROOKS[us][i]['flag']) != 0)) {
           castling[us] ^= ROOKS[us][i]['flag'];
           break;
@@ -895,7 +887,7 @@ class Chess {
     /* turn off castling if we capture a rook */
     if (castling[them] != 0) {
       for (int i = 0, len = ROOKS[them].length; i < len; i++) {
-        if (move['to'] == ROOKS[them][i]['square'] &&
+        if (move.to == ROOKS[them][i]['square'] &&
             ((castling[them] & ROOKS[them][i]['flag']) != 0)) {
           castling[them] ^= ROOKS[them][i]['flag'];
           break;
@@ -904,20 +896,20 @@ class Chess {
     }
 
     /* if big pawn move, update the en passant square */
-    if ((move['flags'] & BITS_BIG_PAWN) != 0) {
+    if ((move.flags & BITS_BIG_PAWN) != 0) {
       if (turn == BLACK) {
-        ep_square = move['to'] - 16;
+        ep_square = move.to - 16;
       } else {
-        ep_square = move['to'] + 16;
+        ep_square = move.to + 16;
       }
     } else {
       ep_square = EMPTY;
     }
 
     /* reset the 50 move counter if a pawn is moved or a piece is captured */
-    if (move['piece'] == PAWN) {
+    if (move.piece == PAWN) {
       half_moves = 0;
-    } else if ((move['flags'] & (BITS_CAPTURE | BITS_EP_CAPTURE)) != 0) {
+    } else if ((move.flags & (BITS_CAPTURE | BITS_EP_CAPTURE)) != 0) {
       half_moves = 0;
     } else {
       half_moves++;
@@ -930,49 +922,49 @@ class Chess {
   }
 
   /// Undoes a move and returns it, or null if move history is empty
-  Map undo_move() {
+  Move undo_move() {
     if (history.isEmpty) {
       return null;
     }
-    var old = history.removeLast();
+    State old = history.removeLast();
     if (old == null) { return null; }
 
-    var move = old['move'];
-    kings = old['kings'];
-    turn = old['turn'];
-    castling = old['castling'];
-    ep_square = old['ep_square'];
-    half_moves = old['half_moves'];
-    move_number = old['move_number'];
+    Move move = old.move;
+    kings = old.kings;
+    turn = old.turn;
+    castling = old.castling;
+    ep_square = old.ep_square;
+    half_moves = old.half_moves;
+    move_number = old.move_number;
 
     Color us = turn;
     Color them = swap_color(turn);
 
-    board[move['from']] = board[move['to']];
-    board[move['from']].type = move['piece'];  // to undo any promotions
-    board[move['to']] = null;
+    board[move.from] = board[move.to];
+    board[move.from].type = move.piece;  // to undo any promotions
+    board[move.to] = null;
 
-    if ((move['flags'] & BITS_CAPTURE) != 0) {
-      board[move['to']] = new Piece(move['captured'], them);
-    } else if ((move['flags'] & BITS_EP_CAPTURE) != 0) {
+    if ((move.flags & BITS_CAPTURE) != 0) {
+      board[move.to] = new Piece(move.captured, them);
+    } else if ((move.flags & BITS_EP_CAPTURE) != 0) {
       var index;
       if (us == BLACK) {
-        index = move['to'] - 16;
+        index = move.to - 16;
       } else {
-        index = move['to'] + 16;
+        index = move.to + 16;
       }
       board[index] = new Piece(PAWN, them);
     }
 
 
-    if ((move['flags'] & (BITS_KSIDE_CASTLE | BITS_QSIDE_CASTLE)) != 0) {
+    if ((move.flags & (BITS_KSIDE_CASTLE | BITS_QSIDE_CASTLE)) != 0) {
       var castling_to, castling_from;
-      if ((move['flags'] & BITS_KSIDE_CASTLE) != 0) {
-        castling_to = move['to'] + 1;
-        castling_from = move['to'] - 1;
-      } else if ((move['flags'] & BITS_QSIDE_CASTLE) != 0) {
-        castling_to = move['to'] - 2;
-        castling_from = move['to'] + 1;
+      if ((move.flags & BITS_KSIDE_CASTLE) != 0) {
+        castling_to = move.to + 1;
+        castling_from = move.to - 1;
+      } else if ((move.flags & BITS_QSIDE_CASTLE) != 0) {
+        castling_to = move.to - 2;
+        castling_from = move.to + 1;
       }
 
       board[castling_to] = board[castling_from];
@@ -983,21 +975,21 @@ class Chess {
   }
 
   /* this function is used to uniquely identify ambiguous moves */
-  get_disambiguator(move) {
-    var moves = generate_moves();
+  get_disambiguator(Move move) {
+    List<Move> moves = generate_moves();
 
-    var from = move['from'];
-    var to = move['to'];
-    var piece = move['piece'];
+    var from = move.from;
+    var to = move.to;
+    var piece = move.piece;
 
     var ambiguities = 0;
     var same_rank = 0;
     var same_file = 0;
 
     for (int i = 0, len = moves.length; i < len; i++) {
-      var ambig_from = moves[i]['from'];
-      var ambig_to = moves[i]['to'];
-      var ambig_piece = moves[i]['piece'];
+      var ambig_from = moves[i].from;
+      var ambig_to = moves[i].to;
+      var ambig_piece = moves[i].piece;
 
       /* if a move of the same piece type ends on the same to square, we'll
        * need to add a disambiguator to the algebraic notation
@@ -1092,42 +1084,22 @@ class Chess {
   }
 
   /// pretty = external move object
-  make_pretty(ugly_move) {
-    var move = clone(ugly_move);
-    move['san'] = move_to_san(move);
-    move['to'] = algebraic(move['to']);
-    move['from'] = algebraic(move['from']);
+  Map make_pretty(Move ugly_move) {
+    Map map = {};
+    map['san'] = move_to_san(ugly_move);
+    map['to'] = algebraic(ugly_move.to);
+    map['from'] = algebraic(ugly_move.from);
+    map['captured'] = ugly_move.captured;
 
     var flags = '';
-
     for (var flag in BITS.keys) {
-      if ((BITS[flag] & move['flags']) != 0) {
+      if ((BITS[flag] & ugly_move.flags) != 0) {
         flags += FLAGS[flag];
       }
     }
-    move['flags'] = flags;
+    map['flags'] = flags;
 
-    return move;
-  }
-
-  /// Duplicate a Map or List
-  clone(obj) {
-    var dupe;
-    if (obj is List) {
-      dupe = new List.from(obj);
-    } else {
-      dupe = new Map.from(obj);
-    }
-
-    /*for (var property in obj) {
-      if (typeof property === 'object') {
-        dupe[property] = clone(obj[property]);
-      } else {
-        dupe[property] = obj[property];
-      }
-    }*/
-
-    return dupe;
+    return map;
   }
 
   String trim(String str) {
@@ -1135,8 +1107,8 @@ class Chess {
   }
 
   // debug utility
-  perft(depth) {
-    var moves = generate_moves({'legal': false});
+  perft(int depth) {
+    List<Move> moves = generate_moves({'legal': false});
     var nodes = 0;
     var color = turn;
 
@@ -1248,24 +1220,24 @@ class Chess {
       }
 
       /* pop all of history onto reversed_history */
-      var reversed_history = [];
+      List<Move> reversed_history = [];
       while (history.length > 0) {
         reversed_history.add(undo_move());
       }
 
-      List moves = [];
+      List<String> moves = [];
       String move_string = '';
       int pgn_move_number = 1;
 
       /* build the list of moves.  a move_string looks like: "3. e3 e6" */
       while (reversed_history.length > 0) {
-        var move = reversed_history.removeLast();
+        Move move = reversed_history.removeLast();
 
         /* if the position started with black to move, start PGN with 1. ... */
-        if (pgn_move_number == 1 && move['color'] == BLACK) {
+        if (pgn_move_number == 1 && move.color == BLACK) {
           move_string = '1. ...';
           pgn_move_number++;
-        } else if (move['color'] == WHITE) {
+        } else if (move.color == WHITE) {
           /* store the previous generated move_string if we have one */
           if (move_string.length != 0) {
             moves.add(move_string);
@@ -1467,9 +1439,8 @@ class Chess {
     ///      promotion: 'q',
     ///      })
     move(move) {
-
-      var move_obj = null;
-      var moves = generate_moves();
+      Move move_obj = null;
+      List<Move> moves = generate_moves();
 
       if (move is String) {
         /* convert the move string to a move object */
@@ -1482,10 +1453,9 @@ class Chess {
       } else if (move is Map) {
         /* convert the pretty move object to an ugly move object */
         for (var i = 0, len = moves.length; i < len; i++) {
-          if (move['from'] == algebraic(moves[i]['from']) &&
-              move['to'] == algebraic(moves[i]['to']) &&
-              (!(moves[i].containsKey("promotion")) ||
-              move['promotion'] == moves[i]['promotion'])) {
+          if (move['from'] == algebraic(moves[i].from) &&
+              move['to'] == algebraic(moves[i].to) &&
+              move['promotion'] == moves[i].promotion) {
             move_obj = moves[i];
             break;
           }
@@ -1524,7 +1494,7 @@ class Chess {
     }
 
     getHistory([Map options]) {
-      var reversed_history = [];
+      List<Move> reversed_history = [];
       var move_history = [];
       var verbose = (options != null && options.containsKey("verbose") &&
                      options["verbose"] == true);
@@ -1534,7 +1504,7 @@ class Chess {
       }
 
       while (reversed_history.length > 0) {
-        var move = reversed_history.removeLast();
+        Move move = reversed_history.removeLast();
         if (verbose) {
           move_history.add(make_pretty(move));
         } else {
@@ -1600,4 +1570,28 @@ class ColorMap<T> {
       _black = value;
     }
   }
+}
+
+class Move {
+  final Color color;
+  final int from;
+  final int to;
+  final int flags;
+  final PieceType piece;
+  final PieceType captured;
+  final PieceType promotion;
+  const Move(this.color, this.from, this.to, this.flags,
+             this.piece, this.captured, this.promotion);
+}
+
+class State {
+  final Move move;
+  final ColorMap kings;
+  final Color turn;
+  final ColorMap castling;
+  final int ep_square;
+  final int half_moves;
+  final int move_number;
+  const State(this.move, this.kings, this.turn, this.castling,
+              this.ep_square, this.half_moves, this.move_number);
 }
