@@ -14,10 +14,10 @@ import "package:chess/chess.dart";
 
 void main() {
   Chess chess = new Chess();
-  print(chess.ascii());
-  while (!chess.game_over()) {
-    print('position: ' + chess.fen());
-    print(chess.ascii());
+  print(chess.ascii);
+  while (!chess.game_over) {
+    print('position: ' + chess.fen);
+    print(chess.ascii);
     var moves = chess.moves();
     moves.shuffle();
     var move = moves[0];

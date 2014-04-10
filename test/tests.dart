@@ -96,7 +96,7 @@ void main() {
       chess.load(checkmate);
 
       test(checkmate, () {
-        expect(chess.in_checkmate(), isTrue);
+        expect(chess.in_checkmate, isTrue);
       });
     });
 
@@ -115,7 +115,7 @@ void main() {
       chess.load(stalemate);
 
       test(stalemate, () {
-        expect(chess.in_stalemate(), isTrue);
+        expect(chess.in_stalemate, isTrue);
       });
 
     });
@@ -144,9 +144,9 @@ void main() {
 
       test(position['fen'], () {
         if (position['draw']) {
-          expect(chess.insufficient_material() && chess.in_draw(), isTrue);
+          expect(chess.insufficient_material && chess.in_draw, isTrue);
         } else {
-          expect(!chess.insufficient_material() && !chess.in_draw(), isTrue);
+          expect(!chess.insufficient_material && !chess.in_draw, isTrue);
         }
       });
 
@@ -174,14 +174,14 @@ void main() {
 
         bool passed = true;
         for (int j = 0; j < position['moves'].length; j++) {
-          if (chess.in_threefold_repetition()) {
+          if (chess.in_threefold_repetition) {
             passed = false;
             break;
           }
           chess.move(position['moves'][j]);
         }
 
-        expect(passed && chess.in_threefold_repetition() && chess.in_draw(), isTrue);
+        expect(passed && chess.in_threefold_repetition && chess.in_draw, isTrue);
 
       });
 
@@ -330,7 +330,7 @@ void main() {
         }
 
         /* finally, check for an empty board */
-        passed = passed && (chess.fen() == '8/8/8/8/8/8/8/8 w - - 0 1');
+        passed = passed && (chess.fen == '8/8/8/8/8/8/8/8 w - - 0 1');
 
         /* some tests should fail, so make sure we're supposed to pass/fail each
          * test
@@ -368,7 +368,7 @@ void main() {
 
       test(position['fen'] + ' (' + position['should_pass'].toString() + ')', () {
         chess.load(position['fen']);
-        expect((chess.fen() == position['fen']) == position['should_pass'], isTrue);
+        expect((chess.fen == position['fen']) == position['should_pass'], isTrue);
       });
 
     });
@@ -439,7 +439,7 @@ void main() {
         }
         //chess.header.apply(null, position['header']);
         var pgn = chess.pgn({'max_width':position['max_width'], 'newline_char':position['newline_char']});
-        var fen = chess.fen();
+        var fen = chess.fen;
         passed = pgn == position['pgn'] && fen == position['fen'];
         expect(passed && error_message.length == 0, isTrue);
       });
@@ -534,7 +534,7 @@ void main() {
 
             if (t.containsKey("fen")) {
               expect(result, isTrue);
-              expect(chess.fen(), equals(t["fen"]));
+              expect(chess.fen, equals(t["fen"]));
               //print(chess.fen());
               //print(t["fen"]);
             } else {
@@ -623,13 +623,13 @@ void main() {
       test(position['fen'] + ' (' + position['move'] + ' ' + position['legal'].toString() + ')', () {
         var result = chess.move(position['move']);
         if (position['legal']) {
-          expect(result, isNotNull);
-          expect(chess.fen(), equals(position['next']));
+          expect(result, isTrue);
+          expect(chess.fen, equals(position['next']));
           if(position.containsKey("captured")) {
-            expect(result["captured"], equals(position["captured"]));
+            expect(chess.history.removeLast().move.captured, equals(position["captured"]));
           }
         } else {
-          expect(result, isNull);
+          expect(result, isFalse);
         }
       });
 
@@ -888,7 +888,7 @@ void main() {
         }
 
         var history = chess.getHistory({'verbose': t['verbose']});
-        if (t['fen'] != chess.fen()) {
+        if (t['fen'] != chess.fen) {
           passed = false;
         } else if (history.length != t['moves'].length) {
           passed = false;
@@ -921,7 +921,7 @@ void main() {
     test('Issue #32 - castling flag reappearing', () {
       Chess chess = new Chess.fromFEN('b3k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qNP/6QK b k - 2 28');
       chess.move({'from':'a8', 'to':'g2'});
-      expect(chess.fen(), equals('4k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qbP/6QK w k - 0 29'));
+      expect(chess.fen, equals('4k2r/5p2/4p3/1p5p/6p1/2PR2P1/BP3qbP/6QK w k - 0 29'));
     });
   });
 }

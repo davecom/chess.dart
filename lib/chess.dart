@@ -252,67 +252,103 @@ class Chess {
   /// Returns a Map with keys valid, error_number, and error
   Map validate_fen(fen) {
     Map errors = {
-       0: 'No errors.',
-       1: 'FEN string must contain six space-delimited fields.',
-       2: '6th field (move number) must be a positive integer.',
-       3: '5th field (half move counter) must be a non-negative integer.',
-       4: '4th field (en-passant square) is invalid.',
-       5: '3rd field (castling availability) is invalid.',
-       6: '2nd field (side to move) is invalid.',
-       7: '1st field (piece positions) does not contain 8 \'/\'-delimited rows.',
-       8: '1st field (piece positions) is invalid [consecutive numbers].',
-       9: '1st field (piece positions) is invalid [invalid piece].',
+      0: 'No errors.',
+      1: 'FEN string must contain six space-delimited fields.',
+      2: '6th field (move number) must be a positive integer.',
+      3: '5th field (half move counter) must be a non-negative integer.',
+      4: '4th field (en-passant square) is invalid.',
+      5: '3rd field (castling availability) is invalid.',
+      6: '2nd field (side to move) is invalid.',
+      7: '1st field (piece positions) does not contain 8 \'/\'-delimited rows.',
+      8: '1st field (piece positions) is invalid [consecutive numbers].',
+      9: '1st field (piece positions) is invalid [invalid piece].',
       10: '1st field (piece positions) is invalid [row too large].',
     };
 
     /* 1st criterion: 6 space-seperated fields? */
     List tokens = fen.split(new RegExp(r"\s+"));
     if (tokens.length != 6) {
-      return {'valid': false, 'error_number': 1, 'error': errors[1]};
+      return {
+        'valid': false,
+        'error_number': 1,
+        'error': errors[1]
+      };
     }
 
     /* 2nd criterion: move number field is a integer value > 0? */
     try {
       int temp = int.parse(tokens[5]);
       if (temp <= 0) {
-        return {'valid': false, 'error_number': 2, 'error': errors[2]};
+        return {
+          'valid': false,
+          'error_number': 2,
+          'error': errors[2]
+        };
       }
     } on FormatException {
-      return {'valid': false, 'error_number': 2, 'error': errors[2]};
+      return {
+        'valid': false,
+        'error_number': 2,
+        'error': errors[2]
+      };
     }
 
     /* 3rd criterion: half move counter is an integer >= 0? */
     try {
       int temp = int.parse(tokens[4]);
       if (temp < 0) {
-        return {'valid': false, 'error_number': 3, 'error': errors[3]};
+        return {
+          'valid': false,
+          'error_number': 3,
+          'error': errors[3]
+        };
       }
     } on FormatException {
-      return {'valid': false, 'error_number': 3, 'error': errors[3]};
+      return {
+        'valid': false,
+        'error_number': 3,
+        'error': errors[3]
+      };
     }
 
     /* 4th criterion: 4th field is a valid e.p.-string? */
     RegExp check4 = new RegExp(r"^(-|[abcdefgh][36])$");
     if (check4.firstMatch(tokens[3]) == null) {
-      return {'valid': false, 'error_number': 4, 'error': errors[4]};
+      return {
+        'valid': false,
+        'error_number': 4,
+        'error': errors[4]
+      };
     }
 
     /* 5th criterion: 3th field is a valid castle-string? */
     RegExp check5 = new RegExp(r"^(KQ?k?q?|Qk?q?|kq?|q|-)$");
     if (check5.firstMatch(tokens[2]) == null) {
-      return {'valid': false, 'error_number': 5, 'error': errors[5]};
+      return {
+        'valid': false,
+        'error_number': 5,
+        'error': errors[5]
+      };
     }
 
     /* 6th criterion: 2nd field is "w" (white) or "b" (black)? */
     RegExp check6 = new RegExp(r"^(w|b)$");
     if (check6.firstMatch(tokens[1]) == null) {
-      return {'valid': false, 'error_number': 6, 'error': errors[6]};
+      return {
+        'valid': false,
+        'error_number': 6,
+        'error': errors[6]
+      };
     }
 
     /* 7th criterion: 1st field contains 8 rows? */
     List rows = tokens[0].split('/');
     if (rows.length != 8) {
-      return {'valid': false, 'error_number': 7, 'error': errors[7]};
+      return {
+        'valid': false,
+        'error_number': 7,
+        'error': errors[7]
+      };
     }
 
     /* 8th criterion: every row is valid? */
@@ -326,14 +362,22 @@ class Chess {
         try {
           int temp2 = int.parse(rows[i][k]);
           if (previous_was_number) {
-            return {'valid': false, 'error_number': 8, 'error': errors[8]};
+            return {
+              'valid': false,
+              'error_number': 8,
+              'error': errors[8]
+            };
           }
           sum_fields += temp2;
           previous_was_number = true;
         } on FormatException {
           RegExp checkOM = new RegExp(r"^[prnbqkPRNBQK]$");
           if (checkOM.firstMatch(rows[i][k]) == null) {
-            return {'valid': false, 'error_number': 9, 'error': errors[9]};
+            return {
+              'valid': false,
+              'error_number': 9,
+              'error': errors[9]
+            };
           }
           sum_fields += 1;
           previous_was_number = false;
@@ -342,12 +386,20 @@ class Chess {
       }
 
       if (sum_fields != 8) {
-        return {'valid': false, 'error_number': 10, 'error': errors[10]};
+        return {
+          'valid': false,
+          'error_number': 10,
+          'error': errors[10]
+        };
       }
     }
 
     /* everything's okay! */
-    return {'valid': true, 'error_number': 0, 'error': errors[0]};
+    return {
+      'valid': true,
+      'error_number': 0,
+      'error': errors[0]
+    };
   }
 
   /// Returns a FEN String representing the current position
@@ -366,8 +418,7 @@ class Chess {
         Color color = board[i].color;
         PieceType type = board[i].type;
 
-        fen += (color == WHITE) ?
-                 type.toUpperCase() : type.toLowerCase();
+        fen += (color == WHITE) ? type.toUpperCase() : type.toLowerCase();
       }
 
       if (((i + 1) & 0x88) != 0) {
@@ -385,10 +436,18 @@ class Chess {
     }
 
     String cflags = '';
-    if ((castling[WHITE] & BITS_KSIDE_CASTLE) != 0) { cflags += 'K'; }
-    if ((castling[WHITE] & BITS_QSIDE_CASTLE) != 0) { cflags += 'Q'; }
-    if ((castling[BLACK] & BITS_KSIDE_CASTLE) != 0) { cflags += 'k'; }
-    if ((castling[BLACK] & BITS_QSIDE_CASTLE) != 0) { cflags += 'q'; }
+    if ((castling[WHITE] & BITS_KSIDE_CASTLE) != 0) {
+      cflags += 'K';
+    }
+    if ((castling[WHITE] & BITS_QSIDE_CASTLE) != 0) {
+      cflags += 'Q';
+    }
+    if ((castling[BLACK] & BITS_KSIDE_CASTLE) != 0) {
+      cflags += 'k';
+    }
+    if ((castling[BLACK] & BITS_QSIDE_CASTLE) != 0) {
+      cflags += 'q';
+    }
 
     /* do we have an empty castling flag? */
     if (cflags == "") {
@@ -402,8 +461,7 @@ class Chess {
   /// Updates [header] with the List of args and returns it
   Map set_header(args) {
     for (int i = 0; i < args.length; i += 2) {
-      if (args[i] is String &&
-          args[i + 1] is String) {
+      if (args[i] is String && args[i + 1] is String) {
         header[args[i]] = args[i + 1];
       }
     }
@@ -488,12 +546,12 @@ class Chess {
   List<Move> generate_moves([Map options]) {
     add_move(List<Piece> board, List<Move> moves, from, to, flags) {
       /* if pawn promotion */
-      if (board[from].type == PAWN &&
-         (rank(to) == RANK_8 || rank(to) == RANK_1)) {
-          List pieces = [QUEEN, ROOK, BISHOP, KNIGHT];
-          for (var i = 0, len = pieces.length; i < len; i++) {
-            moves.add(build_move(board, from, to, flags, pieces[i]));
-          }
+      if (board[from].type == PAWN && (rank(to) == RANK_8 || rank(to) == RANK_1)) {
+        List pieces = [QUEEN, ROOK, BISHOP, KNIGHT];
+        for (var i = 0,
+            len = pieces.length; i < len; i++) {
+          moves.add(build_move(board, from, to, flags, pieces[i]));
+        }
       } else {
         moves.add(build_move(board, from, to, flags));
       }
@@ -511,8 +569,7 @@ class Chess {
     bool single_square = false;
 
     /* do we want legal moves? */
-    var legal = (options != null && options.containsKey('legal')) ?
-                options['legal'] : true;
+    var legal = (options != null && options.containsKey('legal')) ? options['legal'] : true;
 
     /* are we generating moves for a single square? */
     if (options != null && options.containsKey('square')) {
@@ -527,7 +584,10 @@ class Chess {
 
     for (int i = first_sq; i <= last_sq; i++) {
       /* did we run off the end of the board */
-      if ((i & 0x88) != 0) { i += 7; continue; }
+      if ((i & 0x88) != 0) {
+        i += 7;
+        continue;
+      }
 
       Piece piece = board[i];
       if (piece == null || piece.color != us) {
@@ -552,15 +612,15 @@ class Chess {
           var square = i + PAWN_OFFSETS[us][j];
           if ((square & 0x88) != 0) continue;
 
-          if (board[square] != null &&
-              board[square].color == them) {
-              add_move(board, moves, i, square, BITS_CAPTURE);
+          if (board[square] != null && board[square].color == them) {
+            add_move(board, moves, i, square, BITS_CAPTURE);
           } else if (square == ep_square) {
-              add_move(board, moves, i, ep_square, BITS_EP_CAPTURE);
+            add_move(board, moves, i, ep_square, BITS_EP_CAPTURE);
           }
         }
       } else {
-        for (int j = 0, len = PIECE_OFFSETS[piece.type].length; j < len; j++) {
+        for (int j = 0,
+            len = PIECE_OFFSETS[piece.type].length; j < len; j++) {
           var offset = PIECE_OFFSETS[piece.type][j];
           var square = i;
 
@@ -593,13 +653,8 @@ class Chess {
         var castling_from = kings[us];
         var castling_to = castling_from + 2;
 
-        if (board[castling_from + 1] == null &&
-            board[castling_to]       == null &&
-            !attacked(them, kings[us]) &&
-            !attacked(them, castling_from + 1) &&
-            !attacked(them, castling_to)) {
-          add_move(board, moves, kings[us] , castling_to,
-                   BITS_KSIDE_CASTLE);
+        if (board[castling_from + 1] == null && board[castling_to] == null && !attacked(them, kings[us]) && !attacked(them, castling_from + 1) && !attacked(them, castling_to)) {
+          add_move(board, moves, kings[us], castling_to, BITS_KSIDE_CASTLE);
         }
       }
 
@@ -608,14 +663,8 @@ class Chess {
         var castling_from = kings[us];
         var castling_to = castling_from - 2;
 
-        if (board[castling_from - 1] == null &&
-            board[castling_from - 2] == null &&
-            board[castling_from - 3] == null &&
-            !attacked(them, kings[us]) &&
-            !attacked(them, castling_from - 1) &&
-            !attacked(them, castling_to)) {
-          add_move(board, moves, kings[us], castling_to,
-                   BITS_QSIDE_CASTLE);
+        if (board[castling_from - 1] == null && board[castling_from - 2] == null && board[castling_from - 3] == null && !attacked(them, kings[us]) && !attacked(them, castling_from - 1) && !attacked(them, castling_to)) {
+          add_move(board, moves, kings[us], castling_to, BITS_QSIDE_CASTLE);
         }
       }
     }
@@ -628,8 +677,9 @@ class Chess {
     }
 
     /* filter out illegal moves */
-    var legal_moves = [];
-    for (int i = 0, len = moves.length; i < len; i++) {
+    List<Move> legal_moves = [];
+    for (int i = 0,
+        len = moves.length; i < len; i++) {
       make_move(moves[i]);
       if (!king_attacked(us)) {
         legal_moves.add(moves[i]);
@@ -670,8 +720,8 @@ class Chess {
     }
 
     make_move(move);
-    if (in_check()) {
-      if (in_checkmate()) {
+    if (in_check) {
+      if (in_checkmate) {
         output += '#';
       } else {
         output += '+';
@@ -685,7 +735,10 @@ class Chess {
   bool attacked(Color color, int square) {
     for (int i = SQUARES_A8; i <= SQUARES_H1; i++) {
       /* did we run off the end of the board */
-      if ((i & 0x88) != 0) { i += 7; continue; }
+      if ((i & 0x88) != 0) {
+        i += 7;
+        continue;
+      }
 
       /* if empty square or wrong color */
       Piece piece = board[i];
@@ -713,7 +766,10 @@ class Chess {
 
         var blocked = false;
         while (j != square) {
-          if (board[j] != null) { blocked = true; break; }
+          if (board[j] != null) {
+            blocked = true;
+            break;
+          }
           j += offset;
         }
 
@@ -728,32 +784,34 @@ class Chess {
     return attacked(swap_color(color), kings[color]);
   }
 
-  bool in_check() {
+  bool get in_check {
     return king_attacked(turn);
   }
 
-  bool in_checkmate() {
-    return in_check() && generate_moves().length == 0;
+  bool get in_checkmate {
+    return in_check && generate_moves().length == 0;
   }
 
-  bool in_stalemate() {
-    return !in_check() && generate_moves().length == 0;
+  bool get in_stalemate {
+    return !in_check && generate_moves().length == 0;
   }
 
-  bool insufficient_material() {
+  bool get insufficient_material {
     Map pieces = {};
     List bishops = [];
     int num_pieces = 0;
     var sq_color = 0;
 
-    for (int i = SQUARES_A8; i<= SQUARES_H1; i++) {
+    for (int i = SQUARES_A8; i <= SQUARES_H1; i++) {
       sq_color = (sq_color + 1) % 2;
-      if ((i & 0x88) != 0) { i += 7; continue; }
+      if ((i & 0x88) != 0) {
+        i += 7;
+        continue;
+      }
 
       var piece = board[i];
       if (piece != null) {
-        pieces[piece.type] = (pieces.containsKey(piece.type)) ?
-                              pieces[piece.type] + 1 : 1;
+        pieces[piece.type] = (pieces.containsKey(piece.type)) ? pieces[piece.type] + 1 : 1;
         if (piece.type == BISHOP) {
           bishops.add(sq_color);
         }
@@ -762,26 +820,27 @@ class Chess {
     }
 
     /* k vs. k */
-    if (num_pieces == 2) { return true; }
-
-    /* k vs. kn .... or .... k vs. kb */
-    else if (num_pieces == 3 && (pieces[BISHOP] == 1 ||
-                                 pieces[KNIGHT] == 1)) { return true; }
-
-    /* kb vs. kb where any number of bishops are all on the same color */
+    if (num_pieces == 2) {
+      return true;
+    } /* k vs. kn .... or .... k vs. kb */
+    else if (num_pieces == 3 && (pieces[BISHOP] == 1 || pieces[KNIGHT] == 1)) {
+      return true;
+    } /* kb vs. kb where any number of bishops are all on the same color */
     else if (pieces.containsKey(BISHOP) && num_pieces == (pieces[BISHOP] + 2)) {
       var sum = 0;
       var len = bishops.length;
       for (int i = 0; i < len; i++) {
         sum += bishops[i];
       }
-      if (sum == 0 || sum == len) { return true; }
+      if (sum == 0 || sum == len) {
+        return true;
+      }
     }
 
     return false;
   }
 
-  bool in_threefold_repetition() {
+  bool get in_threefold_repetition {
     /* TODO: while this function is fine for casual use, a better
      * implementation would use a Zobrist key (instead of FEN). the
      * Zobrist key would be maintained in the make_move/undo_move functions,
@@ -802,7 +861,7 @@ class Chess {
     while (true) {
       /* remove the last two fields in the FEN string, they're not needed
        * when checking for draw by rep */
-      var fen = generate_fen().split(' ').sublist(0,4).join(' ');
+      var fen = generate_fen().split(' ').sublist(0, 4).join(' ');
 
       /* has the position occurred three or move times */
       positions[fen] = (positions.containsKey(fen)) ? positions[fen] + 1 : 1;
@@ -820,14 +879,7 @@ class Chess {
   }
 
   void push(Move move) {
-    history.add(new State(
-        move,
-        new ColorMap.clone(kings),
-        turn,
-        new ColorMap.clone(castling),
-        ep_square,
-        half_moves,
-        move_number));
+    history.add(new State(move, new ColorMap.clone(kings), turn, new ColorMap.clone(castling), ep_square, half_moves, move_number));
   }
 
   make_move(Move move) {
@@ -875,9 +927,9 @@ class Chess {
 
     /* turn off castling if we move a rook */
     if (castling[us] != 0) {
-      for (int i = 0, len = ROOKS[us].length; i < len; i++) {
-        if (move.from == ROOKS[us][i]['square'] &&
-            ((castling[us] & ROOKS[us][i]['flag']) != 0)) {
+      for (int i = 0,
+          len = ROOKS[us].length; i < len; i++) {
+        if (move.from == ROOKS[us][i]['square'] && ((castling[us] & ROOKS[us][i]['flag']) != 0)) {
           castling[us] ^= ROOKS[us][i]['flag'];
           break;
         }
@@ -886,9 +938,9 @@ class Chess {
 
     /* turn off castling if we capture a rook */
     if (castling[them] != 0) {
-      for (int i = 0, len = ROOKS[them].length; i < len; i++) {
-        if (move.to == ROOKS[them][i]['square'] &&
-            ((castling[them] & ROOKS[them][i]['flag']) != 0)) {
+      for (int i = 0,
+          len = ROOKS[them].length; i < len; i++) {
+        if (move.to == ROOKS[them][i]['square'] && ((castling[them] & ROOKS[them][i]['flag']) != 0)) {
           castling[them] ^= ROOKS[them][i]['flag'];
           break;
         }
@@ -927,7 +979,9 @@ class Chess {
       return null;
     }
     State old = history.removeLast();
-    if (old == null) { return null; }
+    if (old == null) {
+      return null;
+    }
 
     Move move = old.move;
     kings = old.kings;
@@ -941,7 +995,7 @@ class Chess {
     Color them = swap_color(turn);
 
     board[move.from] = board[move.to];
-    board[move.from].type = move.piece;  // to undo any promotions
+    board[move.from].type = move.piece; // to undo any promotions
     board[move.to] = null;
 
     if ((move.flags & BITS_CAPTURE) != 0) {
@@ -986,7 +1040,8 @@ class Chess {
     var same_rank = 0;
     var same_file = 0;
 
-    for (int i = 0, len = moves.length; i < len; i++) {
+    for (int i = 0,
+        len = moves.length; i < len; i++) {
       var ambig_from = moves[i].from;
       var ambig_to = moves[i].to;
       var ambig_piece = moves[i].piece;
@@ -1013,14 +1068,12 @@ class Chess {
        */
       if (same_rank > 0 && same_file > 0) {
         return algebraic(from);
-      }
-      /* if the moving piece rests on the same file, use the rank symbol as the
+      } /* if the moving piece rests on the same file, use the rank symbol as the
        * disambiguator
        */
       else if (same_file > 0) {
         return algebraic(from)[1];
-      }
-      /* else use the file symbol */
+      } /* else use the file symbol */
       else {
         return algebraic(from)[0];
       }
@@ -1031,7 +1084,7 @@ class Chess {
 
   /// Returns a String representation of the current position
   /// complete with ascii art
-  String ascii() {
+  String get ascii {
     String s = '   +------------------------+\n';
     for (var i = SQUARES_A8; i <= SQUARES_H1; i++) {
       /* display the rank */
@@ -1045,8 +1098,7 @@ class Chess {
       } else {
         PieceType type = board[i].type;
         Color color = board[i].color;
-        var symbol = (color == WHITE) ?
-                     type.toUpperCase() : type.toLowerCase();
+        var symbol = (color == WHITE) ? type.toUpperCase() : type.toLowerCase();
         s += ' ' + symbol + ' ';
       }
 
@@ -1070,9 +1122,10 @@ class Chess {
     return i & 15;
   }
 
-  String algebraic(int i){
-    var f = file(i), r = rank(i);
-    return 'abcdefgh'.substring(f,f+1) + '87654321'.substring(r,r+1);
+  String algebraic(int i) {
+    var f = file(i),
+        r = rank(i);
+    return 'abcdefgh'.substring(f, f + 1) + '87654321'.substring(r, r + 1);
   }
 
   Color swap_color(Color c) {
@@ -1108,11 +1161,14 @@ class Chess {
 
   // debug utility
   perft(int depth) {
-    List<Move> moves = generate_moves({'legal': false});
+    List<Move> moves = generate_moves({
+      'legal': false
+    });
     var nodes = 0;
     var color = turn;
 
-    for (var i = 0, len = moves.length; i < len; i++) {
+    for (var i = 0,
+        len = moves.length; i < len; i++) {
       make_move(moves[i]);
       if (!king_attacked(color)) {
         if (depth - 1 > 0) {
@@ -1147,180 +1203,174 @@ class Chess {
   ///  'k' - kingside castling
   ///  'q' - queenside castling
   ///  A flag of 'pc' would mean that a pawn captured a piece on the 8th rank and promoted.
-    moves([Map options]) {
-      /* The internal representation of a chess move is in 0x88 format, and
+  ///  
+  ///  If "asObjects" is set to true in the options Map, then it returns a List<Move>
+  List moves([Map options]) {
+    /* The internal representation of a chess move is in 0x88 format, and
        * not meant to be human-readable.  The code below converts the 0x88
        * square coordinates to algebraic coordinates.  It also prunes an
        * unnecessary move keys resulting from a verbose call.
        */
 
-      var ugly_moves = generate_moves(options);
-      List moves = [];
+    List<Move> ugly_moves = generate_moves(options);
+    if (options != null && options.containsKey('asObjects') && options['asObjects'] == true) {
+      return ugly_moves;
+    }
+    List moves = [];
 
-      for (int i = 0, len = ugly_moves.length; i < len; i++) {
+    for (int i = 0,
+        len = ugly_moves.length; i < len; i++) {
 
-        /* does the user want a full move object (most likely not), or just
+      /* does the user want a full move object (most likely not), or just
          * SAN
          */
-        if (options != null && options.containsKey('verbose') &&
-            options['verbose'] == true) {
-          moves.add(make_pretty(ugly_moves[i]));
-        } else {
-          moves.add(move_to_san(ugly_moves[i]));
-        }
+      if (options != null && options.containsKey('verbose') && options['verbose'] == true) {
+        moves.add(make_pretty(ugly_moves[i]));
+      } else {
+        moves.add(move_to_san(ugly_moves[i]));
       }
-
-      return moves;
     }
 
-    in_draw() {
-      return half_moves >= 100 ||
-             in_stalemate() ||
-             insufficient_material() ||
-             in_threefold_repetition();
-    }
+    return moves;
+  }
 
-    game_over() {
-      return half_moves >= 100 ||
-             in_checkmate() ||
-             in_stalemate() ||
-             insufficient_material() ||
-             in_threefold_repetition();
-    }
+  bool get in_draw {
+    return half_moves >= 100 || in_stalemate || insufficient_material || in_threefold_repetition;
+  }
 
-    fen() {
-      return generate_fen();
-    }
+  bool get game_over {
+    return in_draw || in_checkmate;
+  }
 
-    /// Return the PGN representation of the game thus far
-    pgn([Map options]) {
-      /* using the specification from http://www.chessclub.com/help/PGN-spec
+  String get fen {
+    return generate_fen();
+  }
+
+  /// Return the PGN representation of the game thus far
+  pgn([Map options]) {
+    /* using the specification from http://www.chessclub.com/help/PGN-spec
        * example for html usage: .pgn({ max_width: 72, newline_char: "<br />" })
        */
-      var newline = (options != null &&
-                     options.containsKey("newline_char") && options["newline_char"] != null) ?
-                     options['newline_char'] : '\n';
-      var max_width = (options != null &&
-                     options.containsKey("max_width") && options["max_width"] != null) ?
-                       options["max_width"] : 0;
-      var result = [];
-      var header_exists = false;
+    var newline = (options != null && options.containsKey("newline_char") && options["newline_char"] != null) ? options['newline_char'] : '\n';
+    var max_width = (options != null && options.containsKey("max_width") && options["max_width"] != null) ? options["max_width"] : 0;
+    var result = [];
+    var header_exists = false;
 
-      /* add the PGN header headerrmation */
-      for (var i in header.keys) {
-        /* TODO: order of enumerated properties in header object is not
+    /* add the PGN header headerrmation */
+    for (var i in header.keys) {
+      /* TODO: order of enumerated properties in header object is not
          * guaranteed, see ECMA-262 spec (section 12.6.4)
          */
-        result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
-        header_exists = true;
-      }
-
-      if (header_exists && (history.length != 0)) {
-        result.add(newline);
-      }
-
-      /* pop all of history onto reversed_history */
-      List<Move> reversed_history = [];
-      while (history.length > 0) {
-        reversed_history.add(undo_move());
-      }
-
-      List<String> moves = [];
-      String move_string = '';
-      int pgn_move_number = 1;
-
-      /* build the list of moves.  a move_string looks like: "3. e3 e6" */
-      while (reversed_history.length > 0) {
-        Move move = reversed_history.removeLast();
-
-        /* if the position started with black to move, start PGN with 1. ... */
-        if (pgn_move_number == 1 && move.color == BLACK) {
-          move_string = '1. ...';
-          pgn_move_number++;
-        } else if (move.color == WHITE) {
-          /* store the previous generated move_string if we have one */
-          if (move_string.length != 0) {
-            moves.add(move_string);
-          }
-          move_string = pgn_move_number.toString() + '.';
-          pgn_move_number++;
-        }
-
-        move_string = move_string + ' ' + move_to_san(move);
-        make_move(move);
-      }
-
-      /* are there any other leftover moves? */
-      if (move_string.length != 0) {
-        moves.add(move_string);
-      }
-
-      /* is there a result? */
-      if (header['Result'] != null) {
-        moves.add(header['Result']);
-      }
-
-      /* history should be back to what is was before we started generating PGN,
-       * so join together moves
-       */
-      if (max_width == 0) {
-        return result.join('') + moves.join(' ');
-      }
-
-      /* wrap the PGN output at max_width */
-      var current_width = 0;
-      for (int i = 0; i < moves.length; i++) {
-        /* if the current move will push past max_width */
-        if (current_width + moves[i].length > max_width && i != 0) {
-
-          /* don't end the line with whitespace */
-          if (result[result.length - 1] == ' ') {
-            result.removeLast();
-          }
-
-          result.add(newline);
-          current_width = 0;
-        } else if (i != 0) {
-          result.add(' ');
-          current_width++;
-        }
-        result.add(moves[i]);
-        current_width += moves[i].length;
-      }
-
-      return result.join('');
+      result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
+      header_exists = true;
     }
 
-    /// Load the moves of a game stored in Portable Game Notation.
-    /// [options] is an optional parameter that contains a 'newline_char'
-    /// which is a string representation of a RegExp (and should not be pre-escaped)
-    /// and defaults to '\r?\n').
-    /// Returns [true] if the PGN was parsed successfully, otherwise [false].
-    load_pgn(String pgn, [Map options]) {
-      mask(str) {
-        return str.replaceAll(new RegExp(r"\\"), '\\');
+    if (header_exists && (history.length != 0)) {
+      result.add(newline);
+    }
+
+    /* pop all of history onto reversed_history */
+    List<Move> reversed_history = [];
+    while (history.length > 0) {
+      reversed_history.add(undo_move());
+    }
+
+    List<String> moves = [];
+    String move_string = '';
+    int pgn_move_number = 1;
+
+    /* build the list of moves.  a move_string looks like: "3. e3 e6" */
+    while (reversed_history.length > 0) {
+      Move move = reversed_history.removeLast();
+
+      /* if the position started with black to move, start PGN with 1. ... */
+      if (pgn_move_number == 1 && move.color == BLACK) {
+        move_string = '1. ...';
+        pgn_move_number++;
+      } else if (move.color == WHITE) {
+        /* store the previous generated move_string if we have one */
+        if (move_string.length != 0) {
+          moves.add(move_string);
+        }
+        move_string = pgn_move_number.toString() + '.';
+        pgn_move_number++;
       }
 
-      /* convert a move from Standard Algebraic Notation (SAN) to 0x88
+      move_string = move_string + ' ' + move_to_san(move);
+      make_move(move);
+    }
+
+    /* are there any other leftover moves? */
+    if (move_string.length != 0) {
+      moves.add(move_string);
+    }
+
+    /* is there a result? */
+    if (header['Result'] != null) {
+      moves.add(header['Result']);
+    }
+
+    /* history should be back to what is was before we started generating PGN,
+       * so join together moves
+       */
+    if (max_width == 0) {
+      return result.join('') + moves.join(' ');
+    }
+
+    /* wrap the PGN output at max_width */
+    var current_width = 0;
+    for (int i = 0; i < moves.length; i++) {
+      /* if the current move will push past max_width */
+      if (current_width + moves[i].length > max_width && i != 0) {
+
+        /* don't end the line with whitespace */
+        if (result[result.length - 1] == ' ') {
+          result.removeLast();
+        }
+
+        result.add(newline);
+        current_width = 0;
+      } else if (i != 0) {
+        result.add(' ');
+        current_width++;
+      }
+      result.add(moves[i]);
+      current_width += moves[i].length;
+    }
+
+    return result.join('');
+  }
+
+  /// Load the moves of a game stored in Portable Game Notation.
+  /// [options] is an optional parameter that contains a 'newline_char'
+  /// which is a string representation of a RegExp (and should not be pre-escaped)
+  /// and defaults to '\r?\n').
+  /// Returns [true] if the PGN was parsed successfully, otherwise [false].
+  load_pgn(String pgn, [Map options]) {
+    mask(str) {
+      return str.replaceAll(new RegExp(r"\\"), '\\');
+    }
+
+    /* convert a move from Standard Algebraic Notation (SAN) to 0x88
        * coordinates
       */
-      move_from_san(move) {
-        var moves = generate_moves();
-        for (var i = 0, len = moves.length; i < len; i++) {
-          /* strip off any trailing move decorations: e.g Nf3+?! */
-          if (move.replaceAll(new RegExp(r"[+#?!=]+$"),'') ==
-              move_to_san(moves[i]).replaceAll(new RegExp(r"[+#?!=]+$"),'')) {
-            return moves[i];
-          }
+    move_from_san(move) {
+      var moves = generate_moves();
+      for (var i = 0,
+          len = moves.length; i < len; i++) {
+        /* strip off any trailing move decorations: e.g Nf3+?! */
+        if (move.replaceAll(new RegExp(r"[+#?!=]+$"), '') == move_to_san(moves[i]).replaceAll(new RegExp(r"[+#?!=]+$"), '')) {
+          return moves[i];
         }
-        return null;
       }
+      return null;
+    }
 
-      get_move_obj(move) {
-        return move_from_san(trim(move));
-      }
+    get_move_obj(move) {
+      return move_from_san(trim(move));
+    }
 
-      /*has_keys(object) {
+    /*has_keys(object) {
         bool has_keys = false;
         for (var key in object) {
           has_keys = true;
@@ -1328,193 +1378,190 @@ class Chess {
         return has_keys;
       }*/
 
-      parse_pgn_header(header, [Map options]) {
-        var newline_char = (options != null &&
-                            options.containsKey("newline_char")) ?
-                            options['newline_char'] : '\r?\n';
-        var header_obj = {};
-        var headers = header.split(newline_char);
-        var key = '';
-        var value = '';
+    parse_pgn_header(header, [Map options]) {
+      var newline_char = (options != null && options.containsKey("newline_char")) ? options['newline_char'] : '\r?\n';
+      var header_obj = {};
+      var headers = header.split(newline_char);
+      var key = '';
+      var value = '';
 
-        for (var i = 0; i < headers.length; i++) {
-          RegExp keyMatch = new RegExp(r"^\[([A-Z][A-Za-z]*)\s.*\]$");
-          var temp = keyMatch.firstMatch(headers[i]);
-          if (temp != null) {
-            key = temp[1];
-          }
-          //print(key);
-          RegExp valueMatch = new RegExp(r'^\[[A-Za-z]+\s"(.*)"\]$');
-          temp = valueMatch.firstMatch(headers[i]);
-          if (temp != null) {
-            value = temp[1];
-          }
-          //print(value);
-          if (trim(key).length > 0) {
-            header_obj[key] = value;
-          }
+      for (var i = 0; i < headers.length; i++) {
+        RegExp keyMatch = new RegExp(r"^\[([A-Z][A-Za-z]*)\s.*\]$");
+        var temp = keyMatch.firstMatch(headers[i]);
+        if (temp != null) {
+          key = temp[1];
         }
-
-        return header_obj;
+        //print(key);
+        RegExp valueMatch = new RegExp(r'^\[[A-Za-z]+\s"(.*)"\]$');
+        temp = valueMatch.firstMatch(headers[i]);
+        if (temp != null) {
+          value = temp[1];
+        }
+        //print(value);
+        if (trim(key).length > 0) {
+          header_obj[key] = value;
+        }
       }
 
-      var newline_char = (options != null &&
-                          options.containsKey("newline_char")) ?
-                          options["newline_char"] : '\r?\n';
-      //var regex = new RegExp(r'^(\[.*\]).*' + r'1\.'); //+ r"1\."); //+ mask(newline_char));
+      return header_obj;
+    }
 
-      int indexOfMoveStart = pgn.indexOf(new RegExp(newline_char + r"1\."));
+    var newline_char = (options != null && options.containsKey("newline_char")) ? options["newline_char"] : '\r?\n';
+    //var regex = new RegExp(r'^(\[.*\]).*' + r'1\.'); //+ r"1\."); //+ mask(newline_char));
 
-      /* get header part of the PGN file */
-      String header_string = null;
-      if (indexOfMoveStart != -1) {
-         header_string = pgn.substring(0, indexOfMoveStart).trim();
-      }
+    int indexOfMoveStart = pgn.indexOf(new RegExp(newline_char + r"1\."));
 
-      /* no info part given, begins with moves */
-      if (header_string == null || header_string[0] != '[') {
-        header_string = '';
-      }
+    /* get header part of the PGN file */
+    String header_string = null;
+    if (indexOfMoveStart != -1) {
+      header_string = pgn.substring(0, indexOfMoveStart).trim();
+    }
 
-     reset();
+    /* no info part given, begins with moves */
+    if (header_string == null || header_string[0] != '[') {
+      header_string = '';
+    }
 
-      /* parse PGN header */
-      var headers = parse_pgn_header(header_string, options);
-      for (var key in headers.keys) {
-        set_header([key, headers[key]]);
-      }
+    reset();
 
-      /* delete header to get the moves */
-      var ms = pgn.replaceAll(header_string, '').replaceAll(new RegExp(mask(newline_char)), ' ');
+    /* parse PGN header */
+    var headers = parse_pgn_header(header_string, options);
+    for (var key in headers.keys) {
+      set_header([key, headers[key]]);
+    }
 
-      /* delete comments */
-      ms = ms.replaceAll(new RegExp(r"(\{[^}]+\})+?"), '');
+    /* delete header to get the moves */
+    var ms = pgn.replaceAll(header_string, '').replaceAll(new RegExp(mask(newline_char)), ' ');
 
-      /* delete move numbers */
-      ms = ms.replaceAll(new RegExp(r"\d+\."), '');
+    /* delete comments */
+    ms = ms.replaceAll(new RegExp(r"(\{[^}]+\})+?"), '');
+
+    /* delete move numbers */
+    ms = ms.replaceAll(new RegExp(r"\d+\."), '');
 
 
-      /* trim and get array of moves */
-      var moves = trim(ms).split(new RegExp(r"\s+"));
+    /* trim and get array of moves */
+    var moves = trim(ms).split(new RegExp(r"\s+"));
 
-      /* delete empty entries */
-      moves = moves.join(',').replaceAll(new RegExp(r",,+"), ',').split(',');
-      var move = '';
+    /* delete empty entries */
+    moves = moves.join(',').replaceAll(new RegExp(r",,+"), ',').split(',');
+    var move = '';
 
-      for (var half_move = 0; half_move < moves.length - 1; half_move++) {
-        move = get_move_obj(moves[half_move]);
+    for (var half_move = 0; half_move < moves.length - 1; half_move++) {
+      move = get_move_obj(moves[half_move]);
 
-        /* move not possible! (don't clear the board to examine to show the
+      /* move not possible! (don't clear the board to examine to show the
          * latest valid position)
          */
-        if (move == null) {
-          return false;
-        } else {
-          make_move(move);
-        }
-      }
-
-      /* examine last move */
-      move = moves[moves.length - 1];
-      if (POSSIBLE_RESULTS.contains(move)) {
-        if (!header.containsKey("Result")) {
-          set_header(['Result', move]);
-        }
-      }
-      else {
-        move = get_move_obj(move);
-        if (move == null) {
-          return false;
-        } else {
-          make_move(move);
-        }
-      }
-      return true;
-    }
-
-    /// The move function can be called with in the following parameters:
-    /// .move('Nxb7')      <- where 'move' is a case-sensitive SAN string
-    /// .move({ from: 'h7', <- where the 'move' is a move object (additional
-    ///      to :'h8',      fields are ignored)
-    ///      promotion: 'q',
-    ///      })
-    move(move) {
-      Move move_obj = null;
-      List<Move> moves = generate_moves();
-
-      if (move is String) {
-        /* convert the move string to a move object */
-        for (var i = 0, len = moves.length; i < len; i++) {
-          if (move == move_to_san(moves[i])) {
-            move_obj = moves[i];
-            break;
-          }
-        }
-      } else if (move is Map) {
-        /* convert the pretty move object to an ugly move object */
-        for (var i = 0, len = moves.length; i < len; i++) {
-          if (move['from'] == algebraic(moves[i].from) &&
-              move['to'] == algebraic(moves[i].to) &&
-              move['promotion'] == moves[i].promotion) {
-            move_obj = moves[i];
-            break;
-          }
-        }
-      }
-
-      /* failed to find move */
-      if (move_obj == null) {
-        return null;
-      }
-
-      /* need to make a copy of move because we can't generate SAN after the
-       * move is made
-       */
-      var pretty_move = make_pretty(move_obj);
-
-      make_move(move_obj);
-
-      return pretty_move;
-    }
-
-    /// Takeback the last half-move, returning a move Map if successful, otherwise null.
-    undo() {
-      var move = undo_move();
-      return (move != null) ? make_pretty(move) : null;
-    }
-
-    /// Returns the color of the square ('light' or 'dark'), or null if [square] is invalid
-    String square_color(square) {
-      if (SQUARES.containsKey(square)) {
-        var sq_0x88 = SQUARES[square];
-        return ((rank(sq_0x88) + file(sq_0x88)) % 2 == 0) ? 'light' : 'dark';
-      }
-
-      return null;
-    }
-
-    getHistory([Map options]) {
-      List<Move> reversed_history = [];
-      var move_history = [];
-      var verbose = (options != null && options.containsKey("verbose") &&
-                     options["verbose"] == true);
-
-      while (history.length > 0) {
-        reversed_history.add(undo_move());
-      }
-
-      while (reversed_history.length > 0) {
-        Move move = reversed_history.removeLast();
-        if (verbose) {
-          move_history.add(make_pretty(move));
-        } else {
-          move_history.add(move_to_san(move));
-        }
+      if (move == null) {
+        return false;
+      } else {
         make_move(move);
       }
-
-      return move_history;
     }
+
+    /* examine last move */
+    move = moves[moves.length - 1];
+    if (POSSIBLE_RESULTS.contains(move)) {
+      if (!header.containsKey("Result")) {
+        set_header(['Result', move]);
+      }
+    } else {
+      move = get_move_obj(move);
+      if (move == null) {
+        return false;
+      } else {
+        make_move(move);
+      }
+    }
+    return true;
+  }
+
+  /// The move function can be called with in the following parameters:
+  /// .move('Nxb7')      <- where 'move' is a case-sensitive SAN string
+  /// .move({ from: 'h7', <- where the 'move' is a move object (additional
+  ///      to :'h8',      fields are ignored)
+  ///      promotion: 'q',
+  ///      })
+  /// or it can be called with a Move object
+  /// It returns true if the move was made, or false if it could not be.
+  bool move(move) {
+    Move move_obj = null;
+    List<Move> moves = generate_moves();
+
+    if (move is String) {
+      /* convert the move string to a move object */
+      for (var i = 0,
+          len = moves.length; i < len; i++) {
+        if (move == move_to_san(moves[i])) {
+          move_obj = moves[i];
+          break;
+        }
+      }
+    } else if (move is Map) {
+      /* convert the pretty move object to an ugly move object */
+      for (var i = 0,
+          len = moves.length; i < len; i++) {
+        if (move['from'] == algebraic(moves[i].from) && move['to'] == algebraic(moves[i].to) && move['promotion'] == moves[i].promotion) {
+          move_obj = moves[i];
+          break;
+        }
+      }
+    } else if (move is Move) {
+      move_obj = move;
+    }
+
+    /* failed to find move */
+    if (move_obj == null) {
+      return false;
+    }
+
+    /* need to make a copy of move because we can't generate SAN after the
+       * move is made
+       */
+
+    make_move(move_obj);
+
+    return true;
+  }
+
+  /// Takeback the last half-move, returning a move Map if successful, otherwise null.
+  undo() {
+    var move = undo_move();
+    return (move != null) ? make_pretty(move) : null;
+  }
+
+  /// Returns the color of the square ('light' or 'dark'), or null if [square] is invalid
+  String square_color(square) {
+    if (SQUARES.containsKey(square)) {
+      var sq_0x88 = SQUARES[square];
+      return ((rank(sq_0x88) + file(sq_0x88)) % 2 == 0) ? 'light' : 'dark';
+    }
+
+    return null;
+  }
+
+  getHistory([Map options]) {
+    List<Move> reversed_history = [];
+    var move_history = [];
+    var verbose = (options != null && options.containsKey("verbose") && options["verbose"] == true);
+
+    while (history.length > 0) {
+      reversed_history.add(undo_move());
+    }
+
+    while (reversed_history.length > 0) {
+      Move move = reversed_history.removeLast();
+      if (verbose) {
+        move_history.add(make_pretty(move));
+      } else {
+        move_history.add(move_to_san(move));
+      }
+      make_move(move);
+    }
+
+    return move_history;
+  }
 
 }
 
@@ -1556,14 +1603,18 @@ class Color {
 class ColorMap<T> {
   T _white;
   T _black;
-  ColorMap(T value) : _white = value, _black = value;
-  ColorMap.clone(ColorMap other) : _white = other._white, _black = other._black;
+  ColorMap(T value)
+      : _white = value,
+        _black = value;
+  ColorMap.clone(ColorMap other)
+      : _white = other._white,
+        _black = other._black;
 
-  T operator[](Color color) {
+  T operator [](Color color) {
     return (color == Color.WHITE) ? _white : _black;
   }
 
-  void operator[]=(Color color, T value) {
+  void operator []=(Color color, T value) {
     if (color == Color.WHITE) {
       _white = value;
     } else {
@@ -1580,8 +1631,7 @@ class Move {
   final PieceType piece;
   final PieceType captured;
   final PieceType promotion;
-  const Move(this.color, this.from, this.to, this.flags,
-             this.piece, this.captured, this.promotion);
+  const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion);
 }
 
 class State {
@@ -1592,6 +1642,5 @@ class State {
   final int ep_square;
   final int half_moves;
   final int move_number;
-  const State(this.move, this.kings, this.turn, this.castling,
-              this.ep_square, this.half_moves, this.move_number);
+  const State(this.move, this.kings, this.turn, this.castling, this.ep_square, this.half_moves, this.move_number);
 }
