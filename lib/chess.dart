@@ -1491,8 +1491,7 @@ class Chess {
 
     if (move is String) {
       /* convert the move string to a move object */
-      for (var i = 0,
-          len = moves.length; i < len; i++) {
+      for (int i = 0; i < moves.length; i++) {
         if (move == move_to_san(moves[i])) {
           move_obj = moves[i];
           break;
@@ -1500,8 +1499,7 @@ class Chess {
       }
     } else if (move is Map) {
       /* convert the pretty move object to an ugly move object */
-      for (var i = 0,
-          len = moves.length; i < len; i++) {
+      for (var i = 0; i < moves.length; i++) {
         if (move['from'] == algebraic(moves[i].from) && move['to'] == algebraic(moves[i].to) && move['promotion'] == moves[i].promotion) {
           move_obj = moves[i];
           break;
@@ -1632,6 +1630,8 @@ class Move {
   final PieceType captured;
   final PieceType promotion;
   const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion);
+  
+  
 }
 
 class State {
