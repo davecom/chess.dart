@@ -1445,7 +1445,7 @@ class Chess {
 
     /* delete empty entries */
     moves = moves.join(',').replaceAll(new RegExp(r",,+"), ',').split(',');
-    var move = '';
+    var move;
 
     for (var half_move = 0; half_move < moves.length - 1; half_move++) {
       move = get_move_obj(moves[half_move]);
@@ -1467,11 +1467,11 @@ class Chess {
         set_header(['Result', move]);
       }
     } else {
-      move = get_move_obj(move);
-      if (move == null) {
+      var moveObj = get_move_obj(move);
+      if (moveObj == null) {
         return false;
       } else {
-        make_move(move);
+        make_move(moveObj);
       }
     }
     return true;

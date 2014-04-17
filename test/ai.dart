@@ -78,10 +78,10 @@ double evaluatePosition(Chess c, Color player) {
     if (c.in_draw) { // draw is a neutral outcome
       return 0.0;
     }
-    if (c.in_checkmate) { // try to avoid mates, and get mates
-      if (c.turn == player) {
+    else { // otherwise must be a mate
+      if (c.turn == player) {  // avoid mates
         return -9999.99;
-      } else {
+      } else {  // go for mating
         return 9999.99;
       }
     }
