@@ -1629,9 +1629,7 @@ class Move {
   final PieceType piece;
   final PieceType captured;
   final PieceType promotion;
-  const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion);
-  
-  
+  const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion); 
 }
 
 class State {
