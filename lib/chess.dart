@@ -707,12 +707,12 @@ class Chess {
 
       if ((flags & (BITS_CAPTURE | BITS_EP_CAPTURE)) != 0) {
         if (move.piece == PAWN) {
-          output += algebraic(move.from)[0];
+          output += move.fromAlgebraic[0];
         }
         output += 'x';
       }
 
-      output += algebraic(move.to);
+      output += move.toAlgebraic;
 
       if ((flags & BITS_PROMOTION) != 0) {
         output += '=' + move.promotion.toUpperCase();
@@ -1114,25 +1114,25 @@ class Chess {
   }
 
   // Utility Functions
-  int rank(int i) {
+  static int rank(int i) {
     return i >> 4;
   }
 
-  int file(int i) {
+  static int file(int i) {
     return i & 15;
   }
 
-  String algebraic(int i) {
+  static String algebraic(int i) {
     var f = file(i),
         r = rank(i);
     return 'abcdefgh'.substring(f, f + 1) + '87654321'.substring(r, r + 1);
   }
 
-  Color swap_color(Color c) {
+  static Color swap_color(Color c) {
     return c == WHITE ? BLACK : WHITE;
   }
 
-  bool is_digit(String c) {
+  static bool is_digit(String c) {
     return '0123456789'.contains(c);
   }
 
@@ -1140,8 +1140,8 @@ class Chess {
   Map make_pretty(Move ugly_move) {
     Map map = {};
     map['san'] = move_to_san(ugly_move);
-    map['to'] = algebraic(ugly_move.to);
-    map['from'] = algebraic(ugly_move.from);
+    map['to'] = ugly_move.toAlgebraic;
+    map['from'] = ugly_move.fromAlgebraic;
     map['captured'] = ugly_move.captured;
 
     var flags = '';
@@ -1203,7 +1203,7 @@ class Chess {
   ///  'k' - kingside castling
   ///  'q' - queenside castling
   ///  A flag of 'pc' would mean that a pawn captured a piece on the 8th rank and promoted.
-  ///  
+  ///
   ///  If "asObjects" is set to true in the options Map, then it returns a List<Move>
   List moves([Map options]) {
     /* The internal representation of a chess move is in 0x88 format, and
@@ -1500,7 +1500,7 @@ class Chess {
     } else if (move is Map) {
       /* convert the pretty move object to an ugly move object */
       for (var i = 0; i < moves.length; i++) {
-        if (move['from'] == algebraic(moves[i].from) && move['to'] == algebraic(moves[i].to)
+        if (move['from'] == moves[i].fromAlgebraic && move['to'] == moves[i].toAlgebraic
             && (moves[i].promotion == null || move['promotion'] == moves[i].promotion.name)) {
           move_obj = moves[i];
           break;
@@ -1630,7 +1630,15 @@ class Move {
   final PieceType piece;
   final PieceType captured;
   final PieceType promotion;
-  const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion); 
+  const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion);
+
+  String get fromAlgebraic {
+    return Chess.algebraic(from);
+  }
+
+  String get toAlgebraic {
+    return Chess.algebraic(to);
+  }
 }
 
 class State {
