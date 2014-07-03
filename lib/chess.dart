@@ -1500,7 +1500,8 @@ class Chess {
     } else if (move is Map) {
       /* convert the pretty move object to an ugly move object */
       for (var i = 0; i < moves.length; i++) {
-        if (move['from'] == algebraic(moves[i].from) && move['to'] == algebraic(moves[i].to) && move['promotion'] == moves[i].promotion.name) {
+        if (move['from'] == algebraic(moves[i].from) && move['to'] == algebraic(moves[i].to)
+            && (moves[i].promotion == null || move['promotion'] == moves[i].promotion.name)) {
           move_obj = moves[i];
           break;
         }
