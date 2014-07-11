@@ -768,7 +768,7 @@ void main() {
     positions.forEach((position) {
 
       test(position['fen'] + ' (valid: ' + (position['error_number']  == 0).toString() + ')', () {
-        var result = validate_fen(position['fen']);
+        var result = Chess.validate_fen(position['fen']);
         expect(result['error_number'], equals(position['error_number']));
       });
 
