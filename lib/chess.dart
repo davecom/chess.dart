@@ -250,7 +250,7 @@ class Chess {
 
   /// Check the formatting of a FEN String is correct
   /// Returns a Map with keys valid, error_number, and error
-  Map validate_fen(fen) {
+  static Map validate_fen(fen) {
     Map errors = {
       0: 'No errors.',
       1: 'FEN string must contain six space-delimited fields.',
