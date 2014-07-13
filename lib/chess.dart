@@ -250,7 +250,7 @@ class Chess {
 
   /// Check the formatting of a FEN String is correct
   /// Returns a Map with keys valid, error_number, and error
-  Map validate_fen(fen) {
+  static Map validate_fen(fen) {
     Map errors = {
       0: 'No errors.',
       1: 'FEN string must contain six space-delimited fields.',
@@ -276,8 +276,8 @@ class Chess {
     }
 
     /* 2nd criterion: move number field is a integer value > 0? */
-    try {
-      int temp = int.parse(tokens[5]);
+    int temp = int.parse(tokens[5], onError: (String) => null);
+    if (temp != null) {
       if (temp <= 0) {
         return {
           'valid': false,
@@ -285,7 +285,7 @@ class Chess {
           'error': errors[2]
         };
       }
-    } on FormatException {
+    } else {
       return {
         'valid': false,
         'error_number': 2,
@@ -294,8 +294,8 @@ class Chess {
     }
 
     /* 3rd criterion: half move counter is an integer >= 0? */
-    try {
-      int temp = int.parse(tokens[4]);
+    temp = int.parse(tokens[4], onError: (String) => null);
+    if (temp != null) {
       if (temp < 0) {
         return {
           'valid': false,
@@ -303,7 +303,7 @@ class Chess {
           'error': errors[3]
         };
       }
-    } on FormatException {
+    } else {
       return {
         'valid': false,
         'error_number': 3,
@@ -359,8 +359,8 @@ class Chess {
 
       for (int k = 0; k < rows[i].length; k++) {
 
-        try {
-          int temp2 = int.parse(rows[i][k]);
+        int temp2 = int.parse(rows[i][k], onError: (String) => null);
+        if (temp2 != null) {
           if (previous_was_number) {
             return {
               'valid': false,
@@ -370,7 +370,7 @@ class Chess {
           }
           sum_fields += temp2;
           previous_was_number = true;
-        } on FormatException {
+        } else {
           RegExp checkOM = new RegExp(r"^[prnbqkPRNBQK]$");
           if (checkOM.firstMatch(rows[i][k]) == null) {
             return {
