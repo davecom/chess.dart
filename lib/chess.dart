@@ -609,7 +609,7 @@ class Chess {
 
         /* pawn captures */
         for (int j = 2; j < 4; j++) {
-          var square = i + PAWN_OFFSETS[us][j];
+          int square = i + PAWN_OFFSETS[us][j];
           if ((square & 0x88) != 0) continue;
 
           if (board[square] != null && board[square].color == them) {
@@ -1643,9 +1643,9 @@ class Move {
 
 class State {
   final Move move;
-  final ColorMap kings;
+  final ColorMap<int> kings;
   final Color turn;
-  final ColorMap castling;
+  final ColorMap<int> castling;
   final int ep_square;
   final int half_moves;
   final int move_number;
