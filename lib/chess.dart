@@ -170,6 +170,20 @@ class Chess {
     load(fen);
   }
 
+  /// Deep copy of the current Chess instance
+  Chess copy() {
+    return new Chess()
+      ..board = new List<Piece>.from(this.board)
+      ..kings = new ColorMap<int>.clone(this.kings)
+      ..turn = new Color._internal(this.turn.value)
+      ..castling = new ColorMap<int>.clone(this.castling)
+      ..ep_square = this.ep_square
+      ..half_moves = this.half_moves
+      ..move_number = this.move_number
+      ..history = new List<State>.from(this.history)
+      ..header = new Map.from(this.header);
+  }
+
   /// Reset all of the instance variables
   clear() {
     board = new List(128);
