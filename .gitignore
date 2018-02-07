@@ -2,3 +2,4 @@
 packages
 .project
 pubspec.lock
+.packages
