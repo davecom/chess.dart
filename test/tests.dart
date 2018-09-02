@@ -1,5 +1,5 @@
 import "package:chess/chess.dart";
-import 'package:unittest/unittest.dart';
+import "package:test/test.dart";
 
 void main() {
   group("Perft", () {
@@ -366,7 +366,7 @@ void main() {
     positions.forEach( (position) {
       Chess chess = new Chess();
 
-      test(position['fen'] + ' (' + position['should_pass'].toString() + ')', () {
+      test(position['fen'].toString() + ' (' + position['should_pass'].toString() + ')', () {
         chess.load(position['fen']);
         expect((chess.fen == position['fen']) == position['should_pass'], isTrue);
       });
