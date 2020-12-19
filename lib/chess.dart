@@ -175,7 +175,7 @@ class Chess {
     return new Chess()
       ..board = new List<Piece>.from(this.board)
       ..kings = new ColorMap<int>.clone(this.kings)
-      ..turn = new Color._internal(this.turn.value)
+      ..turn = this.turn
       ..castling = new ColorMap<int>.clone(this.castling)
       ..ep_square = this.ep_square
       ..half_moves = this.half_moves
@@ -468,8 +468,9 @@ class Chess {
       cflags = '-';
     }
     String epflags = (ep_square == EMPTY) ? '-' : algebraic(ep_square);
+    String turnStr = (turn == Color.WHITE) ? 'w' : 'b';
 
-    return [fen, turn, cflags, epflags, half_moves, move_number].join(' ');
+    return [fen, turnStr, cflags, epflags, half_moves, move_number].join(' ');
   }
 
   /// Updates [header] with the List of args and returns it
@@ -1607,15 +1608,9 @@ class PieceType {
   String toUpperCase() => name.toUpperCase();
 }
 
-class Color {
-  final int value;
-  const Color._internal(this.value);
-
-  static const Color WHITE = const Color._internal(0);
-  static const Color BLACK = const Color._internal(1);
-
-  int get hashCode => value;
-  String toString() => (this == WHITE) ? 'w' : 'b';
+enum Color {
+  WHITE,
+  BLACK
 }
 
 class ColorMap<T> {
