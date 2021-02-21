@@ -175,7 +175,7 @@ class Chess {
     return new Chess()
       ..board = new List<Piece>.from(this.board)
       ..kings = new ColorMap<int>.clone(this.kings)
-      ..turn = new Color._internal(this.turn.value)
+      ..turn = this.turn
       ..castling = new ColorMap<int>.clone(this.castling)
       ..ep_square = this.ep_square
       ..half_moves = this.half_moves
@@ -468,8 +468,9 @@ class Chess {
       cflags = '-';
     }
     String epflags = (ep_square == EMPTY) ? '-' : algebraic(ep_square);
+    String turnStr = (turn == Color.WHITE) ? 'w' : 'b';
 
-    return [fen, turn, cflags, epflags, half_moves, move_number].join(' ');
+    return [fen, turnStr, cflags, epflags, half_moves, move_number].join(' ');
   }
 
   /// Updates [header] with the List of args and returns it
@@ -1260,29 +1261,8 @@ class Chess {
     return generate_fen();
   }
 
-  /// Return the PGN representation of the game thus far
-  pgn([Map options]) {
-    /* using the specification from http://www.chessclub.com/help/PGN-spec
-       * example for html usage: .pgn({ max_width: 72, newline_char: "<br />" })
-       */
-    var newline = (options != null && options.containsKey("newline_char") && options["newline_char"] != null) ? options['newline_char'] : '\n';
-    var max_width = (options != null && options.containsKey("max_width") && options["max_width"] != null) ? options["max_width"] : 0;
-    var result = [];
-    var header_exists = false;
-
-    /* add the PGN header headerrmation */
-    for (var i in header.keys) {
-      /* TODO: order of enumerated properties in header object is not
-         * guaranteed, see ECMA-262 spec (section 12.6.4)
-         */
-      result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
-      header_exists = true;
-    }
-
-    if (header_exists && (history.length != 0)) {
-      result.add(newline);
-    }
-
+  /// return the san string representation of each move in history. Each string corresponds to one move.
+  List<String> san_moves() {
     /* pop all of history onto reversed_history */
     List<Move> reversed_history = [];
     while (history.length > 0) {
@@ -1324,9 +1304,35 @@ class Chess {
       moves.add(header['Result']);
     }
 
-    /* history should be back to what is was before we started generating PGN,
-       * so join together moves
+    return moves;
+  }
+
+  /// Return the PGN representation of the game thus far
+  pgn([Map options]) {
+    /* using the specification from http://www.chessclub.com/help/PGN-spec
+       * example for html usage: .pgn({ max_width: 72, newline_char: "<br />" })
        */
+    var newline = (options != null && options.containsKey("newline_char") && options["newline_char"] != null) ? options['newline_char'] : '\n';
+    var max_width = (options != null && options.containsKey("max_width") && options["max_width"] != null) ? options["max_width"] : 0;
+    var result = [];
+    var header_exists = false;
+
+    /* add the PGN header headerrmation */
+    for (var i in header.keys) {
+      /* TODO: order of enumerated properties in header object is not
+         * guaranteed, see ECMA-262 spec (section 12.6.4)
+         */
+      result.add('[' + i.toString() + ' \"' + header[i].toString() + '\"]' + newline);
+      header_exists = true;
+    }
+
+    if (header_exists && (history.length != 0)) {
+      result.add(newline);
+    }
+
+    List<String> moves = san_moves();
+    
+
     if (max_width == 0) {
       return result.join('') + moves.join(' ');
     }
@@ -1602,15 +1608,9 @@ class PieceType {
   String toUpperCase() => name.toUpperCase();
 }
 
-class Color {
-  final int value;
-  const Color._internal(this.value);
-
-  static const Color WHITE = const Color._internal(0);
-  static const Color BLACK = const Color._internal(1);
-
-  int get hashCode => value;
-  String toString() => (this == WHITE) ? 'w' : 'b';
+enum Color {
+  WHITE,
+  BLACK
 }
 
 class ColorMap<T> {
