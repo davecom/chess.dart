@@ -314,7 +314,7 @@ void main() {
         if (passed) {
           /* remove the pieces */
           for (var square in Chess.SQUARES.keys) {
-            Piece piece = chess.remove(square);
+            Piece? piece = chess.remove(square);
             if ((!(position['pieces'].containsKey(square))) && piece != null) {
               passed = false;
               break;
@@ -367,7 +367,7 @@ void main() {
       Chess chess = new Chess();
 
       test(position['fen'].toString() + ' (' + position['should_pass'].toString() + ')', () {
-        chess.load(position['fen']);
+        chess.load(position['fen'] as String);
         expect((chess.fen == position['fen']) == position['should_pass'], isTrue);
       });
 
@@ -379,8 +379,8 @@ void main() {
 
   group("PGN", () {
 
-    bool passed = true;
-    var error_message;
+    //bool passed = true;
+    //var error_message;
     List positions = [
       {'moves': ['d4', 'd5', 'Nf3', 'Nc6', 'e3', 'e6', 'Bb5', 'g5', 'O-O', 'Qf6', 'Nc3',
                'Bd7', 'Bxc6', 'Bxc6', 'Re1', 'O-O-O', 'a4', 'Bb4', 'a5', 'b5', 'axb6',
@@ -428,7 +428,7 @@ void main() {
         bool passed = true;
         String error_message = "";
         for (int j = 0; j < position['moves'].length; j++) {
-          if (chess.move(position['moves'][j]) == null) {
+          if (!chess.move(position['moves'][j])) {
             error_message = "move() did not accept " + position['moves'][j] + " : ";
             break;
           }
@@ -639,7 +639,7 @@ void main() {
 
   group("Validate FEN", () {
 
-    Chess chess = new Chess();
+    //Chess chess = new Chess();
     List positions = [
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNRw KQkq - 0 1',   'error_number': 1},
       {'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 x',  'error_number': 2},

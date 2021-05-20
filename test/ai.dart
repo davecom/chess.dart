@@ -6,14 +6,14 @@ import "dart:math";
 import "package:chess/chess.dart";
 
 // find the best move using simple alphaBeta
-Move findBestMove(Chess chess) {
+Move? findBestMove(Chess chess) {
   const int PLY = 4;
   Color toPlay = chess.turn;
-  List<List> moveEvalPairs = new List<List>();
+  List<List> moveEvalPairs = [];
 
   for (Move m in chess.moves({
     "asObjects": true
-  })) {
+  }) as Iterable<Move>) {
     chess.move(m);
     double eval = alphaBeta(new Chess.fromFEN(chess.fen), PLY, -9999999.0, 9999999.0, toPlay);
     moveEvalPairs.add([m, eval]);
@@ -21,7 +21,7 @@ Move findBestMove(Chess chess) {
   }
 
   double highestEval = -9999999.0;
-  Move bestMove = null;
+  Move? bestMove = null;
 
   for (List l in moveEvalPairs) {
     if (l[1] > highestEval) {
@@ -44,7 +44,7 @@ double alphaBeta(Chess c, int depth, double alpha, double beta, Color player) {
     // go through all legal moves
     for (Move m in c.moves({
       "asObjects": true
-    })) {
+    }) as Iterable<Move>) {
       c.move(m);
       alpha = max(alpha, alphaBeta(c, depth - 1, alpha, beta, player));
       if (beta <= alpha) {
@@ -57,7 +57,7 @@ double alphaBeta(Chess c, int depth, double alpha, double beta, Color player) {
   } else { // opponent ist he player
     for (Move m in c.moves({
       "asObjects": true
-    })) {
+    }) as Iterable<Move>) {
       c.move(m);
       beta = min(beta, alphaBeta(c, depth - 1, alpha, beta, player));
       if (beta <= alpha) {
@@ -97,7 +97,7 @@ double evaluatePosition(Chess c, Color player) {
         continue;
       }
 
-      Piece piece = c.board[i];
+      Piece? piece = c.board[i];
       if (piece != null) {
         evaluation += (piece.color == player) ? pieceValues[piece.type] : -pieceValues[piece.type];
       }
@@ -114,14 +114,14 @@ void main() {
   while (!chess.game_over) {
     print(chess.ascii);
     print("What would you like to play?");
-    String playerMove = stdin.readLineSync();
+    String? playerMove = stdin.readLineSync();
     if (chess.move(playerMove) == false) {
       print("Could not understand your move or it's illegal. Moves should be in SAN format.");
       continue;
     }
     print("Computer thinking...");
 
-    Move compMove = findBestMove(chess);
+    Move? compMove = findBestMove(chess);
     chess.move(compMove);
     //print('Computer Played: ' + chess.move_to_san(compMove));
   }
