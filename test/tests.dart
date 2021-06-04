@@ -314,7 +314,7 @@ void main() {
         if (passed) {
           /* remove the pieces */
           for (var square in Chess.SQUARES.keys) {
-            Piece piece = chess.remove(square);
+            Piece? piece = chess.remove(square);
             if ((!(position['pieces'].containsKey(square))) && piece != null) {
               passed = false;
               break;
@@ -367,7 +367,7 @@ void main() {
       Chess chess = new Chess();
 
       test(position['fen'].toString() + ' (' + position['should_pass'].toString() + ')', () {
-        chess.load(position['fen']);
+        chess.load(position['fen'] as String);
         expect((chess.fen == position['fen']) == position['should_pass'], isTrue);
       });
 
