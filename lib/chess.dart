@@ -227,7 +227,7 @@ class Chess {
         square += int.parse(piece);
       } else {
         Color color = (piece == piece.toUpperCase()) ? WHITE : BLACK;
-        PieceType? type = PIECE_TYPES[piece.toLowerCase()];
+        PieceType type = PIECE_TYPES[piece.toLowerCase()]!;
         put(new Piece(type, color), algebraic(square));
         square++;
       }
@@ -432,7 +432,7 @@ class Chess {
         Color color = board[i]!.color;
         PieceType? type = board[i]!.type;
 
-        fen += (color == WHITE) ? type!.toUpperCase() : type!.toLowerCase();
+        fen += (color == WHITE) ? type.toUpperCase() : type.toLowerCase();
       }
 
       if (((i + 1) & 0x88) != 0) {
@@ -509,7 +509,7 @@ class Chess {
   /// Put [piece] on [square]
   bool put(Piece piece, String? square) {
     /* check for piece */
-    if (SYMBOLS.indexOf(piece.type!.toLowerCase()) == -1) {
+    if (SYMBOLS.indexOf(piece.type.toLowerCase()) == -1) {
       return false;
     }
 
@@ -635,8 +635,8 @@ class Chess {
         }
       } else {
         for (int j = 0,
-            len = PIECE_OFFSETS[piece.type!]!.length; j < len; j++) {
-          var offset = PIECE_OFFSETS[piece.type!]![j];
+            len = PIECE_OFFSETS[piece.type]!.length; j < len; j++) {
+          var offset = PIECE_OFFSETS[piece.type]![j];
           var square = i;
 
           while (true) {
@@ -717,7 +717,7 @@ class Chess {
       var disambiguator = get_disambiguator(move);
 
       if (move.piece != PAWN) {
-        output += move.piece!.toUpperCase() + disambiguator;
+        output += move.piece.toUpperCase() + disambiguator;
       }
 
       if ((flags & (BITS_CAPTURE | BITS_EP_CAPTURE)) != 0) {
@@ -761,7 +761,7 @@ class Chess {
 
       var difference = i - square;
       var index = difference + 119;
-      PieceType type = piece.type!;
+      PieceType type = piece.type;
 
       if ((ATTACKS[index] & (1 << type.shift)) != 0) {
         if (type == PAWN) {
@@ -916,7 +916,7 @@ class Chess {
 
     /* if pawn promotion, replace with new piece */
     if ((move.flags & BITS_PROMOTION) != 0) {
-      board[move.to] = new Piece(move.promotion, us);
+      board[move.to] = new Piece(move.promotion!, us);
     }
 
     /* if we moved the king */
@@ -1011,7 +1011,7 @@ class Chess {
     board[move.to] = null;
 
     if ((move.flags & BITS_CAPTURE) != 0) {
-      board[move.to] = new Piece(move.captured, them);
+      board[move.to] = new Piece(move.captured!, them);
     } else if ((move.flags & BITS_EP_CAPTURE) != 0) {
       var index;
       if (us == BLACK) {
@@ -1108,9 +1108,9 @@ class Chess {
       if (board[i] == null) {
         s += ' . ';
       } else {
-        PieceType? type = board[i]!.type;
+        PieceType type = board[i]!.type;
         Color color = board[i]!.color;
-        var symbol = (color == WHITE) ? type!.toUpperCase() : type!.toLowerCase();
+        var symbol = (color == WHITE) ? type.toUpperCase() : type.toLowerCase();
         s += ' ' + symbol + ' ';
       }
 
@@ -1582,7 +1582,7 @@ class Chess {
 }
 
 class Piece {
-  PieceType? type;
+  PieceType type;
   final Color color;
   Piece(this.type, this.color);
 }
@@ -1638,7 +1638,7 @@ class Move {
   final int from;
   final int to;
   final int flags;
-  final PieceType? piece;
+  final PieceType piece;
   final PieceType? captured;
   final PieceType? promotion;
   const Move(this.color, this.from, this.to, this.flags, this.piece, this.captured, this.promotion);
