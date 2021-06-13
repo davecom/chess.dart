@@ -507,7 +507,7 @@ class Chess {
   }
 
   /// Put [piece] on [square]
-  bool put(Piece piece, String? square) {
+  bool put(Piece piece, String square) {
     /* check for piece */
     if (SYMBOLS.indexOf(piece.type.toLowerCase()) == -1) {
       return false;
@@ -579,8 +579,8 @@ class Chess {
     second_rank[BLACK] = RANK_7;
     second_rank[WHITE] = RANK_2;
 
-    int? first_sq = SQUARES_A8;
-    int? last_sq = SQUARES_H1;
+    int first_sq = SQUARES_A8;
+    int last_sq = SQUARES_H1;
     bool single_square = false;
 
     /* do we want legal moves? */
@@ -597,7 +597,7 @@ class Chess {
       }
     }
 
-    for (int i = first_sq!; i <= last_sq!; i++) {
+    for (int i = first_sq; i <= last_sq; i++) {
       /* did we run off the end of the board */
       if ((i & 0x88) != 0) {
         i += 7;
