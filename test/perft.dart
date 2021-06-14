@@ -5,7 +5,7 @@ class PerftBenchmark extends BenchmarkBase {
   final String fen;
   final int depth;
   final int nodes;
-  Chess chess;
+  Chess? chess;
 
   PerftBenchmark(String fen, this.depth, this.nodes)
       : this.fen = fen
@@ -13,7 +13,7 @@ class PerftBenchmark extends BenchmarkBase {
 
   setup() {
     chess = new Chess();
-    chess.load(fen);
+    chess!.load(fen);
   }
 
   teardown() {
@@ -21,7 +21,7 @@ class PerftBenchmark extends BenchmarkBase {
   }
 
   run() {
-    int result = chess.perft(depth);
+    int result = chess!.perft(depth);
     if (result != nodes) {
       throw 'Wrong result: Expected <$nodes> but got <$result>.';
     }
@@ -43,7 +43,7 @@ void main() {
         'rnbqkbnr/p3pppp/2p5/1pPp4/3P4/8/PP2PPPP/RNBQKBNR w KQkq b6 0 4',
         3, 23509)
   ];
-  for (BenchmarkBase perft in perfts) {
+  for (BenchmarkBase perft in perfts as Iterable<BenchmarkBase>) {
     perft.report();
   }
 }
