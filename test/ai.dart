@@ -1,29 +1,29 @@
 // Example of a simple chess AI in Dart using chess.dart
 // The user plays white by default.
 
-import "dart:io";
-import "dart:math";
-import "package:chess/chess.dart";
+import 'dart:io';
+import 'dart:math';
+import 'package:chess/chess.dart';
 
 // find the best move using simple alphaBeta
 Move? findBestMove(Chess chess) {
-  const int PLY = 4;
-  Color toPlay = chess.turn;
-  List<List> moveEvalPairs = [];
+  const PLY = 4;
+  final toPlay = chess.turn;
+  final moveEvalPairs = <List>[];
 
-  for (Move m in chess.moves({
-    "asObjects": true
+  for (final m in chess.moves({
+    'asObjects': true
   }) as Iterable<Move>) {
     chess.move(m);
-    double eval = alphaBeta(new Chess.fromFEN(chess.fen), PLY, -9999999.0, 9999999.0, toPlay);
+    final eval = alphaBeta(Chess.fromFEN(chess.fen), PLY, -9999999.0, 9999999.0, toPlay);
     moveEvalPairs.add([m, eval]);
     chess.undo();
   }
 
-  double highestEval = -9999999.0;
-  Move? bestMove = null;
+  var highestEval = -9999999.0;
+  Move? bestMove;
 
-  for (List l in moveEvalPairs) {
+  for (final l in moveEvalPairs) {
     if (l[1] > highestEval) {
       highestEval = l[1];
       bestMove = l[0];
@@ -42,8 +42,8 @@ double alphaBeta(Chess c, int depth, double alpha, double beta, Color player) {
   // if the computer is the current player
   if (c.turn == player) {
     // go through all legal moves
-    for (Move m in c.moves({
-      "asObjects": true
+    for (final m in c.moves({
+      'asObjects': true
     }) as Iterable<Move>) {
       c.move(m);
       alpha = max(alpha, alphaBeta(c, depth - 1, alpha, beta, player));
@@ -55,8 +55,8 @@ double alphaBeta(Chess c, int depth, double alpha, double beta, Color player) {
     }
     return alpha;
   } else { // opponent ist he player
-    for (Move m in c.moves({
-      "asObjects": true
+    for (final m in c.moves({
+      'asObjects': true
     }) as Iterable<Move>) {
       c.move(m);
       beta = min(beta, alphaBeta(c, depth - 1, alpha, beta, player));
@@ -70,7 +70,7 @@ double alphaBeta(Chess c, int depth, double alpha, double beta, Color player) {
   }
 }
 
-const Map pieceValues = const {PieceType.PAWN: 1, PieceType.KNIGHT: 3, PieceType.BISHOP: 3.5, PieceType.ROOK: 5, PieceType.QUEEN: 9, PieceType.KING: 10};
+const Map pieceValues = {PieceType.PAWN: 1, PieceType.KNIGHT: 3, PieceType.BISHOP: 3.5, PieceType.ROOK: 5, PieceType.QUEEN: 9, PieceType.KING: 10};
 
 // simple material based evaluation
 double evaluatePosition(Chess c, Color player) {
@@ -88,16 +88,16 @@ double evaluatePosition(Chess c, Color player) {
   } else {
 
     // otherwise do a simple material evaluation
-    double evaluation = 0.0;
+    var evaluation = 0.0;
     var sq_color = 0;
-    for (int i = Chess.SQUARES_A8; i <= Chess.SQUARES_H1; i++) {
+    for (var i = Chess.SQUARES_A8; i <= Chess.SQUARES_H1; i++) {
       sq_color = (sq_color + 1) % 2;
       if ((i & 0x88) != 0) {
         i += 7;
         continue;
       }
 
-      Piece? piece = c.board[i];
+      final piece = c.board[i];
       if (piece != null) {
         evaluation += (piece.color == player) ? pieceValues[piece.type] : -pieceValues[piece.type];
       }
@@ -110,33 +110,33 @@ double evaluatePosition(Chess c, Color player) {
 
 
 void main() {
-  Chess chess = new Chess();
+  final chess = Chess();
   while (!chess.game_over) {
     print(chess.ascii);
-    print("What would you like to play?");
-    String? playerMove = stdin.readLineSync();
+    print('What would you like to play?');
+    final playerMove = stdin.readLineSync();
     if (chess.move(playerMove) == false) {
       print("Could not understand your move or it's illegal. Moves should be in SAN format.");
       continue;
     }
-    print("Computer thinking...");
+    print('Computer thinking...');
 
-    Move? compMove = findBestMove(chess);
+    final compMove = findBestMove(chess);
     chess.move(compMove);
     //print('Computer Played: ' + chess.move_to_san(compMove));
   }
 
   print(chess.ascii);
   if (chess.in_checkmate) {
-    print("Checkmate");
+    print('Checkmate');
   }
   if (chess.in_stalemate) {
-    print("Stalemate");
+    print('Stalemate');
   }
   if (chess.in_draw) {
-    print("Draw");
+    print('Draw');
   }
   if (chess.insufficient_material) {
-    print("Insufficient Material");
+    print('Insufficient Material');
   }
 }

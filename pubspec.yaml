@@ -5,6 +5,7 @@ homepage: https://github.com/davecom/chess.dart
 dev_dependencies:
   benchmark_harness: ^2.0.0
   test: '>=1.2.0 <2.0.0'
+  pedantic: ^1.11.0
 environment:
   sdk: '>=2.12.0-0 <3.0.0'
 
