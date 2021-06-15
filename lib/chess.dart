@@ -1397,7 +1397,7 @@ class Chess {
     Map<String, String> parse_pgn_header(header, [Map? options]) {
       final newline_char = (options != null && options.containsKey('newline_char')) ? options['newline_char'] : '\r?\n';
       final header_obj = <String, String>{};
-      final headers = header.split(newline_char);
+      final headers = header.split(RegExp(newline_char));
       var key = '';
       var value = '';
 
