@@ -1,7 +1,7 @@
-import "package:chess/chess.dart";
+import 'package:chess/chess.dart';
 
 void main() {
-  Chess chess = new Chess();
+  final chess = Chess();
   print(chess.ascii);
   while (!chess.game_over) {
     print('position: ' + chess.fen);
@@ -15,15 +15,15 @@ void main() {
   
   print(chess.ascii);
   if (chess.in_checkmate) {
-    print("Checkmate");
+    print('Checkmate');
   }
   if (chess.in_stalemate) {
-    print("Stalemate");
+    print('Stalemate');
   }
   if (chess.in_draw) {
-    print("Draw");
+    print('Draw');
   }
   if (chess.insufficient_material) {
-    print("Insufficient Material");
+    print('Insufficient Material');
   }
 }
