@@ -1,3 +1,6 @@
+### 0.7.0
+- Null safety, style fixes, and bug fixes (Thanks @daniel-mf)
+
 ### 0.6.6
 - Change `Color` from class to enum to fix `copy()` issue with `turn` getting flipped (Thanks @safield) 
 
