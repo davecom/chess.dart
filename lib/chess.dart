@@ -279,6 +279,7 @@ class Chess {
       10: '1st field (piece positions) is invalid [row too large].',
       11: '1st field (piece positions) is invalid [wrong kings counts]',
       12: '1st field (piece positions) is invalid [kings on neighbours cells]',
+      13: '1st field (piece positions) is invalid [pawn(s) on first/last rank]',
     };
 
     /* 1st criterion: 6 space-seperated fields? */
@@ -457,6 +458,24 @@ class Chess {
         'valid': false,
         'error_number': 12,
         'error': errors[12]
+      };
+    }
+
+    /* Any pawn on first or last rank ? */
+    final firstRank = boardPart.split('/')[0];
+    final lastRank = boardPart.split('/')[7];
+
+    final whitePawnOnFirstRank = firstRank.contains('P');
+    final blackPawnOnFirstRank = firstRank.contains('p');
+    final whitePawnOnLastRank = lastRank.contains('P');
+    final blackPawnOnLastRank = lastRank.contains('p');
+
+    if (whitePawnOnFirstRank || whitePawnOnLastRank || 
+    blackPawnOnFirstRank || blackPawnOnLastRank) {
+      return {
+        'valid': false,
+        'error_number': 13,
+        'error': errors[13]
       };
     }
 
