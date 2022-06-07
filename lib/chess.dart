@@ -264,7 +264,7 @@ class Chess {
 
   /// Check the formatting of a FEN String is correct
   /// Returns a Map with keys valid, error_number, and error
-  static Map validate_fen(fen) {
+  static Map validate_fen(String fen) {
     const errors = {
       0: 'No errors.',
       1: 'FEN string must contain six space-delimited fields.',
@@ -277,6 +277,9 @@ class Chess {
       8: '1st field (piece positions) is invalid [consecutive numbers].',
       9: '1st field (piece positions) is invalid [invalid piece].',
       10: '1st field (piece positions) is invalid [row too large].',
+      11: '1st field (piece positions) is invalid [wrong kings counts]',
+      12: '1st field (piece positions) is invalid [kings on neighbours cells]',
+      13: '1st field (piece positions) is invalid [pawn(s) on first/last rank]',
     };
 
     /* 1st criterion: 6 space-seperated fields? */
@@ -406,6 +409,74 @@ class Chess {
           'error': errors[10]
         };
       }
+    }
+
+    final boardPart = fen.split(' ')[0];
+
+    /* Is white and black kings' count legal (except for empty board) ? */
+    final isEmptyBoard = boardPart == '8/8/8/8/8/8/8/8';
+    final whiteKingCount = boardPart.split('').where((elem) => elem == 'K').length;
+    final blackKingCount = boardPart.split('').where((elem) => elem == 'k').length;
+
+    if (!isEmptyBoard && (whiteKingCount != 1 || blackKingCount != 1)) {
+      return {
+        'valid': false,
+        'error_number': 11,
+        'error': errors[11]
+      };
+    }
+
+    /* Are both kings on neighbours cells ? */
+    // Computes a kind of 'expanded' FEN : cells are translated as underscores,
+    //  and removing all slashes.
+    final expandedFen = boardPart.split('').fold<String>('', (accum, curr) {
+      final digitValue = int.tryParse(curr);
+      if (curr == '/') {
+        return accum;
+      } else if (digitValue != null) {
+        var result = '';
+        for (var i = 0; i < digitValue; i++) {
+          result += '_';
+        }
+        return accum + result;
+      }
+      else {
+        return accum + curr;
+      }
+    });
+    final whiteKingIndex = expandedFen.indexOf('K');
+    final blackKingIndex = expandedFen.indexOf('k');
+    final whiteKingCoords = [whiteKingIndex % 8, whiteKingIndex ~/ 8];
+    final blackKingCoords = [blackKingIndex % 8, blackKingIndex ~/ 8];
+
+    final deltaX = (whiteKingCoords[0] - blackKingCoords[0]).abs();
+    final deltaY = (whiteKingCoords[1] - blackKingCoords[1]).abs();
+
+    final kingsTooClose = (deltaX <= 1) && (deltaY <= 1);
+    if (!isEmptyBoard && kingsTooClose) {
+      return {
+        'valid': false,
+        'error_number': 12,
+        'error': errors[12]
+      };
+    }
+
+    /* Any pawn on first or last rank ? */
+    final firstRank = boardPart.split('/')[0];
+    final lastRank = boardPart.split('/')[7];
+
+    final whitePawnOnFirstRank = firstRank.contains('P');
+    final blackPawnOnFirstRank = firstRank.contains('p');
+    final whitePawnOnLastRank = lastRank.contains('P');
+    final blackPawnOnLastRank = lastRank.contains('p');
+
+    if (whitePawnOnFirstRank || whitePawnOnLastRank || 
+    blackPawnOnFirstRank || blackPawnOnLastRank) {
+      return {
+        'valid': false,
+        'error_number': 13,
+        'error': errors[13]
+      };
     }
 
     /* everything's okay! */

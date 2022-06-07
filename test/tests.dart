@@ -361,6 +361,26 @@ void main() {
 
       /* bad piece (X)*/
       {'fen': '1nbqkbn1/pppp1ppX/8/4p3/4P3/8/PPPP1PPP/1NBQKBN1 b - - 1 2', 'should_pass': false},
+
+      /* no king */
+      {'fen': '8/8/8/4n3/2p5/2P5/4N3/8 b - - 0 40', 'should_pass': false},
+
+      /* 2 white kings */
+      {'fen': '2k5/8/8/4n3/2p5/2P5/4N3/K6K w - - 0 40', 'should_pass': false}, 
+
+      /* 2 black kings */
+      {'fen': '2k5/8/5k2/4n3/2p5/2P5/4N3/7K w - - 0 40', 'should_pass': false},
+
+      /* both kings are on neighbours cells */
+      {'fen': '2k5/3K4/8/4n3/2p5/2P5/4N3/8 w - - 0 40', 'should_pass': false},     
+
+      /* pawn on first rank */
+      {'fen': '8/8/4k3/8/8/2K5/8/4P3 w - - 0 1', 'should_pass': false},
+      {'fen': '8/8/4k3/8/8/2K5/8/p7 w - - 0 1', 'should_pass': false},
+
+      /* pawn on 8th rank */
+      {'fen': '2p5/8/4k3/8/8/2K5/8/8 w - - 0 1', 'should_pass': false},
+      {'fen': '5P2/8/4k3/8/8/2K5/8/8 w - - 0 1', 'should_pass': false},
     ];
 
     positions.forEach( (position) {
