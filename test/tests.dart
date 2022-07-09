@@ -573,7 +573,41 @@ void main() {
 
     });
 
-  // special case dirty file containing a mix of \n and \r\n
+    test('with variations', () {
+      var pgnWithVariations = '''
+        1. e4 c5 2. Nc3 Nc6 (2... d6 3. f4 Nc6 4. Nf3 g6 5. Bb5 Bd7 (5... Bg7) 6. O-O
+        Bg7 7. d3 a6 (7... Nf6) 8. Bxc6 Bxc6 9. Be3 Nf6 10. h3 O-O 11. Qd2; 2... e6 3.
+        Nf3 a6 (3... Nc6 4. d4 cxd4 5. Nxd4 Qc7 (5... a6; 5... d6) 6. Be2 a6 (6... Nf6)
+        7. O-O Nf6 8. Be3 Bb4 (8... Be7) 9. Na4 Be7 (9... O-O 10. Nxc6 bxc6 11. Nb6 Rb8
+        12. Nxc8 Rfxc8 (12... Qxc8 13. e5) 13. Bxa6; 9... Bd6 10. g3 b5 11. Nb6 Rb8
+        (11... Qxb6 12. Nxb5 Bc5 13. Bxc5 Qxc5 14. Nc7+) 12. Nxc8 Rxc8 13. a4) 10. Nxc6
+        bxc6 11. Nb6 Rb8 12. Nxc8 Qxc8 13. Bd4; 3... d6 4. d4 cxd4 5. Nxd4 Nf6 6. Be2
+        Be7 7. O-O O-O 8. f4 Nc6 9. Be3 Bd7 10. Nb3; 3... Nf6 4. e5 Nd5 5. Nxd5 exd5 6.
+        d4 Nc6 7. dxc5 Bxc5 8. Qxd5 Qb6 9. Bc4 Bxf2+ 10. Ke2 O-O 11. Rf1 Bc5 12. Ng5
+        Nd4+ 13. Kd1 Ne6 14. Ne4 d6 15. exd6 Rd8 16. Bd3 Bxd6 17. Nxd6 Qxd6 18. Qf5))
+        3. Nf3 e6 (3... d6 4. d4 cxd4 5. Nxd4 Nf6 6. Bg5; 3... g6; 3... e5; 3... Nf6)
+        4. d4 cxd4 5. Nxd4 Qc7 (5... a6; 5... d6) 6. Be2 a6 (6... Nf6) 7. O-O Nf6 8.
+        Be3 Bb4 (8... Be7) 9. Na4 Be7 (9... O-O 10. Nxc6 bxc6 11. Nb6 Rb8 12. Nxc8
+        Rfxc8 (12... Qxc8 13. e5) 13. Bxa6; 9... Bd6 10. g3 b5 11. Nb6 Rb8 (11... Qxb6
+        12. Nxb5 Bc5 13. Bxc5 Qxc5 14. Nc7+) 12. Nxc8 Rxc8 13. a4) 10. Nxc6 bxc6 11.
+        Nb6 Rb8 12. Nxc8 Qxc8 13. Bd4''';
+      var mainPgn =
+          '1. e4 c5 2. Nc3 Nc6 3. Nf3 e6 4. d4 cxd4 5. Nxd4 Qc7 6. Be2 a6\n'
+          '7. O-O Nf6 8. Be3 Bb4 9. Na4 Be7 10. Nxc6 bxc6 11. Nb6 Rb8\n'
+          '12. Nxc8 Qxc8 13. Bd4';
+
+      var result = chess.load_pgn(pgnWithVariations);
+      expect(result, true);
+
+      expect(
+          chess.pgn({
+            'max_width': 65,
+            'newline_char': '\n',
+          }),
+          equals(mainPgn));
+    });
+
+    // special case dirty file containing a mix of \n and \r\n
     test('dirty pgn', () {
       var pgn =
            '[Event "Reykjavik WCh"]\n'
