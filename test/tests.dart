@@ -1263,6 +1263,14 @@ void main() {
         'fen': 'rnbqkbnr/p1p1p1p1p/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         'error_number': 10
       },
+      {'fen': '8/1p6/2k1K3/8/3K4/8/6P1/8 w - - 0 1', 'error_number': 11},
+      {'fen': '8/8/2knk3/8/8/8/5P2/8 b - - 0 1', 'error_number': 11},
+      {'fen': '8/8/2knk3/8/8/2K5/5P2/8 b - - 0 1', 'error_number': 11},
+      {'fen': '8/8/3n4/8/3k4/2K5/5P2/8 b - - 0 1', 'error_number': 12},
+      {'fen': '6p1/3k1n2/8/8/8/8/3K4/8 w - - 0 1', 'error_number': 13},
+      {'fen': '8/3k1n2/8/8/8/8/3K4/6p1 w - - 0 1', 'error_number': 13},
+      {'fen': '3k4/8/1B6/8/8/8/2K5/8 w - - 0 1', 'error_number': 14},
+      {'fen': '3k4/8/8/8/8/4n3/2K5/8 b - - 0 1', 'error_number': 14},
       {
         'fen': 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
         'error_number': 0

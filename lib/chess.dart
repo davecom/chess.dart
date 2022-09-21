@@ -674,8 +674,8 @@ class Chess {
   }
 
   /// Start with a position from a FEN
-  Chess.fromFEN(String fen) {
-    load(fen);
+  Chess.fromFEN(String fen, {bool check_validity = true}) {
+    load(fen, check_validity: check_validity);
   }
 
   /// Deep copy of the current Chess instance
@@ -712,16 +712,18 @@ class Chess {
   }
 
   /// Load a position from a FEN String
-  bool load(String fen) {
+  bool load(String fen, {bool check_validity = true}) {
     List tokens = fen.split(RegExp(r'\s+'));
     String position = tokens[0];
     var square = 0;
     //String valid = SYMBOLS + '12345678/';
 
-    final validMap = validate_fen(fen);
-    if (!validMap['valid']) {
-      print(validMap['error']);
-      return false;
+    if (check_validity) {
+      final validMap = validate_fen(fen);
+      if (!validMap['valid']) {
+        print(validMap['error']);
+        return false;
+      }
     }
 
     clear();
@@ -788,6 +790,7 @@ class Chess {
       11: '1st field (piece positions) is invalid [wrong kings counts]',
       12: '1st field (piece positions) is invalid [kings on neighbours cells]',
       13: '1st field (piece positions) is invalid [pawn(s) on first/last rank]',
+      14: 'King of opponent player is in check.',
     };
 
     /* 1st criterion: 6 space-seperated fields? */
@@ -926,6 +929,17 @@ class Chess {
         blackPawnOnFirstRank ||
         blackPawnOnLastRank) {
       return {'valid': false, 'error_number': 13, 'error': errors[13]};
+    }
+
+    /* Is king of player in turn in check (without being in checkmate) ? */
+    final board = Chess.fromFEN(fen, check_validity: false);
+    final turn = board.turn;
+    final opponentTurn = turn == Color.WHITE ? Color.BLACK : Color.WHITE;
+    final kingInChess =
+        !board.in_checkmate && board.king_attacked(opponentTurn);
+
+    if (kingInChess) {
+      return {'valid': false, 'error_number': 14, 'error': errors[14]};
     }
 
     /* everything's okay! */
