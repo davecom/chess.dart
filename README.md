@@ -3,9 +3,9 @@ chess.dart
 
 chess.dart is a library for legal chess move generation, maintenance of chess game state, and conversion to and from the formats FEN and PGN.  It has no external dependencies.
 
-It is a port of chess.js to Dart.  It aims to include all of the functionality in the original library, while making the API a little bit more Dart-like. In limited testing, the Dart version (after some refactoring) now outperforms the JavaScript original. 
+In 2014, chess.dart started as a port of chess.js to Dart, including all of the functionality in the original library, while making the API a little bit more Dart-like. It has since accumulated bug fixes and performance improvements thanks to contributions from the Dart community.
 
-At this early stage, it is working, and passes all of the unit tests which come with chess.js (which you can find in the *test* directory). However, beyond this, it is not tested in production.
+chess.dart includes a test suite composed of all of the original chess.js unit tests as well as newer tests specific to bug fixes and feature additions specific to the Dart version (which you can find in the *test* directory). chess.dart is depended upon by multiple popular packages for chess board display.
 
 ## A Random Game
 
