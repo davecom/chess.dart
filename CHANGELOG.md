@@ -1,3 +1,7 @@
+### 0.8.0
+- PGN with annotation variations (thanks @gabriel-amaral)
+- Additional position validity checks (thanks @loloof64)
+
 ### 0.7.0
 - Null safety, style fixes, and bug fixes (Thanks @daniel-mf)
 
