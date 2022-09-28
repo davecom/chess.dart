@@ -7,6 +7,22 @@ In 2014, chess.dart started as a port of chess.js to Dart, including all of the 
 
 chess.dart includes a test suite composed of all of the original chess.js unit tests as well as newer tests specific to bug fixes and feature additions specific to the Dart version (which you can find in the *test* directory). chess.dart is depended upon by multiple popular packages for chess board display.
 
+## Installation
+
+The package is just called `chess` [on pub](https://pub.dev/packages/chess). If for some strange reason you can't use pub, you can also just add the `chess.dart` file from the `lib` directory to your project. Adding the pub package is:
+
+```shell
+ $ dart pub add chess
+```
+
+Or you can manually add `chess` to your `pubspec.yaml`.
+
+Then importing chess.dart in your code is simply:
+
+```dart
+import 'package:chess/chess.dart';
+```
+
 ## A Random Game
 
 ```dart
@@ -50,6 +66,7 @@ dart test/ai.dart
 ```
 
 ## Links
+- [chess on pub.dev](https://pub.dev/packages/chess)
 - [chess.js](https://github.com/jhlywa/chess.js)
 - [Wikipedia's Article on FEN Format](http://en.wikipedia.org/wiki/Forsyth–Edwards_Notation)
 - [Wikipedia's Article on PGN Format](http://en.wikipedia.org/wiki/Portable_Game_Notation)
