@@ -1302,17 +1302,23 @@ class Chess {
       reversed_history.add(undo_move());
     }
 
+    var start_move_number = 1;
+    if (header['FEN'] != null) {
+      final move_number_string = header['FEN'].split(' ')[5];
+      start_move_number = int.parse(move_number_string);
+    }
+
     final moves = <String?>[];
     var move_string = '';
-    var pgn_move_number = 1;
+    var pgn_move_number = start_move_number;
 
     /* build the list of moves.  a move_string looks like: "3. e3 e6" */
     while (reversed_history.isNotEmpty) {
       final move = reversed_history.removeLast()!;
 
-      /* if the position started with black to move, start PGN with 1. ... */
-      if (pgn_move_number == 1 && move.color == BLACK) {
-        move_string = '1. ...';
+      /* if the position started with black to move, start PGN with ${start_move_number}. ... */
+      if (pgn_move_number == start_move_number && move.color == BLACK) {
+        move_string = '$start_move_number. ...';
         pgn_move_number++;
       } else if (move.color == WHITE) {
         /* store the previous generated move_string if we have one */
