@@ -898,6 +898,33 @@ void main() {
       },
       {
         'moves': [
+          'e7+',
+          'Ke8',
+          'Ke6'
+        ],
+        'header': [],
+        'max_width': 80,
+        'starting_position': '3k4/8/3KP3/8/8/8/8/8 w - - 0 42',
+        'pgn':
+            '[SetUp "1"]\n[FEN "3k4/8/3KP3/8/8/8/8/8 w - - 0 42"]\n\n42. e7+ Ke8 43. Ke6',
+        'fen': '4k3/4P3/4K3/8/8/8/8/8 b - - 2 43'
+      },
+      {
+        'moves': [
+          'Ke8',
+          'e7',
+          'Kf7',
+          'Kd7'
+        ],
+        'header': [],
+        'max_width': 80,
+        'starting_position': '3k4/8/3KP3/8/8/8/8/8 b - - 0 39',
+        'pgn':
+            '[SetUp "1"]\n[FEN "3k4/8/3KP3/8/8/8/8/8 b - - 0 39"]\n\n39. ... Ke8 40. e7 Kf7 41. Kd7',
+        'fen': '8/3KPk2/8/8/8/8/8/8 b - - 2 41'
+      },
+      {
+        'moves': [
           'f3',
           'e5',
           'g4',
