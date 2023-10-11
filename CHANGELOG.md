@@ -1,3 +1,6 @@
+### 0.8.1
+- PGN generation considers start move (thanks @loloof64)
+
 ### 0.8.0
 - PGN with annotation variations (thanks @gabriel-amaral)
 - Additional position validity checks (thanks @loloof64)

@@ -54,15 +54,15 @@ chess.dart version 0.6.5 and above requires Dart 2. For Dart 1, use version 0.6.
 The *test* directory contains *tests.dart* which is a port of chess.js's unit tests. The program *random.dart* plays a random game of chess. *ai.dart* is an example of a simple 4 ply alpha beta search for black (yes a simple chess-playing program) that uses a purely material evaluation function (it is rather slow). You can run the unit tests using pub:
 ```dart
 pub get
-pub run test/tests.dart
+dart run test/tests.dart
 ```
 And you can also run performance tests.
 ```dart
-pub run test/perft.dart
+dart run test/perft.dart
 ```
 And, finally you can run the simple AI:
 ```dart
-dart test/ai.dart
+dart run test/ai.dart
 ```
 
 ## Links
