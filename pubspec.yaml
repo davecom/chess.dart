@@ -7,5 +7,5 @@ dev_dependencies:
   test: ^1.17.8
   pedantic: ^1.11.0
 environment:
-  sdk: '>=2.12.0-0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
